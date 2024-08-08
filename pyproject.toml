@@ -12,7 +12,9 @@ dependencies = [
   "matplotlib>=3.9.1",
   "tqdm>=4.66.4",
   "jupyter>=1.0.0",
-  "ipykernel>=6.29.5"
+  "ipykernel>=6.29.5",
+  "torch",
+  "torchvision",
 ]
 
 [build-system]
