@@ -3,21 +3,24 @@ from functools import partial
 
 import jax
 import jax.numpy as jnp
+import numpy as np
 import optax
 import torch
 from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Float, Int, UInt8
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, TensorDataset, Subset
 from torchvision import datasets
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
+from config import MNISTExperimentConfig
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
+from spikegd.theta import ThetaNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
-# %%
+# %%Ö
 ############################
 ### Data loading
 ############################
@@ -61,6 +64,13 @@ def load_data(data: Callable, root: str, config: dict) -> tuple[DataLoader, Data
     # Training set
     train_set = data(root, train=True, download=True)
     train_set = transform_dataset(train_set, partial(transform_image, config=config))
+
+    print("Full train_set shape:", train_set.tensors[0].shape)
+
+    if (Ntrain := config.get("Ntrain")) is not None:
+        train_set = Subset(train_set, np.arange(Ntrain))
+        print(f"Using reduced train_set size of {Ntrain}")
+
     train_loader = DataLoader(train_set, batch_size=Nbatch, shuffle=True)
 
     # Test set
@@ -720,3 +730,29 @@ def plot_traces(ax: Axes, example: dict, config: dict) -> None:
     ax.set_ylim(-8, 8)
     ax.set_ylabel("Potential $V$")
     ax.spines["left"].set_visible(False)
+
+
+def run_single_theta(config: MNISTExperimentConfig) -> dict:
+    """
+    Wrapper to train a network of Theta neurons with the given configuration.
+
+    See docstring of `run` and article for more information.
+    """
+    neuron = ThetaNeuron(config.tau, config.I0, config.eps)
+    metrics = run(neuron, config.model_dump(), progress_bar="notebook")
+    return metrics
+
+
+def run_multiple_thetas(config: MNISTExperimentConfig):
+    key = random.PRNGKey(config.seed)
+    seeds = random.randint(
+        key, (config.Nsample,), 0, jnp.uint32(2**32 - 1), dtype=jnp.uint32
+    )
+    metrics_list = []
+    for seed in seeds:
+        config_theta = config.model_copy(update={"seed": seed})
+        metrics = run_single_theta(config_theta)
+        metrics_list.append(metrics)
+    metrics_example = metrics_list[0]
+    metrics = jax.tree.map(lambda *args: jnp.stack(args), *metrics_list)
+    return metrics
