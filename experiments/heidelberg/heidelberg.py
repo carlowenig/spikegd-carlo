@@ -1,4 +1,3 @@
-from collections.abc import Callable
 from functools import partial
 
 import jax
@@ -7,14 +6,14 @@ import numpy as np
 import optax
 import torch
 from jax import jit, random, value_and_grad, vmap
-from jaxtyping import Array, ArrayLike, Float, Int, UInt8
+from jaxtyping import Array, ArrayLike, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
-from torch.utils.data import DataLoader, Subset, TensorDataset
-from torchvision import datasets
+from torch.utils.data import DataLoader, Subset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
+from shd import SHD
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
@@ -24,46 +23,31 @@ from spikegd.utils.plotting import formatter, petroff10
 ############################
 
 
-def transform_dataset(dataset: datasets.MNIST, transform: Callable) -> TensorDataset:
-    """
-    Applies dataset transformation on whole dataset.
+# def get_h5_arr(file: h5py.File, path: str, dtype=None) -> np.ndarray:
+#     h5_dataset = file[path]
 
-    This speeds up the training significantly as python-multiprocessing does not work
-    together with JAX. Thus one cannot use `num_workers>0` in PyTorch's DataLoader.
+#     assert isinstance(h5_dataset, h5py.Dataset)
 
-    This function does not only work with MNIST but also other derived datasets like
-    FMNIST.
-    """
-    return TensorDataset(transform(dataset.data), dataset.targets)
+#     arr = h5_dataset[:]
 
+#     assert isinstance(arr, np.ndarray)
 
-def transform_image(
-    image: UInt8[torch.Tensor, "Batch Dim Dim"], config: dict
-) -> Int[torch.Tensor, "Batch Dim*Dim"]:
-    """
-    Transforms image pixel values to indices of virtual input neurons.
+#     if dtype is not None:
+#         arr = arr.astype(dtype)
 
-    Specifically, the pixel values are binned, with each bin corresponding to an input
-    spike time except for the last bin, which is ignored. Each input spike time is
-    assigned to a virtual input neuron, whose effect summarizes the effects of all
-    actual input neurons that code for the pixels in the bin (quantization).
-    """
-    Nin_virtual: int = config["Nin_virtual"]
-    neurons_in = (255 - torch.flatten(image, start_dim=1)) // (256 // (Nin_virtual + 1))
-    return neurons_in
+#     return arr
 
 
-def load_data(data: Callable, root: str, config: dict) -> tuple[DataLoader, DataLoader]:
+def load_data(root: str, config: dict) -> tuple[DataLoader, DataLoader]:
     """
     Creates DataLoaders.
     """
     Nbatch: int = config["Nbatch"]
 
     # Training set
-    train_set = data(root, train=True, download=True)
-    train_set = transform_dataset(train_set, partial(transform_image, config=config))
+    train_set = SHD(root, train=True, download=True)
 
-    print("Full train_set shape:", train_set.tensors[0].shape)
+    print("Train set size:", len(train_set))
 
     if (Ntrain := config.get("Ntrain")) is not None:
         train_set = Subset(train_set, np.arange(Ntrain))
@@ -72,8 +56,10 @@ def load_data(data: Callable, root: str, config: dict) -> tuple[DataLoader, Data
     train_loader = DataLoader(train_set, batch_size=Nbatch, shuffle=True)
 
     # Test set
-    test_set = data(root, train=False, download=True)
-    test_set = transform_dataset(test_set, partial(transform_image, config=config))
+    test_set = SHD(root, train=False, download=True)
+
+    print("Test set size:", len(test_set))
+
     test_loader = DataLoader(test_set, batch_size=1_000, shuffle=True)
 
     return train_loader, test_loader
@@ -492,7 +478,7 @@ def run(
 
     # Data
     torch.manual_seed(seed)
-    train_loader, test_loader = load_data(datasets.MNIST, "data", config)
+    train_loader, test_loader = load_data("data", config)
 
     # Parameters
     key = random.PRNGKey(seed)
@@ -563,7 +549,7 @@ def run_example(p: list, neuron: AbstractPseudoPhaseOscNeuron, config: dict) -> 
 
     # Data
     torch.manual_seed(seed)
-    _, test_loader = load_data(datasets.MNIST, "data", config)
+    _, test_loader = load_data("data", config)
 
     input, label = next(iter(test_loader))
     input, label = jnp.array(input[2]), jnp.array(label[2])

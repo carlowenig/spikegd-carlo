@@ -17,6 +17,7 @@ dependencies = [
   "torchvision",
   "pydantic",
   "click",
+  "h5py",
 ]
 
 [build-system]
