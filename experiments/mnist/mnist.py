@@ -10,7 +10,7 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Float, Int, UInt8
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
-from torch.utils.data import DataLoader, TensorDataset, Subset
+from torch.utils.data import DataLoader, Subset, TensorDataset
 from torchvision import datasets
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
@@ -51,7 +51,24 @@ def transform_image(
     actual input neurons that code for the pixels in the bin (quantization).
     """
     Nin_virtual: int = config["Nin_virtual"]
-    neurons_in = (255 - torch.flatten(image, start_dim=1)) // (256 // (Nin_virtual + 1))
+
+    # First, we flatten the 3D image tensor of shape (Batch, Dim, Dim)
+    # to a 2D tensor of shape (Batch, Dim*Dim). Additionally, we invert the pixel
+    # values, such that the brightest pixels correspond to the lowest input spike times.
+    values = 255 - torch.flatten(image, start_dim=1)
+
+    # Since we assign each bin except the last one to an input spike time
+    # (and thus to a virtual input neuron), we get the following number of bins:
+    n_bins = Nin_virtual + 1
+
+    # Since there are 256 possible pixel values, we determine the bin size as follows:
+    bin_size = 256 // n_bins
+    # E.g., using 1 virtual input neuron, we would get n_bins = 2 and bin_size = 128.
+    # This corresponds to binarizing the pixel values, as described in the article.
+
+    # Finally, for each pixel value, we determine the bin it belongs to
+    neurons_in = values // bin_size
+
     return neurons_in
 
 
