@@ -9,11 +9,11 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
-from shd import SHD
 from torch.utils.data import DataLoader, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
+from shd import SHD
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
@@ -23,9 +23,15 @@ from spikegd.utils.plotting import formatter, petroff10
 ############################
 
 
-def quantize_dataset(dataset: SHD, config: dict):
+def quantize_dataset(dataset: SHD, config: dict, dtype=torch.int8):
     sample_indices = range(dataset.Nsamples)
     N_bin = config["Nin_virtual"] + 1
+
+    if N_bin > torch.iinfo(dtype).max:
+        raise ValueError(
+            f"Number of bins N_bin = {N_bin} exceeds maximum value for {dtype}: {torch.iinfo(dtype).max}"
+        )
+
     N_t = config["Nt"]
     t_max = config.get("tmax", dataset.t_max + 1e-6)
 
@@ -33,8 +39,12 @@ def quantize_dataset(dataset: SHD, config: dict):
     x_arr = np.zeros((len(sample_indices), N_in * N_t), dtype=np.int32)
     dt = t_max / N_t
 
-    bin_edges = np.arange(0, t_max + 1e-8, dt)
-    assert bin_edges.shape == (N_t + 1,)
+    bin_edges = np.arange(0, t_max + dt / 2, dt)
+    assert bin_edges.shape == (
+        N_t + 1,
+    ), f"Expected bin_edges to have shape ({N_t + 1}), got {bin_edges.shape}"
+
+    max_count = 0
 
     for i, sample_index in enumerate(sample_indices):
         times = dataset.times_arr[sample_index]
@@ -51,9 +61,19 @@ def quantize_dataset(dataset: SHD, config: dict):
         # Apply the quantization
         x_arr[i] = np.maximum(N_bin - 1 - count_arr, 0).ravel()
 
+        max_count = max(max_count, count_arr.max())
+
+    if abs(max_count - N_bin) > 0:
+        print(
+            f"Max spike count in single time interval ({max_count}) "
+            f"is very different to N_bin ({N_bin})"
+        )
+
     # Create tensor dataset
-    data = torch.tensor(x_arr)
-    targets = torch.tensor(dataset.label_index_arr)
+    data = torch.as_tensor(x_arr, dtype=dtype)
+    targets = torch.as_tensor(dataset.label_index_arr, dtype=torch.int8)
+
+    print("Quantized data memory:", data.element_size() * data.numel() / 1e6, "MB")
 
     assert data.shape[:1] == targets.shape == (dataset.Nsamples,)
 
@@ -66,6 +86,7 @@ def load_data(root: str, config: dict) -> tuple[DataLoader, DataLoader]:
     """
     Nbatch: int = config["Nbatch"]
     Nin: int = config["Nin"]
+    Nout: int = config["Nout"]
     Nt: int = config["Nt"]
 
     # Training set
@@ -74,6 +95,10 @@ def load_data(root: str, config: dict) -> tuple[DataLoader, DataLoader]:
         f"config.Nin does not match number of neurons in train dataset ({train_set.N})"
         f"times the number of time steps Nt ({Nt})."
         f"Got {Nin}, expected {train_set.N * Nt}."
+    )
+    assert Nout == train_set.Nlabel, (
+        f"config.Nout does not match number of labels in train dataset."
+        f"Got {Nout}, expected {train_set.Nlabel}."
     )
 
     print("Quantizing training set...")
@@ -92,6 +117,10 @@ def load_data(root: str, config: dict) -> tuple[DataLoader, DataLoader]:
         f"config.Nin does not match number of neurons in test dataset ({test_set.N})"
         f"times the number of time steps Nt ({Nt})."
         f"Got {Nin}, expected {test_set.N * Nt}."
+    )
+    assert Nout == test_set.Nlabel, (
+        f"config.Nout does not match number of labels in test dataset."
+        f"Got {Nout}, expected {test_set.Nlabel}."
     )
     print("Quantizing test set...")
     test_set = quantize_dataset(test_set, config)
@@ -684,7 +713,7 @@ def plot_spikes(ax: Axes, example: dict, config: dict) -> None:
     ax.set_ylabel("Neuron", labelpad=-0.1)
 
 
-def plot_error(ax: Axes, metrics: dict, config: dict) -> None:
+def plot_error(ax: Axes, metrics: dict, config: dict, ylog=True) -> None:
     ### Unpack arguments
     Nepochs: int = config["Nepochs"]
     acc: Array = metrics["acc"]
@@ -720,7 +749,8 @@ def plot_error(ax: Axes, metrics: dict, config: dict) -> None:
     ax.xaxis.set_major_formatter(formatter)
     ax.set_ylim(0.01, 1)
     ax.set_ylabel("Test error", labelpad=-3)
-    ax.set_yscale("log")
+    if ylog:
+        ax.set_yscale("log")
     ax.yaxis.set_major_formatter(formatter)
 
 

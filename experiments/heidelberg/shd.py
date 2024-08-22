@@ -72,8 +72,8 @@ class SHD(OnlineDataset[SHDSample]):
             self.speaker_index_arr = _get_dataset_arr(file, "extra/speaker", int)
 
             self.Nsamples = len(self.times_arr)
-            self.N = max(units.max() for units in self.units_arr) + 1
-            self.t_max = max(times[-1] for times in self.times_arr)
+            self.N = max(units.astype(int).max() for units in self.units_arr) + 1
+            self.t_max = max(times.astype(float)[-1] for times in self.times_arr)
 
             assert (
                 self.units_arr.shape
@@ -85,6 +85,7 @@ class SHD(OnlineDataset[SHDSample]):
 
             # Store label names as array for easy access
             self.label_names = _get_dataset_arr(file, "extra/keys", str)
+            self.Nlabel = len(self.label_names)
 
             # Store speaker info as arrays for easy access
             self.ages_by_speaker = _get_dataset_arr(file, "extra/meta_info/age", int)
@@ -101,7 +102,9 @@ class SHD(OnlineDataset[SHDSample]):
 
         # Derived quantities
         self.spike_count_arr = np.array([len(times) for times in self.times_arr])
-        self.trial_length_arr = np.array([times[-1] for times in self.times_arr])
+        self.trial_length_arr = np.array(
+            [times.astype(float)[-1] for times in self.times_arr]
+        )
         self.spike_rate_arr = self.spike_count_arr / self.trial_length_arr
 
         self._verbose_print("Loading audio filenames")
