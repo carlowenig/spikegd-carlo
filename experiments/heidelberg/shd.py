@@ -68,10 +68,12 @@ class SHD(OnlineDataset[SHDSample]):
             # times_arr and units_arr are arrays of numpy arrays
             self.times_arr = _get_dataset_arr(file, "spikes/times")
             self.units_arr = _get_dataset_arr(file, "spikes/units")
-            self.label_index_arr = _get_dataset_arr(file, "labels")
-            self.speaker_index_arr = _get_dataset_arr(file, "extra/speaker")
+            self.label_index_arr = _get_dataset_arr(file, "labels", int)
+            self.speaker_index_arr = _get_dataset_arr(file, "extra/speaker", int)
 
             self.Nsamples = len(self.times_arr)
+            self.N = max(units.max() for units in self.units_arr) + 1
+            self.t_max = max(times[-1] for times in self.times_arr)
 
             assert (
                 self.units_arr.shape
@@ -85,12 +87,12 @@ class SHD(OnlineDataset[SHDSample]):
             self.label_names = _get_dataset_arr(file, "extra/keys", str)
 
             # Store speaker info as arrays for easy access
-            self.ages_by_speaker = _get_dataset_arr(file, "extra/meta_info/age")
+            self.ages_by_speaker = _get_dataset_arr(file, "extra/meta_info/age", int)
             self.genders_by_speaker = _get_dataset_arr(
                 file, "extra/meta_info/gender", str
             )
             self.body_heights_by_speaker = _get_dataset_arr(
-                file, "extra/meta_info/body_height"
+                file, "extra/meta_info/body_height", float
             )
 
         self.age_arr = self.ages_by_speaker[self.speaker_index_arr]

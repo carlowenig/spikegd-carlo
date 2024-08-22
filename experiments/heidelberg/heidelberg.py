@@ -9,33 +9,55 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
-from torch.utils.data import DataLoader, Subset
+from shd import SHD
+from torch.utils.data import DataLoader, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
-from shd import SHD
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
-# %%Ö
+# %%
 ############################
 ### Data loading
 ############################
 
 
-# def get_h5_arr(file: h5py.File, path: str, dtype=None) -> np.ndarray:
-#     h5_dataset = file[path]
+def quantize_dataset(dataset: SHD, config: dict):
+    sample_indices = range(dataset.Nsamples)
+    N_bin = config["Nin_virtual"] + 1
+    N_t = config["Nt"]
+    t_max = config.get("tmax", dataset.t_max + 1e-6)
 
-#     assert isinstance(h5_dataset, h5py.Dataset)
+    N_in = dataset.N  # Number of input neurons
+    x_arr = np.zeros((len(sample_indices), N_in * N_t), dtype=np.int32)
+    dt = t_max / N_t
 
-#     arr = h5_dataset[:]
+    bin_edges = np.arange(0, t_max + 1e-8, dt)
+    assert bin_edges.shape == (N_t + 1,)
 
-#     assert isinstance(arr, np.ndarray)
+    for i, sample_index in enumerate(sample_indices):
+        times = dataset.times_arr[sample_index]
+        neurons = dataset.units_arr[sample_index]
 
-#     if dtype is not None:
-#         arr = arr.astype(dtype)
+        # Use numpy's digitize to bin the spike times
+        binned_spikes = np.digitize(times, bin_edges) - 1
 
-#     return arr
+        # Count spikes in each bin for each neuron
+        count_arr = np.bincount(
+            neurons * N_t + binned_spikes, minlength=N_in * N_t
+        ).reshape(N_in, N_t)
+
+        # Apply the quantization
+        x_arr[i] = np.maximum(N_bin - 1 - count_arr, 0).ravel()
+
+    # Create tensor dataset
+    data = torch.tensor(x_arr)
+    targets = torch.tensor(dataset.label_index_arr)
+
+    assert data.shape[:1] == targets.shape == (dataset.Nsamples,)
+
+    return TensorDataset(data, targets)
 
 
 def load_data(root: str, config: dict) -> tuple[DataLoader, DataLoader]:
@@ -43,10 +65,19 @@ def load_data(root: str, config: dict) -> tuple[DataLoader, DataLoader]:
     Creates DataLoaders.
     """
     Nbatch: int = config["Nbatch"]
+    Nin: int = config["Nin"]
+    Nt: int = config["Nt"]
 
     # Training set
-    train_set = SHD(root, train=True, download=True)
+    train_set = SHD(root, mode="train", download=False)
+    assert Nin == train_set.N * Nt, (
+        f"config.Nin does not match number of neurons in train dataset ({train_set.N})"
+        f"times the number of time steps Nt ({Nt})."
+        f"Got {Nin}, expected {train_set.N * Nt}."
+    )
 
+    print("Quantizing training set...")
+    train_set = quantize_dataset(train_set, config)
     print("Train set size:", len(train_set))
 
     if (Ntrain := config.get("Ntrain")) is not None:
@@ -56,8 +87,14 @@ def load_data(root: str, config: dict) -> tuple[DataLoader, DataLoader]:
     train_loader = DataLoader(train_set, batch_size=Nbatch, shuffle=True)
 
     # Test set
-    test_set = SHD(root, train=False, download=True)
-
+    test_set = SHD(root, mode="test", download=False)
+    assert Nin == test_set.N * Nt, (
+        f"config.Nin does not match number of neurons in test dataset ({test_set.N})"
+        f"times the number of time steps Nt ({Nt})."
+        f"Got {Nin}, expected {test_set.N * Nt}."
+    )
+    print("Quantizing test set...")
+    test_set = quantize_dataset(test_set, config)
     print("Test set size:", len(test_set))
 
     test_loader = DataLoader(test_set, batch_size=1_000, shuffle=True)
