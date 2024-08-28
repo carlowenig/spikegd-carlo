@@ -100,6 +100,16 @@ def init_target(key: Array, config: dict) -> tuple:
 def w_to_weights_net(w: Array) -> Array:
     """
     Transforms learnable weights to network weight matrix.
+
+    Learnable weights are different from network weights in that they do not contain
+    the weights of connections projecting to the neuron itself (w_ii). This function
+    inserts zeros at the respective positions to obtain the network weight matrix.
+
+    Example for N=3:
+        [[w01 w02]     [[ 0  w01 w02]
+         [w10 w12]  ->  [w10  0  w12]
+         [w20 w21]]     [w20 w21  0 ]]
+
     """
     weights_net = jnp.array([jnp.insert(w_i, i, 0) for i, w_i in enumerate(w)])
     return weights_net
@@ -108,6 +118,14 @@ def w_to_weights_net(w: Array) -> Array:
 def weights_net_to_w(weights_net: Array) -> Array:
     """
     Extract learnable weights from network weight matrix.
+
+    Inverse operation of `w_to_weights_net`.
+
+
+    Example for N=3:
+        [[ 0  w01 w02]     [[w01 w02]
+         [w10  0  w12]  ->  [w10 w12]
+         [w20 w21  0 ]]     [w20 w21]]
     """
     w = jnp.array([jnp.delete(w_i, i) for i, w_i in enumerate(weights_net)])
     return w

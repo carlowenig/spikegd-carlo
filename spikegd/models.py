@@ -127,6 +127,7 @@ class AbstractNeuron(ABC):
         def f(state: tuple, k: Array) -> tuple:
             return self.spike(state, weights_net, weights_in, spikes_in, config)
 
+        # TODO: Check if f is associative so we can use lax.associative_scan to parallelize (O(N) -> O(log(N)))
         _, out = lax.scan(f, state, jnp.arange(K))
 
         # Check if enough spikes have been simulated to reach trial end.

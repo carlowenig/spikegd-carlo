@@ -1,4 +1,7 @@
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from functools import partial
+from typing import Any, ClassVar
 
 import jax
 import jax.numpy as jnp
@@ -9,12 +12,16 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
+from shd import SHD
 from torch.utils.data import DataLoader, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
-from shd import SHD
-from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
+from spikegd.models import (
+    AbstractNeuron,
+    AbstractPhaseOscNeuron,
+    AbstractPseudoPhaseOscNeuron,
+)
 from spikegd.utils.plotting import formatter, petroff10
 
 # %%
@@ -322,266 +329,537 @@ def simulatefn(
     return mean_loss, accuracy
 
 
-def probefn(
-    neuron: AbstractPseudoPhaseOscNeuron,
-    p: list,
-    input: Int[Array, "Batch Nin"],
-    labels: Int[Array, " Batch"],
-    config: dict,
-) -> tuple:
-    """
-    Computes several metrics.
-    """
-
-    ### Unpack arguments
-    T: float = config["T"]
-    Nhidden: int = config["Nhidden"]
-    Nlayer: int = config["Nlayer"]
-    Nout: int = config["Nout"]
-    N = Nhidden * (Nlayer - 1) + Nout
-    Nbatch: int = config["Nbatch"]
-
-    ### Batched functions
-    @vmap
-    def batch_eventffwd(input):
-        return eventffwd(neuron, p, input, config)
-
-    @vmap
-    def batch_outfn(outs):
-        return outfn(neuron, outs, p, config)
-
-    @vmap
-    def batch_lossfn(t_outs, labels):
-        return lossfn(t_outs, labels, config)
-
-    ### Run network
-    outs = batch_eventffwd(input)
-    times: Array = outs[0]
-    spike_in: Array = outs[1]
-    neurons: Array = outs[2]
-    t_outs = batch_outfn(outs)
-
-    ### Loss and accuracy with pseudospikes
-    loss, correct = batch_lossfn(t_outs, labels)
-    mean_loss = jnp.mean(loss)
-    acc = jnp.mean(correct)
-
-    ### Loss and accuracy without pseudospikes
-    t_out_ord = jnp.where(t_outs < T, t_outs, T)
-    loss_ord, correct_ord = batch_lossfn(t_out_ord, labels)
-    mean_loss_ord = jnp.mean(loss_ord)
-    acc_ord = jnp.mean(correct_ord)
-
-    ### Activity and silent neurons
-    mask = (spike_in == False) & (neurons < N - Nout) & (neurons >= 0)  # noqa: E712
-    activity = jnp.sum(mask) / (Nbatch * (N - Nout))
-    silent_neurons = jnp.isin(
-        jnp.arange(N - Nout), jnp.where(mask, neurons, -1), invert=True
-    )
-
-    ### Activity and silent neurons until first output spike
-    t_out_first = jnp.min(t_out_ord, axis=1)
-    mask = (
-        (spike_in == False)  # noqa: E712
-        & (neurons < N - Nout)
-        & (neurons >= 0)
-        & (times < t_out_first[:, jnp.newaxis])
-    )
-    activity_first = jnp.sum(mask) / (Nbatch * (N - Nout))
-    silent_neurons_first = jnp.isin(
-        jnp.arange(N - Nout), jnp.where(mask, neurons, -1), invert=True
-    )
-
-    ### Pack results in dictionary
-    metrics = {
-        "loss": mean_loss,
-        "acc": acc,
-        "loss_ord": mean_loss_ord,
-        "acc_ord": acc_ord,
-        "activity": activity,
-        "activity_first": activity_first,
-    }
-    silents = {
-        "silent_neurons": silent_neurons,
-        "silent_neurons_first": silent_neurons_first,
-    }
-
-    return metrics, silents
-
-
 # %%
 ############################
 ### Training
 ############################
 
 
-def run(
-    neuron: AbstractPseudoPhaseOscNeuron,
-    config: dict,
-    progress_bar: str | None = None,
-) -> dict:
-    """
-    Trains a feedforward network with time-to-first-spike encoding on MNIST.
-
-    The pixel values are binned into `Nin_virtual+1` bins, each corresponding to an
-    input spike time except for the last bin, which is ignored. The effect of all inputs
-    in each bin is captured by a virtual input neuron under the hood to speed up the
-    simulation. See `transform_image` and `eventffwd` for details. The trained
-    parameters `p` are the feedforward weights of the network and the initial phases of
-    the neurons.
-
-    Args:
-        neuron:
-            Phase oscillator model including pseudodynamics.
-        config:
-            Simulation configuration. Needs to contain the following items:
-                `seed`: Random seed
-                `Nin`: Number of input neurons, has to be 28*28 for MNIST
-                `Nin_virtual`: Number of virtual input neurons
-                `Nhidden`: Number of hidden neurons per layer
-                `Nlayer`: Number of layers
-                `Nout`: Number of output neurons, has to be 10 for MNIST
-                `w_scale`: Scale of the initial weights
-                `T`: Trial duration
-                `K`: Maximal number of simulated ordinary spikes
-                `dt`: Integration time step (for state traces)
-                `gamma`: Regularization strength
-                `Nbatch`: Batch size
-                `lr`: Learning rate
-                `tau_lr`: Learning rate decay time constant
-                `beta1`: Adabelief parameter
-                `beta2`: Adabelief parameter
-                `p_flip`: Probability of flipping input pixels
-                `Nepochs`: Number of epochs
-        progress_bar:
-            Whether to use 'notebook' or 'script' tqdm progress bar or `None`.
-    Returns:
-        A dictionary containing detailed learning dynamics.
-    """
-
-    ### Unpack arguments
-    seed: int = config["seed"]
-    Nin_virtual: int = config["Nin_virtual"]
-    Nhidden: int = config["Nhidden"]
-    Nlayer: int = config["Nlayer"]
-    Nout: int = config["Nout"]
-    N = Nhidden * (Nlayer - 1) + Nout
-    Nepochs: int = config["Nepochs"]
-    p_flip: float = config["p_flip"]
-    lr: float = config["lr"]
-    tau_lr: float = config["tau_lr"]
-    beta1: float = config["beta1"]
-    beta2: float = config["beta2"]
-    theta = neuron.Theta()
-    if progress_bar == "notebook":
-        trange = trange_notebook
-    elif progress_bar == "script":
-        trange = trange_script
-    else:
-        trange = range
-
-    ### Set up the simulation
-
-    # Gradient
-    @jit
-    @partial(value_and_grad, has_aux=True)
-    def gradfn(
-        p: list, input: Int[Array, "Batch Nin"], labels: Int[Array, " Batch"]
+class Loss(ABC):
+    @abstractmethod
+    def __call__(
+        self, t_outs: Float[Array, " Nout"], label: Int[Array, ""]
     ) -> tuple[Array, Array]:
-        loss, acc = simulatefn(neuron, p, input, labels, config)
-        return loss, acc
+        """
+        Compute loss and if the network prediction was correct.
+        """
 
-    # Regularization
-    @jit
-    def flip(key: Array, input: Array) -> tuple[Array, Array]:
-        key, subkey = jax.random.split(key)
-        mask = jax.random.bernoulli(subkey, p=p_flip, shape=input.shape)
-        return key, jnp.where(mask, Nin_virtual - input, input)
+    def vectorize(self):
+        return vmap(self.__call__)
 
-    # Optimization step
-    @jit
-    def trial(
+    def check_network_compatibility(self, network: "Network"):
+        pass
+
+
+class SpikeEncoding(ABC):
+    @abstractmethod
+    def output_to_spikes(
+        self,
+        weights: Array,
+        times: Array,
+        spike_in: Array,
+        neurons: Array,
+        x: Array,
+    ) -> Array:
+        """
+        Computes output spike times given simulation results.
+        """
+
+
+@dataclass
+class PseudoTimeToFirstSpikeEncoding(SpikeEncoding):
+    net: "FFNetwork[AbstractPseudoPhaseOscNeuron]"
+
+    def output_to_spikes(
+        self,
+        weights: Array,
+        times: Array,
+        spike_in: Array,
+        neurons: Array,
+        x: Array,
+    ):
+        neuron = self.net.neuron
+
+        ### Run network as feedforward rate ANN
+        Kord = jnp.sum(neurons >= 0)  # Number of ordinary spikes
+        x_end = x[Kord]
+        pseudo_rates = jnp.zeros(self.net.N_in)
+        for i in range(self.net.N_layer - 1):
+            input = neuron.linear(pseudo_rates, weights[i])
+            x_end_i = x_end[:, i * self.net.N_hidden : (i + 1) * self.net.N_hidden]
+            pseudo_rates = neuron.construct_ratefn(x_end_i)(input)
+        input = neuron.linear(pseudo_rates, weights[self.net.N_layer - 1])
+
+        ### Spike times for each learned neuron
+        def compute_tout(i: ArrayLike) -> Array:
+            ### Potential ordinary output spike times
+            mask = (neurons == self.net.N - self.net.N_out + i) & (spike_in == False)  # noqa: E712
+            Kout = jnp.sum(mask)  # Number of ordinary output spikes
+            t_out_ord = times[jnp.argmax(mask)]
+
+            ### Pseudospike time
+            t_out_pseudo = neuron.t_pseudo(
+                x_end[:, self.net.N - self.net.N_out + i],
+                input[i],
+                1,
+                {"T": self.net.T},
+            )
+
+            ### Output spike time
+            t_out = jnp.where(0 < Kout, t_out_ord, t_out_pseudo)
+
+            return t_out
+
+        t_outs = vmap(compute_tout)(jnp.arange(self.net.N_out))
+
+        return t_outs
+
+
+@dataclass
+class CrossEntropyLoss(Loss):
+    T: float = 1.0
+    gamma: float = 1e-2
+
+    def __call__(
+        self, t_outs: Float[Array, " Nout"], label: Int[Array, ""]
+    ) -> tuple[Array, Array]:
+        log_softmax = jax.nn.log_softmax(-t_outs)
+        regu = jnp.exp(t_outs / self.T) - 1
+        loss = -log_softmax[label] + self.gamma * regu[label]
+        correct = jnp.argmin(t_outs) == label
+        return loss, correct
+
+    def check_network_compatibility(self, network: "Network"):
+        if self.T != network.T:
+            raise ValueError(
+                f"CrossEntropyLoss T ({self.T}) does not match network T ({network.T})."
+            )
+
+
+@dataclass
+class Network[Neuron: AbstractNeuron](ABC):
+    neuron: Neuron
+    N: int
+    N_in: int
+    N_out: int
+    T: float
+    K: int
+    seed: int
+    w_scale: float
+
+    defaults: ClassVar[dict[str, Any]] = {"seed": 0, "w_scale": 1.0}
+
+    @classmethod
+    def create(cls, *args, **kwargs):
+        return cls(*args, **(cls.defaults | kwargs))
+
+    @abstractmethod
+    def init_weights(self, key: Array) -> tuple[Array, list[Array]]:
+        """
+        Initializes input and network weights.
+        """
+
+    @abstractmethod
+    def simulate(self, p: list, input: Int[Array, " Nin"], loss: Loss) -> tuple:
+        """
+        Simulates the network for a single example input given the parameters `p`.
+        """
+
+    @abstractmethod
+    def outfn(self, out: tuple, p: list) -> Array:
+        """
+        Computes output spike times given simulation results.
+        """
+
+    def simulate_many(
+        self,
         p: list,
         input: Int[Array, "Batch Nin"],
         labels: Int[Array, " Batch"],
-        opt_state: optax.OptState,
+        loss: Loss,
+    ) -> tuple[Array, Array]:
+        """
+        Simulates the network and computes the loss and accuracy for batched input.
+        """
+        loss.check_network_compatibility(self)
+
+        outs = vmap(self.simulate, in_axes=(None, 0, None))(p, input, loss)
+        t_outs = vmap(self.outfn, in_axes=(0, None))(outs, p)
+        loss_val, correct = loss.vectorize()(t_outs, labels)
+        mean_loss = jnp.mean(loss_val)
+        accuracy = jnp.mean(correct)
+        return mean_loss, accuracy
+
+
+@dataclass
+class Prober:
+    net: Network
+    loss: Loss
+    encoding: SpikeEncoding
+    N_batch: int
+
+    def probefn(
+        self,
+        p: list,
+        input: Int[Array, "Batch Nin"],
+        labels: Int[Array, " Batch"],
     ) -> tuple:
-        (loss, acc), grad = gradfn(p, input, labels)
-        updates, opt_state = optim.update(grad, opt_state)
-        p = optax.apply_updates(p, updates)  # type: ignore
-        p[1] = jnp.clip(p[1], 0, theta)
-        return loss, acc, p, opt_state
+        """
+        Computes several metrics.
+        """
 
-    # Probe network
-    @jit
-    def jprobefn(p, input, labels):
-        return probefn(neuron, p, input, labels, config)
+        vectorized_loss = self.loss.vectorize()
+        T = self.net.T
+        N = self.net.N
+        N_out = self.net.N_out
+        N_not_out = N - N_out
 
-    def probe(p: list) -> dict:
+        ### Run network
+        outs = vmap(self.net.simulate, in_axes=(None, 0, None))(p, input, self.loss)
+        times: Array = outs[0]
+        spike_in: Array = outs[1]
+        neurons: Array = outs[2]
+        t_outs = vmap(self.encoding.output_to_spikes)(*outs)
+
+        ### Loss and accuracy with pseudospikes
+        loss_vals, correct = vectorized_loss(t_outs, labels)
+        mean_loss = jnp.mean(loss_vals)
+        acc = jnp.mean(correct)
+
+        ### Loss and accuracy without pseudospikes
+        t_out_ord = jnp.where(t_outs < T, t_outs, T)
+        loss_ord, correct_ord = vectorized_loss(t_out_ord, labels)
+        mean_loss_ord = jnp.mean(loss_ord)
+        acc_ord = jnp.mean(correct_ord)
+
+        ### Activity and silent neurons
+        mask = (spike_in == False) & (neurons < N_not_out) & (neurons >= 0)  # noqa: E712
+        activity = jnp.sum(mask) / (self.N_batch * N_not_out)
+        silent_neurons = jnp.isin(
+            jnp.arange(N_not_out), jnp.where(mask, neurons, -1), invert=True
+        )
+
+        ### Activity and silent neurons until first output spike
+        t_out_first = jnp.min(t_out_ord, axis=1)
+        mask = (
+            (spike_in == False)  # noqa: E712
+            & (neurons < N_not_out)
+            & (neurons >= 0)
+            & (times < t_out_first[:, jnp.newaxis])
+        )
+        activity_first = jnp.sum(mask) / (self.N_batch * N_not_out)
+        silent_neurons_first = jnp.isin(
+            jnp.arange(N_not_out), jnp.where(mask, neurons, -1), invert=True
+        )
+
+        ### Pack results in dictionary
         metrics = {
-            "loss": 0.0,
-            "acc": 0.0,
-            "loss_ord": 0.0,
-            "acc_ord": 0.0,
-            "activity": 0.0,
-            "activity_first": 0.0,
+            "loss": mean_loss,
+            "acc": acc,
+            "loss_ord": mean_loss_ord,
+            "acc_ord": acc_ord,
+            "activity": activity,
+            "activity_first": activity_first,
         }
         silents = {
-            "silent_neurons": jnp.ones(N - Nout, dtype=bool),
-            "silent_neurons_first": jnp.ones(N - Nout, dtype=bool),
+            "silent_neurons": silent_neurons,
+            "silent_neurons_first": silent_neurons_first,
         }
-        steps = len(test_loader)
-        for data in test_loader:
-            input, labels = jnp.array(data[0]), jnp.array(data[1])
-            metric, silent = jprobefn(p, input, labels)
-            metrics = {k: metrics[k] + metric[k] / steps for k in metrics}
-            silents = {k: silents[k] & silent[k] for k in silents}
-        for k, v in silents.items():
-            metrics[k] = jnp.mean(v).item()
+
+        return metrics, silents
+
+
+@dataclass
+class FFNetwork[Neuron: AbstractNeuron](Network[Neuron]):
+    N_layer: int
+    N_hidden: int
+    N: int = field(init=False)
+
+    def __post_init__(self):
+        self.N = self.N_hidden * (self.N_layer - 1) + self.N_out
+
+    def init_weights(self, key: Array) -> tuple[Array, list[Array]]:
+        key, subkey = random.split(key)
+        weights: list[Array] = []
+        width = self.w_scale / jnp.sqrt(self.N_in)
+        weights_in = random.uniform(
+            subkey, (self.N_hidden, self.N_in), minval=-width, maxval=width
+        )
+        weights.append(weights_in)
+        width = self.w_scale / jnp.sqrt(self.N_hidden)
+        for _ in range(1, self.N_layer - 1):
+            key, subkey = random.split(key)
+            weights_hidden = random.uniform(
+                subkey, (self.N_hidden, self.N_hidden), minval=-width, maxval=width
+            )
+            weights.append(weights_hidden)
+        key, subkey = random.split(key)
+        weights_out = random.uniform(
+            subkey, (self.N_out, self.N_hidden), minval=-width, maxval=width
+        )
+        weights.append(weights_out)
+
+        return key, weights
+
+    def simulate(self, p: list, input: Int[Array, " Nin"]) -> tuple:
+        """
+        Simulates a feedforward network with time-to-first-spike input encoding.
+        """
+        weights: list = p[0]
+        phi0: Array = p[1]
+        x0 = phi0[jnp.newaxis]
+
+        ### Input
+        # Times computed as spike times of a LIF neuron with constant input Iconst
+        I_const = jnp.arange(self.N_in, 0, -1)
+        V_th = 0.01 * self.N_in
+        times_in = jnp.where(
+            I_const > V_th, self.T * jnp.log(I_const / (I_const - V_th)), jnp.inf
+        )
+        neurons_in = jnp.arange(self.N_in)
+        spikes_in = (times_in, neurons_in)
+
+        ### Input weights
+        weights_in = weights[0]
+        weights_in_virtual = jnp.zeros((self.N, self.N_in))
+        for i in range(self.N_in):
+            weights_in_virtual = weights_in_virtual.at[: self.N_hidden, i].set(
+                weights_in @ (input == i)
+            )
+
+        ### Network weights
+        weights_net = jnp.zeros((self.N, self.N))
+        for i in range(self.N_layer - 2):
+            slice_in = slice(i * self.N_hidden, (i + 1) * self.N_hidden)
+            slice_out = slice((i + 1) * self.N_hidden, (i + 2) * self.N_hidden)
+            weights_net = weights_net.at[slice_out, slice_in].set(weights[i + 1])
+
+        N_not_out = self.N - self.N_out
+        weights_net = weights_net.at[
+            N_not_out:, N_not_out - self.N_hidden : N_not_out
+        ].set(weights[-1])
+
+        # Run simulation
+        out = self.neuron.event(
+            x0, weights_net, weights_in_virtual, spikes_in, {"K": self.K, "T": self.T}
+        )
+
+        return out
+
+    def outfn(self, out: tuple, p: list) -> Array:
+        """
+        Computes output spike times given simulation results.
+        """
+        neuron = self.neuron
+        if not isinstance(neuron, AbstractPseudoPhaseOscNeuron):
+            raise ValueError("Only pseudo-phase oscillator neurons are supported.")
+
+        weights = p[0]
+        times: Array = out[0]
+        spike_in: Array = out[1]
+        neurons: Array = out[2]
+        x: Array = out[3]
+
+        ### Run network as feedforward rate ANN
+        Kord = jnp.sum(neurons >= 0)  # Number of ordinary spikes
+        x_end = x[Kord]
+        pseudo_rates = jnp.zeros(self.N_in)
+        for i in range(self.N_layer - 1):
+            input = neuron.linear(pseudo_rates, weights[i])
+            x_end_i = x_end[:, i * self.N_hidden : (i + 1) * self.N_hidden]
+            pseudo_rates = neuron.construct_ratefn(x_end_i)(input)
+        input = neuron.linear(pseudo_rates, weights[self.N_layer - 1])
+
+        ### Spike times for each learned neuron
+        def compute_tout(i: ArrayLike) -> Array:
+            ### Potential ordinary output spike times
+            mask = (neurons == self.N - self.N_out + i) & (spike_in == False)  # noqa: E712
+            Kout = jnp.sum(mask)  # Number of ordinary output spikes
+            t_out_ord = times[jnp.argmax(mask)]
+
+            ### Pseudospike time
+            t_out_pseudo = neuron.t_pseudo(
+                x_end[:, self.N - self.N_out + i], input[i], 1, {"T": self.T}
+            )
+
+            ### Output spike time
+            t_out = jnp.where(0 < Kout, t_out_ord, t_out_pseudo)
+
+            return t_out
+
+        t_outs = vmap(compute_tout)(jnp.arange(self.N_out))
+
+        return t_outs
+
+
+@dataclass
+class Trainer[Neuron: AbstractNeuron]:
+    network: Network[Neuron]
+    loader: DataLoader
+    N_epochs: int
+    p_flip: float
+
+    def train(
+        self,
+        loss: Loss,
+        progress_bar: str | None = None,
+    ) -> dict:
+        """
+        Trains a feedforward network with time-to-first-spike encoding on MNIST.
+
+        The pixel values are binned into `Nin_virtual+1` bins, each corresponding to an
+        input spike time except for the last bin, which is ignored. The effect of all inputs
+        in each bin is captured by a virtual input neuron under the hood to speed up the
+        simulation. See `transform_image` and `eventffwd` for details. The trained
+        parameters `p` are the feedforward weights of the network and the initial phases of
+        the neurons.
+
+        Args:
+            neuron:
+                Phase oscillator model including pseudodynamics.
+            config:
+                Simulation configuration. Needs to contain the following items:
+                    `seed`: Random seed
+                    `Nin`: Number of input neurons, has to be 28*28 for MNIST
+                    `Nin_virtual`: Number of virtual input neurons
+                    `Nhidden`: Number of hidden neurons per layer
+                    `Nlayer`: Number of layers
+                    `Nout`: Number of output neurons, has to be 10 for MNIST
+                    `w_scale`: Scale of the initial weights
+                    `T`: Trial duration
+                    `K`: Maximal number of simulated ordinary spikes
+                    `dt`: Integration time step (for state traces)
+                    `gamma`: Regularization strength
+                    `Nbatch`: Batch size
+                    `lr`: Learning rate
+                    `tau_lr`: Learning rate decay time constant
+                    `beta1`: Adabelief parameter
+                    `beta2`: Adabelief parameter
+                    `p_flip`: Probability of flipping input pixels
+                    `Nepochs`: Number of epochs
+            progress_bar:
+                Whether to use 'notebook' or 'script' tqdm progress bar or `None`.
+        Returns:
+            A dictionary containing detailed learning dynamics.
+        """
+
+        theta = neuron.Theta()
+        if progress_bar == "notebook":
+            trange = trange_notebook
+        elif progress_bar == "script":
+            trange = trange_script
+        else:
+            trange = range
+
+        ### Set up the simulation
+
+        # Gradient
+        @jit
+        @partial(value_and_grad, has_aux=True)
+        def gradfn(
+            p: list, input: Int[Array, "Batch Nin"], labels: Int[Array, " Batch"]
+        ) -> tuple[Array, Array]:
+            return self.network.simulate_many(p, input, labels, loss)
+
+        # Regularization
+        @jit
+        def flip(key: Array, input: Array) -> tuple[Array, Array]:
+            key, subkey = jax.random.split(key)
+            mask = jax.random.bernoulli(subkey, p=self.p_flip, shape=input.shape)
+            return key, jnp.where(mask, self.network.N_in - input, input)
+
+        # Optimization step
+        @jit
+        def trial(
+            p: list,
+            input: Int[Array, "Batch Nin"],
+            labels: Int[Array, " Batch"],
+            opt_state: optax.OptState,
+        ) -> tuple:
+            (loss, acc), grad = gradfn(p, input, labels)
+            updates, opt_state = optim.update(grad, opt_state)
+            p = optax.apply_updates(p, updates)  # type: ignore
+            p[1] = jnp.clip(p[1], 0, theta)
+            return loss, acc, p, opt_state
+
+        # Probe network
+        @jit
+        def jprobefn(p, input, labels):
+            return probefn(neuron, p, input, labels, config)
+
+        def probe(p: list) -> dict:
+            metrics = {
+                "loss": 0.0,
+                "acc": 0.0,
+                "loss_ord": 0.0,
+                "acc_ord": 0.0,
+                "activity": 0.0,
+                "activity_first": 0.0,
+            }
+            silents = {
+                "silent_neurons": jnp.ones(N - Nout, dtype=bool),
+                "silent_neurons_first": jnp.ones(N - Nout, dtype=bool),
+            }
+            steps = len(test_loader)
+            for data in test_loader:
+                input, labels = jnp.array(data[0]), jnp.array(data[1])
+                metric, silent = jprobefn(p, input, labels)
+                metrics = {k: metrics[k] + metric[k] / steps for k in metrics}
+                silents = {k: silents[k] & silent[k] for k in silents}
+            for k, v in silents.items():
+                metrics[k] = jnp.mean(v).item()
+            return metrics
+
+        ### Simulation
+
+        # Data
+        torch.manual_seed(seed)
+        train_loader, test_loader = load_data("data", config)
+
+        # Parameters
+        key = random.PRNGKey(seed)
+        key, weights = init_weights(key, config)
+        phi0 = init_phi0(neuron, config)
+        p = [weights, phi0]
+        p_init = [weights, phi0]
+
+        # Optimizer
+        schedule = optax.exponential_decay(
+            lr, int(tau_lr * len(train_loader)), 1 / jnp.e
+        )
+        optim = optax.adabelief(schedule, b1=beta1, b2=beta2)
+        opt_state = optim.init(p)
+
+        # Metrics
+        metrics: dict[str, Array | list] = {k: [v] for k, v in probe(p).items()}
+
+        # Training
+        for epoch in trange(Nepochs):
+            for data in train_loader:
+                input, labels = jnp.array(data[0]), jnp.array(data[1])
+                key, input = flip(key, input)
+                _, _, p, opt_state = trial(p, input, labels, opt_state)
+            # Probe network
+            metric = probe(p)
+            metrics = {k: v + [metric[k]] for k, v in metrics.items()}
+        if jnp.any(jnp.isnan(jnp.array(metrics["loss"]))):
+            print(
+                "Warning: A NaN appeared. "
+                "Likely not enough spikes have been simulated. "
+                "Try increasing `K`."
+            )
+        metrics = {k: jnp.array(v) for k, v in metrics.items()}
+        p_end = p
+        metrics["p_init"] = p_init
+        metrics["p_end"] = p_end
+
         return metrics
 
-    ### Simulation
 
-    # Data
-    torch.manual_seed(seed)
-    train_loader, test_loader = load_data("data", config)
-
-    # Parameters
-    key = random.PRNGKey(seed)
-    key, weights = init_weights(key, config)
-    phi0 = init_phi0(neuron, config)
-    p = [weights, phi0]
-    p_init = [weights, phi0]
-
-    # Optimizer
-    schedule = optax.exponential_decay(lr, int(tau_lr * len(train_loader)), 1 / jnp.e)
-    optim = optax.adabelief(schedule, b1=beta1, b2=beta2)
-    opt_state = optim.init(p)
-
-    # Metrics
-    metrics: dict[str, Array | list] = {k: [v] for k, v in probe(p).items()}
-
-    # Training
-    for epoch in trange(Nepochs):
-        for data in train_loader:
-            input, labels = jnp.array(data[0]), jnp.array(data[1])
-            key, input = flip(key, input)
-            loss, acc, p, opt_state = trial(p, input, labels, opt_state)
-        # Probe network
-        metric = probe(p)
-        metrics = {k: v + [metric[k]] for k, v in metrics.items()}
-    if jnp.any(jnp.isnan(jnp.array(metrics["loss"]))):
-        print(
-            "Warning: A NaN appeared. "
-            "Likely not enough spikes have been simulated. "
-            "Try increasing `K`."
-        )
-    metrics = {k: jnp.array(v) for k, v in metrics.items()}
-    p_end = p
-    metrics["p_init"] = p_init
-    metrics["p_end"] = p_end
-
-    return metrics
+@dataclass
+class Tester[Neuron: AbstractNeuron]:
+    network: Network[Neuron]
+    loader: DataLoader
 
 
 # %%
