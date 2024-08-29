@@ -38,26 +38,24 @@ def quantize_dataset(
     dataset: SHD, config: dict, dtype=torch.int8, normalize_trials=True
 ):
     sample_indices = range(dataset.Nsamples)
-    N_bin = config["Nin_virtual"] + 1
+    Nin_virtual = config["Nin_virtual"]
+    N_bin = Nin_virtual
 
     if N_bin > torch.iinfo(dtype).max:
         raise ValueError(
             f"Number of bins N_bin = {N_bin} exceeds maximum value for {dtype}: {torch.iinfo(dtype).max}"
         )
 
-    N_t = config["Nt"]
     t_max = config.get("tmax", 1 if normalize_trials else dataset.t_max + 1e-6)
 
     N_in = dataset.N  # Number of input neurons
-    x_arr = np.zeros((len(sample_indices), N_in * N_t), dtype=np.int32)
-    dt = t_max / N_t
+    X_arr = np.zeros((len(sample_indices), N_in, Nin_virtual), dtype=np.int32)
+    dt = t_max / N_bin
 
     bin_edges = np.arange(0, t_max + dt / 2, dt)
     assert bin_edges.shape == (
-        N_t + 1,
-    ), f"Expected bin_edges to have shape ({N_t + 1}), got {bin_edges.shape}"
-
-    max_count = 0
+        N_bin + 1,
+    ), f"Expected bin_edges to have shape ({N_bin + 1}), got {bin_edges.shape}"
 
     for i, sample_index in enumerate(sample_indices):
         times = dataset.times_arr[sample_index]
@@ -69,28 +67,19 @@ def quantize_dataset(
         # Use numpy's digitize to bin the spike times
         binned_spikes = np.digitize(times, bin_edges) - 1
 
-        # Count spikes in each bin for each neuron
+        # Count spikes in each bin for each neuron and exclude last bin
         count_arr = np.bincount(
-            neurons * N_t + binned_spikes, minlength=N_in * N_t
-        ).reshape(N_in, N_t)
+            neurons * N_bin + binned_spikes, minlength=N_in * N_bin
+        ).reshape(N_in, N_bin)
 
         count_step = config.get("spike_count_step", 1)
         count_offset = config.get("spike_count_offset", 0)
         count_arr = count_arr // count_step + count_offset
 
-        # Apply the quantization
-        x_arr[i] = np.maximum(N_bin - 1 - count_arr, 0).ravel()
-
-        max_count = max(max_count, count_arr.max())
-
-    if config.get("verbose", False):  # and abs(max_count - N_bin) > 0:
-        print(
-            f"Max spike count in single time interval ({max_count}) "
-            f"is very different to what is allowed by N_bin ({N_bin})"
-        )
+        X_arr[i] = -count_arr
 
     # Create tensor dataset
-    data = torch.as_tensor(x_arr, dtype=dtype)
+    data = torch.as_tensor(X_arr, dtype=dtype)
     targets = torch.as_tensor(dataset.label_index_arr, dtype=torch.int8)
 
     # print("Quantized data memory:", data.element_size() * data.numel() / 1e6, "MB")
@@ -113,18 +102,15 @@ def load_data(datasets: tuple[SHD, SHD], config: dict) -> tuple[DataLoader, Data
     Nbatch: int = config["Nbatch"]
     Nin: int = config["Nin"]
     Nout: int = config["Nout"]
-    Nt: int = config["Nt"]
 
     train_set, test_set = datasets
 
     torch.manual_seed(config["seed"])
 
     # Training set
-    assert Nin == train_set.N * Nt, (
-        f"config.Nin does not match number of neurons in train dataset ({train_set.N})"
-        f"times the number of time steps Nt ({Nt})."
-        f"Got {Nin}, expected {train_set.N * Nt}."
-    )
+    assert (
+        Nin == train_set.N
+    ), f"config.Nin ({Nin}) does not match number of neurons in train dataset ({train_set.N})."
     assert Nout == train_set.Nlabel, (
         f"config.Nout does not match number of labels in train dataset."
         f"Got {Nout}, expected {train_set.Nlabel}."
@@ -141,11 +127,9 @@ def load_data(datasets: tuple[SHD, SHD], config: dict) -> tuple[DataLoader, Data
     train_loader = DataLoader(train_set, batch_size=Nbatch, shuffle=True)
 
     # Test set
-    assert Nin == test_set.N * Nt, (
-        f"config.Nin does not match number of neurons in test dataset ({test_set.N})"
-        f"times the number of time steps Nt ({Nt})."
-        f"Got {Nin}, expected {test_set.N * Nt}."
-    )
+    assert (
+        Nin == test_set.N
+    ), f"config.Nin ({Nin}) does not match number of neurons in test dataset ({test_set.N})."
     assert Nout == test_set.Nlabel, (
         f"config.Nout does not match number of labels in test dataset."
         f"Got {Nout}, expected {test_set.Nlabel}."
@@ -219,7 +203,10 @@ def init_phi0(neuron: AbstractPhaseOscNeuron, config: dict) -> Array:
 
 
 def eventffwd(
-    neuron: AbstractPhaseOscNeuron, p: list, input: Int[Array, " Nin"], config: dict
+    neuron: AbstractPhaseOscNeuron,
+    p: list,
+    input: Int[Array, " Nin Nvirt"],
+    config: dict,
 ) -> tuple:
     """
     Simulates a feedforward network with time-to-first-spike input encoding.
@@ -245,13 +232,10 @@ def eventffwd(
     neurons_in = jnp.arange(Nin_virtual)
     spikes_in = (times_in, neurons_in)
 
-    ### Input weights
+    # ### Input weights
     weights_in = weights[0]
-    weights_in_virtual = jnp.zeros((N, Nin_virtual))
-    virt_indices = jnp.arange(Nin_virtual)
-    indicator_matrix = input[:, jnp.newaxis] == virt_indices
-    weights_in_virtual = weights_in_virtual.at[:Nhidden].set(
-        weights_in @ indicator_matrix
+    weights_in_virtual = (
+        jnp.zeros((N, Nin_virtual)).at[:Nhidden].set(weights_in @ input)
     )
 
     ### Network weights
@@ -354,7 +338,7 @@ def simulatefn(
 def probefn(
     neuron: AbstractPseudoPhaseOscNeuron,
     p: list,
-    input: Int[Array, "Batch Nin"],
+    input: Int[Array, "Batch Nin Nvirt"],
     labels: Int[Array, " Batch"],
     config: dict,
 ) -> tuple:
@@ -517,7 +501,7 @@ def run(
     @jit
     @partial(value_and_grad, has_aux=True)
     def gradfn(
-        p: list, input: Int[Array, "Batch Nin"], labels: Int[Array, " Batch"]
+        p: list, input: Int[Array, "Batch Nin Nvirt"], labels: Int[Array, " Batch"]
     ) -> tuple[Array, Array]:
         loss, acc = simulatefn(neuron, p, input, labels, config)
         return loss, acc
@@ -533,7 +517,7 @@ def run(
     @jit
     def trial(
         p: list,
-        input: Int[Array, "Batch Nin"],
+        input: Int[Array, "Batch Nin Nvirt"],
         labels: Int[Array, " Batch"],
         opt_state: optax.OptState,
     ) -> tuple:
@@ -606,6 +590,16 @@ def run(
         for data in train_loader:
             input, labels = jnp.array(data[0]), jnp.array(data[1])
             key, input = flip(key, input)
+
+            # expected_input_shape = (
+            #     config["Nbatch"],
+            #     config["Nin"],
+            #     config["Nin_virtual"],
+            # )
+            # assert (
+            #     input.shape == expected_input_shape
+            # ), f"Expected input shape {expected_input_shape}, got {input.shape}"
+
             loss, acc, p, opt_state = trial(p, input, labels, opt_state)
         # Probe network
         metric = probe(p)
