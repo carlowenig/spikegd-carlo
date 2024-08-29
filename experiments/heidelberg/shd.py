@@ -57,9 +57,10 @@ class SHD(OnlineDataset[SHDSample]):
         data_root: str | Path,
         mode: Literal["train", "test"] = "train",
         download=True,
+        verbose=False,
     ):
         self.mode = mode
-        super().__init__(data_root=data_root, download=download)
+        super().__init__(data_root=data_root, download=download, verbose=verbose)
 
         self._verbose_print("Loading data from h5 file")
 

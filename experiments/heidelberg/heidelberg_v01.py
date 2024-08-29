@@ -1,3 +1,4 @@
+import time
 from functools import partial
 
 import jax
@@ -9,11 +10,11 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
-from shd import SHD
 from torch.utils.data import DataLoader, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
+from shd import SHD
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
@@ -23,7 +24,19 @@ from spikegd.utils.plotting import formatter, petroff10
 ############################
 
 
-def quantize_dataset(dataset: SHD, config: dict, dtype=torch.int8):
+def normalize_times(times, neurons, dt, t_max=1, signal_percentage=0.05):
+    N_signal = int(len(times) * signal_percentage)
+
+    start = times[N_signal] - dt
+    end = times[-N_signal] + dt
+    new_times = (times - start) / (end - start) * t_max
+    mask = (new_times >= 0) & (new_times < t_max)
+    return new_times[mask], neurons[mask]
+
+
+def quantize_dataset(
+    dataset: SHD, config: dict, dtype=torch.int8, normalize_trials=True
+):
     sample_indices = range(dataset.Nsamples)
     N_bin = config["Nin_virtual"] + 1
 
@@ -33,7 +46,7 @@ def quantize_dataset(dataset: SHD, config: dict, dtype=torch.int8):
         )
 
     N_t = config["Nt"]
-    t_max = config.get("tmax", dataset.t_max + 1e-6)
+    t_max = config.get("tmax", 1 if normalize_trials else dataset.t_max + 1e-6)
 
     N_in = dataset.N  # Number of input neurons
     x_arr = np.zeros((len(sample_indices), N_in * N_t), dtype=np.int32)
@@ -50,6 +63,9 @@ def quantize_dataset(dataset: SHD, config: dict, dtype=torch.int8):
         times = dataset.times_arr[sample_index]
         neurons = dataset.units_arr[sample_index]
 
+        if normalize_trials:
+            times, neurons = normalize_times(times, neurons, dt, t_max)
+
         # Use numpy's digitize to bin the spike times
         binned_spikes = np.digitize(times, bin_edges) - 1
 
@@ -63,7 +79,7 @@ def quantize_dataset(dataset: SHD, config: dict, dtype=torch.int8):
 
         max_count = max(max_count, count_arr.max())
 
-    if abs(max_count - N_bin) > 0:
+    if config.get("verbose", False) and abs(max_count - N_bin) > 0:
         print(
             f"Max spike count in single time interval ({max_count}) "
             f"is very different to N_bin ({N_bin})"
@@ -73,14 +89,20 @@ def quantize_dataset(dataset: SHD, config: dict, dtype=torch.int8):
     data = torch.as_tensor(x_arr, dtype=dtype)
     targets = torch.as_tensor(dataset.label_index_arr, dtype=torch.int8)
 
-    print("Quantized data memory:", data.element_size() * data.numel() / 1e6, "MB")
+    # print("Quantized data memory:", data.element_size() * data.numel() / 1e6, "MB")
 
     assert data.shape[:1] == targets.shape == (dataset.Nsamples,)
 
     return TensorDataset(data, targets)
 
 
-def load_data(root: str, config: dict) -> tuple[DataLoader, DataLoader]:
+def load_datasets(root: str, verbose: bool = False) -> tuple[SHD, SHD]:
+    train_set = SHD(root, mode="train", download=False, verbose=verbose)
+    test_set = SHD(root, mode="test", download=False, verbose=verbose)
+    return train_set, test_set
+
+
+def load_data(datasets: tuple[SHD, SHD], config: dict) -> tuple[DataLoader, DataLoader]:
     """
     Creates DataLoaders.
     """
@@ -89,8 +111,11 @@ def load_data(root: str, config: dict) -> tuple[DataLoader, DataLoader]:
     Nout: int = config["Nout"]
     Nt: int = config["Nt"]
 
+    train_set, test_set = datasets
+
+    torch.manual_seed(config["seed"])
+
     # Training set
-    train_set = SHD(root, mode="train", download=False)
     assert Nin == train_set.N * Nt, (
         f"config.Nin does not match number of neurons in train dataset ({train_set.N})"
         f"times the number of time steps Nt ({Nt})."
@@ -101,18 +126,17 @@ def load_data(root: str, config: dict) -> tuple[DataLoader, DataLoader]:
         f"Got {Nout}, expected {train_set.Nlabel}."
     )
 
-    print("Quantizing training set...")
+    # print("Quantizing training set...")
     train_set = quantize_dataset(train_set, config)
-    print("Train set size:", len(train_set))
+    # print("Train set size:", len(train_set))
 
     if (Ntrain := config.get("Ntrain")) is not None:
         train_set = Subset(train_set, np.arange(Ntrain))
-        print(f"Using reduced train_set size of {Ntrain}")
+        # print(f"Using reduced train_set size of {Ntrain}")
 
     train_loader = DataLoader(train_set, batch_size=Nbatch, shuffle=True)
 
     # Test set
-    test_set = SHD(root, mode="test", download=False)
     assert Nin == test_set.N * Nt, (
         f"config.Nin does not match number of neurons in test dataset ({test_set.N})"
         f"times the number of time steps Nt ({Nt})."
@@ -122,9 +146,9 @@ def load_data(root: str, config: dict) -> tuple[DataLoader, DataLoader]:
         f"config.Nout does not match number of labels in test dataset."
         f"Got {Nout}, expected {test_set.Nlabel}."
     )
-    print("Quantizing test set...")
+    # print("Quantizing test set...")
     test_set = quantize_dataset(test_set, config)
-    print("Test set size:", len(test_set))
+    # print("Test set size:", len(test_set))
 
     test_loader = DataLoader(test_set, batch_size=1_000, shuffle=True)
 
@@ -417,9 +441,10 @@ def probefn(
 
 def run(
     neuron: AbstractPseudoPhaseOscNeuron,
+    data_loaders: tuple[DataLoader, DataLoader],
     config: dict,
     progress_bar: str | None = None,
-) -> dict:
+) -> tuple[dict, dict]:
     """
     Trains a feedforward network with time-to-first-spike encoding on MNIST.
 
@@ -481,6 +506,7 @@ def run(
         trange = range
 
     ### Set up the simulation
+    compilation_start = time.perf_counter()
 
     # Gradient
     @jit
@@ -517,6 +543,8 @@ def run(
     def jprobefn(p, input, labels):
         return probefn(neuron, p, input, labels, config)
 
+    compilation_time = time.perf_counter() - compilation_start
+
     def probe(p: list) -> dict:
         metrics = {
             "loss": 0.0,
@@ -543,20 +571,27 @@ def run(
     ### Simulation
 
     # Data
-    torch.manual_seed(seed)
-    train_loader, test_loader = load_data("data", config)
+    train_loader, test_loader = data_loaders
 
     # Parameters
     key = random.PRNGKey(seed)
+    weights_init_start = time.perf_counter()
     key, weights = init_weights(key, config)
+    weights_init_time = time.perf_counter() - weights_init_start
+
+    phi0_init_start = time.perf_counter()
     phi0 = init_phi0(neuron, config)
+    phi0_init_time = time.perf_counter() - phi0_init_start
+
     p = [weights, phi0]
     p_init = [weights, phi0]
 
     # Optimizer
+    optim_init_start = time.perf_counter()
     schedule = optax.exponential_decay(lr, int(tau_lr * len(train_loader)), 1 / jnp.e)
     optim = optax.adabelief(schedule, b1=beta1, b2=beta2)
     opt_state = optim.init(p)
+    optim_init_time = time.perf_counter() - optim_init_start
 
     # Metrics
     metrics: dict[str, Array | list] = {k: [v] for k, v in probe(p).items()}
@@ -581,7 +616,14 @@ def run(
     metrics["p_init"] = p_init
     metrics["p_end"] = p_end
 
-    return metrics
+    perf_metrics = {
+        "perf.compilation_time": compilation_time,
+        "perf.weights_init_time": weights_init_time,
+        "perf.phi0_init_time": phi0_init_time,
+        "perf.optim_init_time": optim_init_time,
+    }
+
+    return metrics, perf_metrics
 
 
 # %%
@@ -590,13 +632,14 @@ def run(
 ############################
 
 
-def run_example(p: list, neuron: AbstractPseudoPhaseOscNeuron, config: dict) -> dict:
+def run_example(
+    p: list, neuron: AbstractPseudoPhaseOscNeuron, data_loaders, config: dict
+) -> dict:
     """
     Simulates the network for a single example input given the parameters `p`.
     """
 
     ### Unpack arguments
-    seed: int = config["seed"]
     Nhidden: int = config["Nhidden"]
     Nlayer: int = config["Nlayer"]
     Nout: int = config["Nout"]
@@ -614,8 +657,7 @@ def run_example(p: list, neuron: AbstractPseudoPhaseOscNeuron, config: dict) -> 
     ### Run simulation
 
     # Data
-    torch.manual_seed(seed)
-    _, test_loader = load_data("data", config)
+    _, test_loader = data_loaders
 
     input, label = next(iter(test_loader))
     input, label = jnp.array(input[2]), jnp.array(label[2])

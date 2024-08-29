@@ -27,7 +27,7 @@ class OnlineDataset(ABC, IterableDataset[T]):
         data_root: str | Path,
         download: bool = True,
         name: str | None = None,
-        verbose=True,
+        verbose=False,
     ):
         super().__init__()
 
