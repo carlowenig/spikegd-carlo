@@ -10,11 +10,11 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
+from shd import SHD
 from torch.utils.data import DataLoader, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
-from shd import SHD
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
@@ -828,3 +828,114 @@ def plot_traces(ax: Axes, example: dict, config: dict) -> None:
     ax.set_ylim(-8, 8)
     ax.set_ylabel("Potential $V$")
     ax.spines["left"].set_visible(False)
+
+
+# %%
+############################
+### Run functions
+############################
+
+
+def run_theta(
+    datasets, config: dict, data_loaders: tuple[DataLoader, DataLoader] | None = None
+):
+    """
+    Wrapper to train a network of Theta neurons with the given configuration.
+
+    See docstring of `run` and article for more information.
+    """
+    from spikegd.theta import ThetaNeuron
+
+    if data_loaders is None:
+        data_loaders = load_data(datasets, config)
+
+    tau, I0, eps = config["tau"], config["I0"], config["eps"]
+    neuron = ThetaNeuron(tau, I0, eps)
+    metrics, perf_metrics = run(neuron, data_loaders, config, progress_bar="script")
+    return metrics, perf_metrics
+
+
+def summarize_ensemble_metrics(ensemble_metrics: dict, Nepochs: int) -> dict:
+    metrics: dict = {}
+    # epoch 0 is the initial state, other epochs are counted from 1
+    epoch_metrics = [{} for _ in range(Nepochs + 1)]
+
+    for key, value in ensemble_metrics.items():
+        if key in ["p_init", "p_end"]:
+            continue
+
+        is_global = key.startswith("perf.")
+
+        if is_global:
+            metrics[f"{key}_mean"] = float(jnp.mean(value))
+            metrics[f"{key}_std"] = float(jnp.std(value))
+        else:
+            min_mean = None
+            min_mean_epoch = None
+            max_mean = None
+            max_mean_epoch = None
+
+            if value.shape[1] != Nepochs + 1:
+                raise ValueError(
+                    f"Expected {Nepochs + 1} (Nepochs + 1) values, got {value.shape[1]} in {key}"
+                )
+
+            for epoch in range(Nepochs + 1):
+                mean = float(jnp.mean(value[:, epoch]))
+                std = float(jnp.std(value[:, epoch]))
+
+                epoch_dict = epoch_metrics[epoch]
+                epoch_dict[f"{key}_mean"] = mean
+                epoch_dict[f"{key}_std"] = std
+
+                if min_mean is None or mean < min_mean:
+                    min_mean = mean
+                    min_mean_epoch = epoch
+                if max_mean is None or mean > max_mean:
+                    max_mean = mean
+                    max_mean_epoch = epoch
+
+            # Also store init, final, min and max values for convenience
+            metrics[f"{key}_init_mean"] = epoch_metrics[0][f"{key}_mean"]
+            metrics[f"{key}_init_std"] = epoch_metrics[0][f"{key}_std"]
+
+            metrics[f"{key}_final_mean"] = epoch_metrics[Nepochs][f"{key}_mean"]
+            metrics[f"{key}_final_std"] = epoch_metrics[Nepochs][f"{key}_std"]
+
+            if min_mean_epoch is not None:
+                metrics[f"{key}_min_epoch"] = min_mean_epoch
+                metrics[f"{key}_min_mean"] = min_mean
+                metrics[f"{key}_min_std"] = epoch_metrics[min_mean_epoch][f"{key}_std"]
+
+            if max_mean_epoch is not None:
+                metrics[f"{key}_max_epoch"] = max_mean_epoch
+                metrics[f"{key}_max_mean"] = max_mean
+                metrics[f"{key}_max_std"] = epoch_metrics[max_mean_epoch][f"{key}_std"]
+
+    metrics["epochs"] = epoch_metrics
+
+    return metrics
+
+
+def run_theta_ensemble(
+    datasets, config: dict, data_loaders: tuple[DataLoader, DataLoader] | None = None
+) -> dict:
+    seed = config.get("seed", 0)
+    Nsamples = config.get("Nsamples", 1)
+    Nepochs = config["Nepochs"]
+
+    key = random.PRNGKey(seed)
+    seeds = random.randint(key, (Nsamples,), 0, jnp.uint32(2**32 - 1), dtype=jnp.uint32)
+    metrics_list = []
+
+    # load data once if not provided
+    if data_loaders is None:
+        data_loaders = load_data(datasets, config)
+
+    for seed in seeds:
+        config_theta = {**config, "seed": seed}
+        metrics, perf_metrics = run_theta(datasets, config_theta, data_loaders)
+        metrics_list.append(metrics | perf_metrics)
+    metrics = jax.tree.map(lambda *args: jnp.stack(args), *metrics_list)
+
+    return summarize_ensemble_metrics(metrics, Nepochs)
