@@ -1,4 +1,4 @@
-.vscode
+# .vscode
 **/__pycache__
 experiments/*/data
 experiments/*/results/*_backup_*

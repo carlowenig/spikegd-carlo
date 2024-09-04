@@ -1,0 +1,9 @@
+{
+    "python.analysis.extraPaths": [
+        "experiments/heidelberg",
+        "experiments/mnist",
+        "experiments/concept",
+        "experiments/rnn",
+        "experiments/singleneuron"
+    ]
+}
