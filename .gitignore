@@ -1,5 +1,6 @@
 .vscode
 **/__pycache__
 experiments/*/data
-experiments/*/results
+experiments/*/results/*_backup_*
 .venv
+**/slurm_output

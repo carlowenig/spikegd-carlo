@@ -449,6 +449,7 @@ def scan_grid(
     if_trial_exists: Literal[
         "skip", "recompute", "recompute_if_error", "raise", "warn"
     ] = "recompute_if_error",
+    max_configs: int | None = None,
 ):
     configs = expand_config(config_grid)
 
@@ -458,7 +459,7 @@ def scan_grid(
     print_dict(
         {
             "varying keys": ", ".join(varying_keys),
-            "configs": len(configs),
+            "configs": f"{len(configs)} (max: {max_configs})",
         }
     )
     print("========== CONSTANTS ==========")
@@ -468,6 +469,10 @@ def scan_grid(
     print()
 
     for config_index, config in enumerate(configs):
+        if max_configs is not None and config_index == max_configs:
+            print("Reached maximum number of configs.")
+            break
+
         print(f"========== CONFIG {config_index + 1:03d} ==========")
         print_dict(filter_dict(config, varying_keys))
 
