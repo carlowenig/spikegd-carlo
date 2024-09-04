@@ -21,14 +21,14 @@ config_grid = {
     "I0": 5 / 4,
     "eps": 1e-6,
     # Network
-    "Nin_virtual": vary(16, 24),  # #Virtual input neurons = N_bin - 1
-    "Nhidden": vary(50, 100, 200),
-    "Nlayer": vary(2, 3),  # Number of layers
+    "Nin_virtual": vary(32, 48, 64),  # #Virtual input neurons = N_bin - 1
+    "Nhidden": vary(200, 300, 400),
+    "Nlayer": 2,  # Number of layers
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
     "T": 2.0,
-    "K": vary(100, 200, 300),  # Maximal number of simulated ordinary spikes
+    "K": 400,  # Maximal number of simulated ordinary spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
     "gamma": 1e-2,
@@ -37,11 +37,11 @@ config_grid = {
     "tau_lr": 1e2,
     "beta1": 0.9,
     "beta2": 0.999,
-    "p_flip": vary(0.0, 0.02),
-    "Nepochs": 10,
+    "p_flip": 0.0,
+    "Nepochs": 20,
     "Ntrain": None,  # Number of training samples
     # SHD Quantization
-    "Nt": vary(8, 16, 24),
+    "Nt": vary(32, 48, 64),
     "Nin_data": 700,
     "Nin": computed(lambda Nin_data, Nt: Nin_data * Nt),
     # Ensemble
