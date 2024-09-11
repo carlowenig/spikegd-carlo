@@ -10,11 +10,11 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
-from shd import SHD
 from torch.utils.data import DataLoader, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
+from shd import SHD
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
@@ -876,11 +876,18 @@ def summarize_ensemble_metrics(ensemble_metrics: dict, Nepochs: int) -> dict:
     # epoch 0 is the initial state, other epochs are counted from 1
     epoch_metrics = [{} for _ in range(Nepochs + 1)]
 
+    # print(
+    #     {
+    #         k: (type(v), f"array{v.shape}" if hasattr(v, "shape") else "no-shape")
+    #         for k, v in ensemble_metrics.items()
+    #     }
+    # )
+
     for key, value in ensemble_metrics.items():
         if key in ["p_init", "p_end"]:
             continue
 
-        is_global = key.startswith("perf.")
+        is_global = value.ndim == 1
 
         if is_global:
             metrics[f"{key}_mean"] = float(jnp.mean(value))
@@ -891,9 +898,17 @@ def summarize_ensemble_metrics(ensemble_metrics: dict, Nepochs: int) -> dict:
             max_mean = None
             max_mean_epoch = None
 
+            # print("local:", key, value.shape, value)
+
+            if value.ndim != 2:
+                raise ValueError(
+                    f"Expected 2 dimensional value array, got {value.ndim} dimensions."
+                )
+
             if value.shape[1] != Nepochs + 1:
                 raise ValueError(
-                    f"Expected {Nepochs + 1} (Nepochs + 1) values, got {value.shape[1]} in {key}"
+                    f"Expected {Nepochs + 1} (Nepochs + 1) values, "
+                    f"got {value.shape[1]} in {key}"
                 )
 
             for epoch in range(Nepochs + 1):

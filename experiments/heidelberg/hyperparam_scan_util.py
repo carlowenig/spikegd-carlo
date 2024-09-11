@@ -374,6 +374,18 @@ class Resource[*Args](ABC):
 
         self._save_to_unchecked(path)
 
+    def delete(self, author: str):
+        self.require_modification(author)
+
+        path = self.get_abs_path()
+
+        if not path.exists():
+            return
+        elif path.is_file():
+            path.unlink()
+        else:
+            shutil.rmtree(path)
+
 
 class FolderWithInfoYamlResource[*Args](Resource[*Args]):
     _info_file_path: ClassVar[str] = "info.yaml"
@@ -504,6 +516,16 @@ class GridScan(FolderWithInfoYamlResource[str]):
             ]
         ).item()
 
+    def clean(
+        self, author: str, *, delete_unsuccessful_trials=True, delete_empty_runs=True
+    ):
+        for run in self.load_runs().values():
+            run.clean(
+                author,
+                delete_unsuccessful_trials=delete_unsuccessful_trials,
+                delete_if_empty=delete_empty_runs,
+            )
+
 
 @dataclass
 class GridRun(FolderWithInfoYamlResource[str, str]):
@@ -592,6 +614,20 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
             root=self.root,
         )
 
+    def clean(
+        self, author: str, *, delete_unsuccessful_trials=True, delete_if_empty=True
+    ):
+        trials = self.load_trials()
+
+        if delete_unsuccessful_trials:
+            for trial_id, trial in trials.copy().items():
+                if not trial.has_finished_successfully:
+                    trial.delete(author)
+                    del trials[trial_id]
+
+        if delete_if_empty and len(trials) == 0:
+            self.delete(author)
+
     def run(
         self,
         func: Callable[[dict[str, Any]], dict[str, Any]],
@@ -599,8 +635,8 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
         *,
         show_metrics: Iterable[str] = (),
         if_trial_exists: Literal[
-            "skip", "recompute", "recompute_if_error", "raise", "warn"
-        ] = "recompute_if_error",
+            "skip", "recompute", "recompute_if_unsuccessful", "raise", "warn"
+        ] = "recompute_if_unsuccessful",
         max_configs: int | None = None,
         author: str,
     ):
@@ -660,48 +696,52 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
                 print_dict(filter_dict(config, varying_keys))
 
                 # Check if this config has already been run in this scan
-                trial = scan.find_trial_by_config(config)
+                existing_trial = scan.find_trial_by_config(config)
 
-                if trial is not None:
+                if existing_trial is not None:
                     if if_trial_exists == "raise":
                         raise ValueError(
-                            f"This config has already been used in run {trial.run_id}, trial {trial.index}."
+                            f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index}."
                         )
                     elif if_trial_exists == "warn":
                         warnings.warn(
-                            f"This config has already been used in run {trial.run_id}, trial {trial.index}."
+                            f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index}."
                         )
                         continue
-                    elif if_trial_exists == "ignore":
+                    elif if_trial_exists == "skip":
                         print(
-                            f"This config has already been used in run {trial.run_id}, trial {trial.index}. "
+                            f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index}. "
                             "Skipping."
                         )
                         print()
                         continue
                     elif if_trial_exists == "recompute":
                         print(
-                            f"This config has already been used in run {trial.run_id}, trial {trial.index}. "
+                            f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index}. "
                             "Recomputing."
                         )
-                        trial.restart(author=author)
-                    elif if_trial_exists == "recompute_if_error":
-                        if trial.error is None:
+                        # trial.restart(author=author)
+                    elif if_trial_exists == "recompute_if_unsuccessful":
+                        if existing_trial.has_finished_successfully:
                             print(
-                                f"This config has already been used in run {trial.run_id}, trial {trial.index} "
-                                "and had no error. Skipping."
+                                f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index} "
+                                "and finished successfully. Skipping."
                             )
                             print()
                             continue
                         else:
                             print(
-                                f"This config has already been used in run {trial.run_id}, trial {trial.index} "
-                                "but had an error. Recomputing."
+                                f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index} "
+                                "but did not finish successfully. Recomputing."
                             )
-                            trial.restart(author=author)
-                else:
-                    trial = self.create_trial(config, author=author)
-                    print(f"Starting trial {trial.index}.")
+                            # trial.restart(author=author)
+                    else:
+                        raise ValueError(
+                            f"Invalid value for if_trial_exists: {if_trial_exists}"
+                        )
+
+                trial = self.create_trial(config, author=author)
+                print(f"Starting trial {trial.index}.")
 
                 try:
                     metrics = func(config)
@@ -786,6 +826,14 @@ class GridTrial(YamlResource[str, str, int]):
         self.metrics = {}
         self.error = None
         self.save(author)
+
+    @property
+    def has_finished(self):
+        return self.finished_at is not None
+
+    @property
+    def has_finished_successfully(self):
+        return self.has_finished and self.error is None
 
 
 def print_dict(d: dict, value_format="", indent=26):
