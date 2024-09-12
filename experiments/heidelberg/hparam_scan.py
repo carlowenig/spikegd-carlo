@@ -39,8 +39,8 @@ config_grid = {
     "eps": 1e-6,
     # Network
     "Nin_virtual": vary(1, 2, 4, 8, 12, 16, 24),  # #Virtual input neurons = N_bin - 1
-    "Nhidden": 100,
-    "Nlayer": 2,  # Number of layers
+    "Nhidden": vary(50, 100, 150, 200),
+    "Nlayer": 3,  # Number of layers
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
@@ -49,7 +49,7 @@ config_grid = {
     "dt": 0.001,  # Step size used to compute state traces
     # Training
     "gamma": 1e-2,
-    "Nbatch": 500,
+    "Nbatch": 1000,
     "lr": 4e-3,
     "tau_lr": 1e2,
     "beta1": 0.9,
