@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --partition=mlgpu_short
-#SBATCH --time=1:00:00
-#SBATCH --gpus=2
+#SBATCH --time=3:00:00
+#SBATCH --gpus=1
 #SBATCH --account=ag_ifg_memmesheimer
 #SBATCH --output=slurm_output/%x_%j.out
 
@@ -18,5 +18,5 @@ echo "Using Python venv at: $(which python)"
 echo ""
 
 echo "--- SCRIPT START ---"
-python -u hparam_scan.py
+srun python hparam_scan.py
 echo "--- SCRIPT END ---"

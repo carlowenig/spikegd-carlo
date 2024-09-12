@@ -1,13 +1,16 @@
+import hashlib
 import inspect
+import json
+import os
 import shutil
 import time
 import traceback
 import warnings
 from abc import ABC, abstractmethod
+from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from fractions import Fraction
-from math import isnan
 from pathlib import Path
 from types import EllipsisType
 from typing import Any, Callable, ClassVar, Iterable, Literal, Self, Unpack, final
@@ -264,7 +267,6 @@ def format_number(x: float, f_str: str = ".3g"):
 @dataclass
 class Resource[*Args](ABC):
     root: PathLike = field(kw_only=True)
-    owner: str = field(kw_only=True)
 
     @classmethod
     @abstractmethod
@@ -272,7 +274,7 @@ class Resource[*Args](ABC):
 
     @classmethod
     @abstractmethod
-    def create(cls, *args: Unpack[Args], root: PathLike, author: str) -> Self: ...
+    def create(cls, *args: Unpack[Args], root: PathLike) -> Self: ...
 
     @classmethod
     @abstractmethod
@@ -300,6 +302,8 @@ class Resource[*Args](ABC):
                 f"Loaded {cls.__name__} has different arguments: {obj._get_args()} != {args}"
             )
 
+        obj._snapshot = obj.copy()
+
         return obj
 
     @classmethod
@@ -307,13 +311,12 @@ class Resource[*Args](ABC):
         cls,
         *args: Unpack[Args],
         root: PathLike,
-        author: str,
         **create_kwargs,
     ) -> Self:
         try:
             return cls.load(*args, root=root)
         except FileNotFoundError:
-            return cls.create(*args, root=root, author=author, **create_kwargs)
+            return cls.create(*args, root=root, **create_kwargs)
 
     def get_rel_path(self) -> Path:
         args = self._get_args()
@@ -325,16 +328,16 @@ class Resource[*Args](ABC):
     def exists(self):
         return self.get_abs_path().exists()
 
-    def require_modification(self, author: str):
-        if self.owner != author:
-            raise PermissionError(
-                f"Resource at {self.get_abs_path()} is owned by {self.owner!r} and cannot be modified by {author!r}."
-            )
-
     def to_dict(self) -> dict[str, Any]:
         dict_ = asdict(self)
         del dict_["root"]
         return dict_
+
+    def copy(self, *, remove_snapshot=True):
+        copy = deepcopy(self)
+        if remove_snapshot:
+            copy._snapshot = None
+        return copy
 
     @classmethod
     def from_dict(cls, dict_: dict[str, Any], root: PathLike) -> Self:
@@ -343,11 +346,8 @@ class Resource[*Args](ABC):
     @final
     def save(
         self,
-        author: str,
         if_exists: Literal["compare", "raise", "skip", "override"] = "override",
     ):
-        self.require_modification(author)
-
         path = self.get_abs_path()
 
         if path.exists():
@@ -373,10 +373,9 @@ class Resource[*Args](ABC):
         path.parent.mkdir(parents=True, exist_ok=True)
 
         self._save_to_unchecked(path)
+        self._snapshot = self.copy()
 
-    def delete(self, author: str):
-        self.require_modification(author)
-
+    def delete(self):
         path = self.get_abs_path()
 
         if not path.exists():
@@ -385,6 +384,11 @@ class Resource[*Args](ABC):
             path.unlink()
         else:
             shutil.rmtree(path)
+
+        self._snapshot = None
+
+    def __str__(self):
+        return f"{type(self).__name__}({", ".join(str(a) for a in self._get_args())})"
 
 
 class FolderWithInfoYamlResource[*Args](Resource[*Args]):
@@ -451,31 +455,18 @@ class GridScan(FolderWithInfoYamlResource[str]):
         *,
         metadata: dict | None = None,
         root: PathLike,
-        author: str,
     ):
         scan = cls(
             id=id,
             created_at=format_timestamp(time.time()),
             metadata=metadata or {},
             root=root,
-            owner=author,
         )
-        scan.save(author)
+        scan.save()
         return scan
 
     def _get_args(self):
         return (self.id,)
-
-    def create_run(
-        self, *, name: str | None = None, description: str | None = None, author: str
-    ):
-        return GridRun.create(
-            self.id,
-            root=self.root,
-            author=author,
-            name=name,
-            description=description,
-        )
 
     def load_run_ids(self) -> list[str]:
         runs_path = self.get_abs_path() / "runs"
@@ -489,23 +480,44 @@ class GridScan(FolderWithInfoYamlResource[str]):
             if p.is_dir() and not p.name.startswith(".")
         ]
 
+    def load_run(self, id: str):
+        return GridRun.load(self.id, id, root=self.root)
+
     def load_runs(self):
-        return {
-            run_id: GridRun.load(self.id, run_id, root=self.root)
-            for run_id in self.load_run_ids()
-        }
+        return {run_id: self.load_run(run_id) for run_id in self.load_run_ids()}
+
+    def load_trial_config_hashes(self) -> list[str]:
+        trials_path = self.get_abs_path() / "trials"
+
+        if not trials_path.exists():
+            return []
+
+        return [p.stem for p in trials_path.iterdir() if p.is_file()]
+
+    def load_trial(self, config_hash: str):
+        return GridTrial.load(self.id, config_hash, root=self.root)
 
     def load_trials(self):
         return {
-            (run.id, trial.index): trial
-            for run in self.load_runs().values()
-            for trial in run.load_trials().values()
+            config_hash: self.load_trial(config_hash)
+            for config_hash in self.load_trial_config_hashes()
         }
 
     def find_trial_by_config(self, config: dict[str, Any]):
-        for trial in self.load_trials().values():
-            if trial.config == config:
-                return trial
+        config_hash = hash_config(config)
+        try:
+            trial = self.load_trial(config_hash)
+        except FileNotFoundError:
+            return None
+        else:
+            if trial.config != config:
+                raise ValueError(
+                    f"Hash collision for config hash {config_hash}:\n"
+                    f"  Config 1: {config}\n"
+                    f"  Config 2: {trial.config}"
+                )
+
+            return trial
 
     def get_mean_trial_duration(self):
         return np.mean(
@@ -516,15 +528,219 @@ class GridScan(FolderWithInfoYamlResource[str]):
             ]
         ).item()
 
-    def clean(
-        self, author: str, *, delete_unsuccessful_trials=True, delete_empty_runs=True
+    def clean(self, *, delete_unsuccessful_trials=True, delete_empty_runs=True):
+        trials = self.load_trials()
+
+        if delete_unsuccessful_trials:
+            for trial_id, trial in trials.copy().items():
+                if trial.error is not None:
+                    print(f"Deleting unsuccessful trial {trial_id}")
+                    trial.delete()
+                    del trials[trial_id]
+
+        if delete_empty_runs:
+            non_empty_run_ids = {trial.run_id for trial in trials.values()}
+            empty_run_ids = set(self.load_run_ids()) - non_empty_run_ids
+
+            for run_id in empty_run_ids:
+                print(f"Deleting empty run {run_id}")
+                self.load_run(run_id).delete()
+
+    def run(
+        self,
+        func: Callable[[dict[str, Any]], dict[str, Any]],
+        config_grid: dict,
+        *,
+        show_metrics: Iterable[str] = (),
+        if_trial_exists: Literal[
+            "skip", "recompute", "recompute_if_error", "raise", "warn"
+        ] = "recompute_if_error",
+        name: str | None = None,
+        description: str | None = None,
+        n_processes=None,
     ):
-        for run in self.load_runs().values():
-            run.clean(
-                author,
-                delete_unsuccessful_trials=delete_unsuccessful_trials,
-                delete_if_empty=delete_empty_runs,
+        if n_processes is None:
+            n_processes = os.cpu_count()
+
+        def process_config(config: dict):
+            config_index = config["_index"]
+
+            remaining_configs = len(configs) - config_index
+            mean_duration = self.get_mean_trial_duration()
+
+            if not np.isnan(mean_duration):
+                remaining_time = remaining_configs * mean_duration
+                remaining_time_str = format_duration(remaining_time)
+                eta = datetime.fromtimestamp(time.time() + remaining_time).strftime(
+                    "%H:%M:%S"
+                )
+                run.log(
+                    f"{remaining_configs} configs remaining "
+                    f"(~{remaining_time_str}, ETA: {eta}, "
+                    f"based on a mean trial duration of {mean_duration:.1f}s)"
+                )
+            else:
+                run.log(
+                    f"{remaining_configs} configs remaining "
+                    f"(could not estimate remaining time)"
+                )
+            print()
+
+            run.log(
+                f"========== CONFIG {config_index + 1} ==========\n"
+                + format_dict(filter_dict(config, variables))
             )
+
+            # Check if this config has already been run in this scan
+            existing_trial = self.find_trial_by_config(config)
+
+            if existing_trial is not None:
+                if if_trial_exists == "raise":
+                    raise ValueError(
+                        f"This config has already been used in trial {existing_trial.config_hash}."
+                    )
+                elif if_trial_exists == "warn":
+                    warnings.warn(
+                        f"This config has already been used in trial {existing_trial.config_hash}."
+                    )
+                    return
+                elif if_trial_exists == "skip":
+                    run.log(
+                        f"This config has already been used in trial {existing_trial.config_hash}. "
+                        "Skipping."
+                    )
+                    # print()
+                    return
+                elif if_trial_exists == "recompute":
+                    run.log(
+                        f"This config has already been used in trial {existing_trial.config_hash}. "
+                        "Recomputing."
+                    )
+                    existing_trial.delete()
+                elif if_trial_exists == "recompute_if_error":
+                    if existing_trial.error is None:
+                        run.log(
+                            f"This config has already been used in trial {existing_trial.config_hash} "
+                            "and finished successfully. Skipping."
+                        )
+                        # print()
+                        return
+                    else:
+                        run.log(
+                            f"This config has already been used in trial {existing_trial.config_hash} "
+                            "but did not finish successfully. Recomputing."
+                        )
+                        existing_trial.delete()
+                else:
+                    raise ValueError(
+                        f"Invalid value for if_trial_exists: {if_trial_exists}"
+                    )
+
+            config_hash = hash_config(config)
+            run.log(f"Starting trial {config_hash}.")
+
+            started_time = time.time()
+
+            try:
+                metrics = func(config)
+            except Exception:
+                finished_time = time.time()
+                error = traceback.format_exc()
+                metrics = {}
+                run.log(format_dict({"error": error}))
+            else:
+                finished_time = time.time()
+                error = None
+                run.log(
+                    format_dict(filter_dict(metrics, show_metrics, require_all=True))
+                )
+
+            trial = GridTrial.create(
+                self.id,
+                config_hash,
+                run_id=run.id,
+                config=config,
+                root=self.root,
+                started_time=started_time,
+                finished_time=finished_time,
+                metrics=metrics,
+                error=error,
+            )
+
+            run.log(f"Finished trial {config_hash} after {trial.duration:.1f}s")
+            # print()
+
+        configs = expand_config(config_grid)
+
+        constants, variables = get_constants(configs)
+
+        run = GridRun.create(
+            self.id,
+            root=self.root,
+            name=name,
+            description=description,
+            metadata={"n_processes": n_processes},
+            constants=constants,
+            variables=variables,
+        )
+        run.log(f"CONSTANTS:\n  {format_dict(constants).replace("\n", "\n  ")}")
+        run.log(f"VARIABLES: {", ".join(variables)}")
+        print(
+            f"Started run {run.id}. Log can be found at grid_scans/runs/{run.id}/main.log"
+        )
+
+        try:
+            # TODO: Is it possible to parallelize this?
+            # import jax.numpy as jnp
+
+            # arr_configs = {
+            #     "_index": jnp.arange(len(configs)),
+            # } | {k: jnp.array([c[k] for c in configs]) for k in configs[0].keys()}
+
+            # jax.pmap(process_config)(arr_configs)
+
+            # with ThreadPool(n_processes) as pool:
+            #     pool.map(process_config, enumerate(configs))
+
+            for config_index, config in enumerate(configs):
+                process_config(config | {"_index": config_index})
+
+        finally:
+            run.finished_at = format_timestamp(time.time())
+            run.duration = time.time() - parse_timestamp(run.started_at)
+            run.save()
+            print(f"Finished run {self.id}")
+
+        return run
+
+
+def format_duration(total_seconds):
+    total_seconds = int(total_seconds)
+    seconds = total_seconds % 60
+    s = f"{seconds}s"
+
+    total_minutes = total_seconds // 60
+    if total_minutes == 0:
+        return s
+
+    minutes = total_minutes % 60
+    s = f"{minutes}m {s}"
+
+    total_hours = total_minutes // 60
+    if total_hours == 0:
+        return s
+
+    hours = total_hours % 24
+    s = f"{hours}h {s}"
+
+    total_days = total_hours // 24
+    if total_days == 0:
+        return s
+
+    days = total_days
+    s = f"{days}d {s}"
+
+    return s
 
 
 @dataclass
@@ -534,7 +750,9 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
     name: str | None
     description: str | None
     metadata: dict
-    started_at: str | None = None
+    constants: dict[str, Any]
+    variables: list[str]
+    started_at: str
     finished_at: str | None = None
     duration: float | None = None
 
@@ -559,21 +777,27 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
         description: str | None = None,
         metadata: dict | None = None,
         root: PathLike,
-        author: str,
+        constants: dict[str, Any] | None = None,
+        variables: list[str] | None = None,
     ):
         if id is None:
             id = cls.create_id(name)
 
+        assert constants is not None
+        assert variables is not None
+
         run = cls(
             root=root,
-            owner=author,
             scan_id=scan_id,
             id=id,
             name=name,
             description=description,
             metadata=metadata or {},
+            constants=constants,
+            variables=variables,
+            started_at=format_timestamp(time.time()),
         )
-        run.save(author)
+        run.save()
         return run
 
     def _get_args(self):
@@ -582,258 +806,82 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
             self.id,
         )
 
-    def load_trial_indices(self) -> list[int]:
-        trials_path = self.get_abs_path() / "trials"
+    def log(self, message: str):
+        # thread_id = threading.get_ident()
+        log_path = self.get_abs_path() / "main.log"
 
-        if not trials_path.exists():
-            return []
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-        return [
-            int(p.stem)
-            for p in trials_path.iterdir()
-            if p.is_file() and p.stem.isdigit()
-        ]
+        with log_path.open("a") as file:
+            file.write(f"[{timestamp}]\n{message}\n")
 
-    def load_next_trial_index(self):
-        return max(self.load_trial_indices(), default=-1) + 1
 
-    def load_trials(self):
-        return {
-            index: GridTrial.load(self.scan_id, self.id, index, root=self.root)
-            for index in self.load_trial_indices()
-        }
-
-    def create_trial(self, config: dict[str, Any], *, author: str):
-        index = self.load_next_trial_index()
-        return GridTrial.create(
-            self.scan_id,
-            self.id,
-            index,
-            config=config,
-            author=author,
-            root=self.root,
-        )
-
-    def clean(
-        self, author: str, *, delete_unsuccessful_trials=True, delete_if_empty=True
-    ):
-        trials = self.load_trials()
-
-        if delete_unsuccessful_trials:
-            for trial_id, trial in trials.copy().items():
-                if not trial.has_finished_successfully:
-                    trial.delete(author)
-                    del trials[trial_id]
-
-        if delete_if_empty and len(trials) == 0:
-            self.delete(author)
-
-    def run(
-        self,
-        func: Callable[[dict[str, Any]], dict[str, Any]],
-        config_grid: dict,
-        *,
-        show_metrics: Iterable[str] = (),
-        if_trial_exists: Literal[
-            "skip", "recompute", "recompute_if_unsuccessful", "raise", "warn"
-        ] = "recompute_if_unsuccessful",
-        max_configs: int | None = None,
-        author: str,
-    ):
-        if self.started_at is not None:
-            raise ValueError(f"Run {self.id} has already been started.")
-
-        self.require_modification(author)
-        self.started_at = format_timestamp(time.time())
-        self.save(author)
-
-        try:
-            configs = expand_config(config_grid)
-
-            constants, varying_keys = get_constants(configs)
-
-            scan = GridScan.load_or_create(self.scan_id, root=self.root, author=author)
-
-            print_dict(
-                {
-                    "varying keys": ", ".join(varying_keys),
-                }
-            )
-            print("========== CONSTANTS ==========")
-            print_dict(constants)
-
-            print()
-
-            for config_index, config in enumerate(configs):
-                if max_configs is not None and config_index == max_configs:
-                    print("Reached maximum number of configs.")
-                    break
-
-                remaining_configs = len(configs) - config_index
-                mean_duration = scan.get_mean_trial_duration()
-
-                if not isnan(mean_duration):
-                    remaining_time = remaining_configs * mean_duration
-                    remaining_time_str = (
-                        f"{int(remaining_time) // 60}m" f"{int(remaining_time) % 60}s"
-                    )
-                    eta = datetime.fromtimestamp(time.time() + remaining_time).strftime(
-                        "%H:%M:%S"
-                    )
-                    print(
-                        f"{remaining_configs} configs remaining "
-                        f"(~{remaining_time_str}, ETA: {eta}, "
-                        f"based on a mean trial duration of {mean_duration:.1f}s)"
-                    )
-                else:
-                    print(
-                        f"{remaining_configs} configs remaining "
-                        f"(could not estimate remaining time)"
-                    )
-                print()
-
-                print(f"========== CONFIG {config_index + 1:03d} ==========")
-                print_dict(filter_dict(config, varying_keys))
-
-                # Check if this config has already been run in this scan
-                existing_trial = scan.find_trial_by_config(config)
-
-                if existing_trial is not None:
-                    if if_trial_exists == "raise":
-                        raise ValueError(
-                            f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index}."
-                        )
-                    elif if_trial_exists == "warn":
-                        warnings.warn(
-                            f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index}."
-                        )
-                        continue
-                    elif if_trial_exists == "skip":
-                        print(
-                            f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index}. "
-                            "Skipping."
-                        )
-                        print()
-                        continue
-                    elif if_trial_exists == "recompute":
-                        print(
-                            f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index}. "
-                            "Recomputing."
-                        )
-                        # trial.restart(author=author)
-                    elif if_trial_exists == "recompute_if_unsuccessful":
-                        if existing_trial.has_finished_successfully:
-                            print(
-                                f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index} "
-                                "and finished successfully. Skipping."
-                            )
-                            print()
-                            continue
-                        else:
-                            print(
-                                f"This config has already been used in run {existing_trial.run_id}, trial {existing_trial.index} "
-                                "but did not finish successfully. Recomputing."
-                            )
-                            # trial.restart(author=author)
-                    else:
-                        raise ValueError(
-                            f"Invalid value for if_trial_exists: {if_trial_exists}"
-                        )
-
-                trial = self.create_trial(config, author=author)
-                print(f"Starting trial {trial.index}.")
-
-                try:
-                    metrics = func(config)
-                except Exception:
-                    e_str = traceback.format_exc()
-                    trial.finish({}, e_str, author=author)
-                    print_dict({"error": e_str})
-                else:
-                    trial.finish(metrics, author=author)
-                    print_dict(filter_dict(metrics, show_metrics, require_all=True))
-
-                print()
-
-        finally:
-            self.finished_at = format_timestamp(time.time())
-            self.duration = time.time() - parse_timestamp(self.started_at)
-            self.save(author)
-            print(f"Finished run {self.id}")
+def hash_config(config: dict[str, Any]):
+    config_str = json.dumps(config, sort_keys=True)
+    hash_obj = hashlib.md5(config_str.encode())
+    return hash_obj.hexdigest()
 
 
 @dataclass
-class GridTrial(YamlResource[str, str, int]):
+class GridTrial(YamlResource[str, str]):
     root: PathLike
     scan_id: str
-    run_id: str
-    index: int
+    run_id: str | None
     config: dict[str, Any]
     started_at: str
-    finished_at: str | None = None
-    duration: float | None = None
+    finished_at: str
+    duration: float
     metrics: dict[str, Any] = field(default_factory=dict)
     error: str | None = None
+    config_hash: str = ""
 
     def __post_init__(self):
-        if self.index > 9999:
-            raise ValueError("Trial indices above 9999 are not supported.")
+        config_hash = hash_config(self.config)
+        if not self.config_hash:
+            self.config_hash = config_hash
+        elif self.config_hash != config_hash:
+            raise ValueError(
+                f"The provided config hash {self.config_hash} is different from the actual config hash {config_hash}."
+            )
 
     @classmethod
-    def get_rel_path_of(cls, scan_id: str, run_id: str, index: int):
-        return GridRun.get_rel_path_of(scan_id, run_id) / "trials" / f"{index:04d}.yaml"
+    def get_rel_path_of(cls, scan_id: str, config_hash: str):
+        return GridScan.get_rel_path_of(scan_id) / "trials" / f"{config_hash}.yaml"
 
     @classmethod
     def create(
         cls,
         scan_id: str,
-        run_id: str,
-        index: int,
+        config_hash: str = "",
         *,
+        run_id: str | None = None,
         config: dict[str, Any] | None = None,
+        started_time: float | None = None,
+        finished_time: float | None = None,
         root: PathLike,
-        author: str,
+        metrics: dict[str, Any] | None = None,
+        error: str | None = None,
     ):
+        assert started_time is not None
+        assert finished_time is not None
+
         trial = cls(
             root=root,
-            owner=author,
             scan_id=scan_id,
             run_id=run_id,
-            index=index,
             config=config.copy() if config is not None else {},
-            started_at=format_timestamp(time.time()),
+            config_hash=config_hash,
+            started_at=format_timestamp(started_time),
+            finished_at=format_timestamp(finished_time),
+            duration=finished_time - started_time,
+            metrics=metrics if metrics is not None else {},
+            error=error,
         )
-        trial.save(author)
+        trial.save()
         return trial
 
     def _get_args(self):
-        return (self.scan_id, self.run_id, self.index)
-
-    def finish(self, metrics: dict[str, Any], error: str | None = None, *, author: str):
-        self.require_modification(author)
-        end_time = time.time()
-        self.metrics = metrics
-        self.error = error
-        self.finished_at = format_timestamp(end_time)
-        self.duration = end_time - parse_timestamp(self.started_at)
-        self.save(author)
-
-    def restart(self, author: str):
-        self.require_modification(author)
-        self.started_at = format_timestamp(time.time())
-        self.finished_at = None
-        self.duration = None
-        self.metrics = {}
-        self.error = None
-        self.save(author)
-
-    @property
-    def has_finished(self):
-        return self.finished_at is not None
-
-    @property
-    def has_finished_successfully(self):
-        return self.has_finished and self.error is None
+        return (self.scan_id, self.config_hash)
 
 
 def print_dict(d: dict, value_format="", indent=26):
@@ -847,3 +895,20 @@ def print_dict(d: dict, value_format="", indent=26):
         v_str = v_str.replace("\n", "\n" + " " * indent)
 
         print(f"{k:<{indent - 1}} {v_str}")
+
+
+def format_dict(d: dict, value_format="", indent=26):
+    lines = []
+
+    for k, v in d.items():
+        if isinstance(v, float):
+            v_str = format_number(v, value_format)
+        else:
+            v_str = f"{v:{value_format}}"
+
+        # indent
+        v_str = v_str.replace("\n", "\n" + " " * indent)
+
+        lines.append(f"{k:<{indent - 1}} {v_str}")
+
+    return "\n".join(lines)
