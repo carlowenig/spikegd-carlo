@@ -1,0 +1,37 @@
+scan_id: main
+id: '20240913_122108'
+name: null
+description: null
+metadata:
+  n_processes: 1
+constants:
+  device_count: 1
+  seed: 0
+  tau: 1.909859317102744
+  I0: 1.25
+  eps: 1.0e-06
+  Nhidden: 100
+  Nlayer: 2
+  Nout: 20
+  w_scale: 0.5
+  T: 2.0
+  K: 300
+  dt: 0.001
+  gamma: 0.01
+  Nbatch: 2000
+  lr: 0.004
+  tau_lr: 100.0
+  beta1: 0.9
+  beta2: 0.999
+  p_flip: 0.0
+  Nepochs: 20
+  Ntrain: null
+  Nin_data: 700
+  Nsamples: 3
+variables:
+- Nin_virtual
+- Nt
+- Nin
+started_at: 2024-09-13_12-21-08_685094
+finished_at: null
+duration: null

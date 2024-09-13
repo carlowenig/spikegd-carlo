@@ -1,0 +1,44 @@
+scan_id: main
+run_id: '20240913_121703'
+config:
+  device_count: 1
+  seed: 0
+  tau: 1.909859317102744
+  I0: 1.25
+  eps: 1.0e-06
+  Nhidden: 100
+  Nlayer: 2
+  Nout: 20
+  w_scale: 0.5
+  T: 2.0
+  K: 300
+  dt: 0.001
+  gamma: 0.01
+  Nbatch: 1000
+  lr: 0.004
+  tau_lr: 100.0
+  beta1: 0.9
+  beta2: 0.999
+  p_flip: 0.0
+  Nepochs: 20
+  Ntrain: null
+  Nin_data: 700
+  Nsamples: 3
+  Nin_virtual: 128
+  Nt: 2
+  Nin: 1400
+  _index: 14
+started_at: 2024-09-13_12-25-21_623327
+finished_at: 2024-09-13_12-25-21_624512
+duration: 0.001184701919555664
+metrics: {}
+error: "Traceback (most recent call last):\n  File \"/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py\"\
+  , line 645, in process_config\n    metrics = func(config)\n              ^^^^^^^^^^^^\n\
+  \  File \"/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py\"\
+  , line 967, in run_theta_ensemble\n    data_loaders = load_data(datasets, config)\n\
+  \                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py\"\
+  , line 134, in load_data\n    train_set = quantize_dataset(train_set, config)\n\
+  \                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py\"\
+  , line 44, in quantize_dataset\n    raise ValueError(\nValueError: Number of bins\
+  \ N_bin = 129 exceeds maximum value for torch.int8: 127\n"
+config_hash: 13cb79162018a042f5d0c4f73ce166d9
