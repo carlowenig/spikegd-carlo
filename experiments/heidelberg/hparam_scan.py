@@ -7,8 +7,8 @@ import jax
 # jax.distributed.initialize()  # type: ignore
 import numpy as np
 
-from heidelberg_v01 import load_datasets, run_theta_ensemble
-from hyperparam_scan_util import GridScan, computed, vary
+from heidelberg_v02 import load_datasets, run_theta_ensemble
+from hyperparam_scan_util import GridScan, vary
 
 assert (
     Path.cwd().as_posix().endswith("experiments/heidelberg")
@@ -41,8 +41,8 @@ config_grid = {
     "Nin_virtual": vary(
         1, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 80, 96, 128
     ),  # #Virtual input neurons = N_bin - 1
-    "Nhidden": 100,
-    "Nlayer": 2,  # Number of layers
+    "Nhidden": vary(100, 200, 300),
+    "Nlayer": vary(2, 3),  # Number of layers
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
@@ -51,7 +51,7 @@ config_grid = {
     "dt": 0.001,  # Step size used to compute state traces
     # Training
     "gamma": 1e-2,
-    "Nbatch": 2000,
+    "Nbatch": vary(1000, 2000),
     "lr": 4e-3,
     "tau_lr": 1e2,
     "beta1": 0.9,
@@ -60,14 +60,15 @@ config_grid = {
     "Nepochs": 20,
     "Ntrain": None,  # Number of training samples
     # SHD Quantization
-    "Nt": vary(2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 80, 96, 128),
-    "Nin_data": 700,
-    "Nin": computed(lambda Nin_data, Nt: Nin_data * Nt),
+    # "Nt": vary(2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 80, 96, 128),
+    # "Nin_data": 700,
+    # "Nin": computed(lambda Nin_data, Nt: Nin_data * Nt),
+    "Nin": 700,
     # Ensemble
     "Nsamples": 3,
 }
 
-scan = GridScan.load_or_create("main", root="results")
+scan = GridScan.load_or_create("main_v2", root="results")
 
 
 scan.run(
