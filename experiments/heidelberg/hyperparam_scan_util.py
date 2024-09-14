@@ -10,13 +10,21 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
-from fractions import Fraction
 from pathlib import Path
 from types import EllipsisType
 from typing import Any, Callable, ClassVar, Iterable, Literal, Self, Unpack, final
 
 import numpy as np
+import pandas as pd
 import yaml
+from tqdm import tqdm
+
+from spikegd.utils.formatting import (
+    fmt_dict_multiline,
+    fmt_duration,
+    fmt_timestamp,
+    parse_timestamp,
+)
 
 
 class ConfigVariable(ABC):
@@ -209,14 +217,6 @@ def get_constants(configs: list[dict]) -> tuple[dict[str, Any], list[str]]:
     return constants, varying_keys
 
 
-def format_timestamp(t: float):
-    return datetime.fromtimestamp(t).strftime("%Y-%m-%d_%H-%M-%S_%f")
-
-
-def parse_timestamp(t: str):
-    return datetime.strptime(t, "%Y-%m-%d_%H-%M-%S_%f").timestamp()
-
-
 PathLike = str | Path | None
 
 
@@ -227,41 +227,6 @@ def as_path(path: PathLike) -> Path:
         return Path(".")
     else:
         return Path(path)
-
-
-_DETECTABLE_CONSTANTS = {
-    "pi": np.pi,
-    "e": np.e,
-}
-
-
-def detect_constant(
-    x: float, min_power=-1, max_power=1, max_int=100
-) -> tuple[str | None, int, Fraction]:
-    from fractions import Fraction
-
-    if x == 0:
-        return None, 0, Fraction(0)
-
-    for name, value in _DETECTABLE_CONSTANTS.items():
-        for power in range(min_power, max_power + 1):
-            if power == 0:
-                continue
-
-            frac = Fraction(x / value**power)
-            if frac.numerator < max_int and frac.denominator < max_int:
-                return name, power, frac
-
-    return None, 0, Fraction(0)
-
-
-def format_number(x: float, f_str: str = ".3g"):
-    constant, power, coeff = detect_constant(x)
-
-    if constant is not None:
-        return f"{coeff ** power} {constant}^{power}"
-
-    return f"{x:{f_str}}"
 
 
 @dataclass
@@ -458,7 +423,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
     ):
         scan = cls(
             id=id,
-            created_at=format_timestamp(time.time()),
+            created_at=fmt_timestamp(time.time()),
             metadata=metadata or {},
             root=root,
         )
@@ -497,11 +462,60 @@ class GridScan(FolderWithInfoYamlResource[str]):
     def load_trial(self, config_hash: str):
         return GridTrial.load(self.id, config_hash, root=self.root)
 
-    def load_trials(self):
+    def load_trials(self, *, progress=False):
+        if progress:
+            print(f"Loading trials for scan {self.id}...")
         return {
             config_hash: self.load_trial(config_hash)
-            for config_hash in self.load_trial_config_hashes()
+            for config_hash in tqdm(
+                self.load_trial_config_hashes(),
+                disable=not progress,
+            )
         }
+
+    def load_trials_df(self, *, progress=False):
+        trials = []
+        for trial in self.load_trials(progress=progress).values():
+            trial_dict = {
+                "run_id": trial.run_id,
+                "config_hash": trial.config_hash,
+                "started_at": trial.started_at,
+                "finished_at": trial.finished_at,
+                "duration": trial.duration,
+                "error": trial.error,
+            }
+
+            for key, value in trial.config.items():
+                if key == "_index":
+                    continue
+                trial_dict[f"config.{key}"] = value
+
+            for key, value in trial.metrics.items():
+                if key == "epochs":
+                    continue
+                trial_dict[f"metrics.{key}"] = value
+
+            trials.append(trial_dict)
+
+        return pd.DataFrame(trials)
+
+    def export_trials_df(self, path: PathLike = None, *, loading_progress=False):
+        if path is None:
+            path = f"trials_export_{time.strftime("%Y%m%d_%H%M%S")}.parquet"
+
+        df = self.load_trials_df(progress=loading_progress)
+        df.to_parquet(self.get_abs_path() / path)
+
+        return df
+
+    def load_exported_trials_df(self, path: PathLike = None):
+        if path is None:
+            paths = self.get_abs_path().glob("trials_export_*.parquet")
+            path = max(paths, key=os.path.getctime)
+        else:
+            path = self.get_abs_path() / path
+
+        return pd.read_parquet(path)
 
     def find_trial_by_config(self, config: dict[str, Any]):
         config_hash = hash_config(config)
@@ -570,7 +584,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
 
             if not np.isnan(mean_duration):
                 remaining_time = remaining_configs * mean_duration
-                remaining_time_str = format_duration(remaining_time)
+                remaining_time_str = fmt_duration(remaining_time)
                 eta = datetime.fromtimestamp(time.time() + remaining_time).strftime(
                     "%H:%M:%S"
                 )
@@ -588,7 +602,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
 
             run.log(
                 f"========== CONFIG {config_index + 1} ==========\n"
-                + format_dict(filter_dict(config, variables))
+                + fmt_dict_multiline(filter_dict(config, variables))
             )
 
             # Check if this config has already been run in this scan
@@ -647,12 +661,14 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 finished_time = time.time()
                 error = traceback.format_exc()
                 metrics = {}
-                run.log(format_dict({"error": error}))
+                run.log(fmt_dict_multiline({"error": error}))
             else:
                 finished_time = time.time()
                 error = None
                 run.log(
-                    format_dict(filter_dict(metrics, show_metrics, require_all=True))
+                    fmt_dict_multiline(
+                        filter_dict(metrics, show_metrics, require_all=True)
+                    )
                 )
 
             trial = GridTrial.create(
@@ -683,7 +699,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
             constants=constants,
             variables=variables,
         )
-        run.log(f"CONSTANTS:\n  {format_dict(constants).replace("\n", "\n  ")}")
+        run.log(f"CONSTANTS:\n  {fmt_dict_multiline(constants).replace("\n", "\n  ")}")
         run.log(f"VARIABLES: {", ".join(variables)}")
         print(
             f"Started run {run.id}. Log can be found at grid_scans/runs/{run.id}/main.log"
@@ -706,41 +722,12 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 process_config(config | {"_index": config_index})
 
         finally:
-            run.finished_at = format_timestamp(time.time())
+            run.finished_at = fmt_timestamp(time.time())
             run.duration = time.time() - parse_timestamp(run.started_at)
             run.save()
             print(f"Finished run {self.id}")
 
         return run
-
-
-def format_duration(total_seconds):
-    total_seconds = int(total_seconds)
-    seconds = total_seconds % 60
-    s = f"{seconds}s"
-
-    total_minutes = total_seconds // 60
-    if total_minutes == 0:
-        return s
-
-    minutes = total_minutes % 60
-    s = f"{minutes}m {s}"
-
-    total_hours = total_minutes // 60
-    if total_hours == 0:
-        return s
-
-    hours = total_hours % 24
-    s = f"{hours}h {s}"
-
-    total_days = total_hours // 24
-    if total_days == 0:
-        return s
-
-    days = total_days
-    s = f"{days}d {s}"
-
-    return s
 
 
 @dataclass
@@ -795,7 +782,7 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
             metadata=metadata or {},
             constants=constants,
             variables=variables,
-            started_at=format_timestamp(time.time()),
+            started_at=fmt_timestamp(time.time()),
         )
         run.save()
         return run
@@ -871,8 +858,8 @@ class GridTrial(YamlResource[str, str]):
             run_id=run_id,
             config=config.copy() if config is not None else {},
             config_hash=config_hash,
-            started_at=format_timestamp(started_time),
-            finished_at=format_timestamp(finished_time),
+            started_at=fmt_timestamp(started_time),
+            finished_at=fmt_timestamp(finished_time),
             duration=finished_time - started_time,
             metrics=metrics if metrics is not None else {},
             error=error,
@@ -882,33 +869,3 @@ class GridTrial(YamlResource[str, str]):
 
     def _get_args(self):
         return (self.scan_id, self.config_hash)
-
-
-def print_dict(d: dict, value_format="", indent=26):
-    for k, v in d.items():
-        if isinstance(v, float):
-            v_str = format_number(v, value_format)
-        else:
-            v_str = f"{v:{value_format}}"
-
-        # indent
-        v_str = v_str.replace("\n", "\n" + " " * indent)
-
-        print(f"{k:<{indent - 1}} {v_str}")
-
-
-def format_dict(d: dict, value_format="", indent=26):
-    lines = []
-
-    for k, v in d.items():
-        if isinstance(v, float):
-            v_str = format_number(v, value_format)
-        else:
-            v_str = f"{v:{value_format}}"
-
-        # indent
-        v_str = v_str.replace("\n", "\n" + " " * indent)
-
-        lines.append(f"{k:<{indent - 1}} {v_str}")
-
-    return "\n".join(lines)
