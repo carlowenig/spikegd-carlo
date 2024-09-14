@@ -18,5 +18,5 @@ echo "Using Python venv at: $(which python)"
 echo ""
 
 echo "--- SCRIPT START ---"
-srun python hparam_scan.py
+python -u hparam_scan.py
 echo "--- SCRIPT END ---"

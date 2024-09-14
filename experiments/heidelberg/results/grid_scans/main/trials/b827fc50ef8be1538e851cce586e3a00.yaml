@@ -1,0 +1,49 @@
+scan_id: main
+run_id: '20240913_122108'
+config:
+  device_count: 1
+  seed: 0
+  tau: 1.909859317102744
+  I0: 1.25
+  eps: 1.0e-06
+  Nhidden: 100
+  Nlayer: 2
+  Nout: 20
+  w_scale: 0.5
+  T: 2.0
+  K: 300
+  dt: 0.001
+  gamma: 0.01
+  Nbatch: 2000
+  lr: 0.004
+  tau_lr: 100.0
+  beta1: 0.9
+  beta2: 0.999
+  p_flip: 0.0
+  Nepochs: 20
+  Ntrain: null
+  Nin_data: 700
+  Nsamples: 3
+  Nin_virtual: 56
+  Nt: 64
+  Nin: 44800
+  _index: 209
+started_at: 2024-09-13_17-08-53_024149
+finished_at: 2024-09-13_17-09-18_857221
+duration: 25.83307123184204
+metrics: {}
+error: "Traceback (most recent call last):\n  File \"/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py\"\
+  , line 645, in process_config\n    metrics = func(config)\n              ^^^^^^^^^^^^\n\
+  \  File \"/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py\"\
+  , line 971, in run_theta_ensemble\n    metrics, perf_metrics = run_theta(\n    \
+  \                        ^^^^^^^^^^\n  File \"/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py\"\
+  , line 870, in run_theta\n    metrics, perf_metrics = run(neuron, data_loaders,\
+  \ config, **kwargs)\n                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\
+  \  File \"/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py\"\
+  , line 615, in run\n    loss, acc, p, opt_state = trial(p, input, labels, opt_state)\n\
+  \                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\njaxlib.xla_extension.XlaRuntimeError:\
+  \ RESOURCE_EXHAUSTED: Out of memory while trying to allocate 40188013640 bytes.\n\
+  --------------------\nFor simplicity, JAX has removed its internal frames from the\
+  \ traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include\
+  \ these.\n"
+config_hash: b827fc50ef8be1538e851cce586e3a00

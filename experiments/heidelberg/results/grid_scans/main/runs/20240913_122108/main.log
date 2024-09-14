@@ -2361,3 +2361,1102 @@ acc_max_mean              0.8124344348907471
 acc_max_std               0.002679899800568819
 [2024-09-13 15:42:20]
 Finished trial 70653dac67e0b4bc7c81905cf85fd43b after 73.5s
+[2024-09-13 15:42:56]
+130 configs remaining (~1h 44m 10s, ETA: 17:27:07, based on a mean trial duration of 48.1s)
+[2024-09-13 15:42:56]
+========== CONFIG 156 ==========
+Nin_virtual               32
+Nt                        64
+Nin                       44800
+[2024-09-13 15:42:56]
+Starting trial e5d92676c158307bda58c83c5db778ac.
+[2024-09-13 15:44:11]
+acc_max_epoch             18
+acc_max_mean              0.8127509355545044
+acc_max_std               0.009099317714571953
+[2024-09-13 15:44:11]
+Finished trial e5d92676c158307bda58c83c5db778ac after 74.9s
+[2024-09-13 15:44:47]
+129 configs remaining (~1h 43m 26s, ETA: 17:28:13, based on a mean trial duration of 48.1s)
+[2024-09-13 15:44:47]
+========== CONFIG 157 ==========
+Nin_virtual               32
+Nt                        80
+Nin                       56000
+[2024-09-13 15:44:47]
+Starting trial 0b5e199b502f398fb698b4c101184f21.
+[2024-09-13 15:46:09]
+acc_max_epoch             20
+acc_max_mean              0.8196499347686768
+acc_max_std               0.0038270466029644012
+[2024-09-13 15:46:09]
+Finished trial 0b5e199b502f398fb698b4c101184f21 after 81.3s
+[2024-09-13 15:46:45]
+128 configs remaining (~1h 42m 42s, ETA: 17:29:27, based on a mean trial duration of 48.1s)
+[2024-09-13 15:46:45]
+========== CONFIG 158 ==========
+Nin_virtual               32
+Nt                        96
+Nin                       67200
+[2024-09-13 15:46:45]
+Starting trial 0faca07757088fc21f1c58acd6ffb59a.
+[2024-09-13 15:48:16]
+acc_max_epoch             20
+acc_max_mean              0.8007643222808838
+acc_max_std               0.009028728120028973
+[2024-09-13 15:48:16]
+Finished trial 0faca07757088fc21f1c58acd6ffb59a after 90.4s
+[2024-09-13 15:48:52]
+127 configs remaining (~1h 41m 59s, ETA: 17:30:52, based on a mean trial duration of 48.2s)
+[2024-09-13 15:48:52]
+========== CONFIG 159 ==========
+Nin_virtual               32
+Nt                        128
+Nin                       89600
+[2024-09-13 15:48:52]
+Starting trial d402269d9c7808fb2d56fd28848471b1.
+[2024-09-13 15:49:19]
+error                     Traceback (most recent call last):
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py", line 645, in process_config
+                              metrics = func(config)
+                                        ^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 971, in run_theta_ensemble
+                              metrics, perf_metrics = run_theta(
+                                                      ^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 870, in run_theta
+                              metrics, perf_metrics = run(neuron, data_loaders, config, **kwargs)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 615, in run
+                              loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 45877613640 bytes.
+                          --------------------
+                          For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+                          
+[2024-09-13 15:49:19]
+Finished trial d402269d9c7808fb2d56fd28848471b1 after 27.6s
+[2024-09-13 15:49:56]
+126 configs remaining (~1h 41m 9s, ETA: 17:31:05, based on a mean trial duration of 48.2s)
+[2024-09-13 15:49:56]
+========== CONFIG 160 ==========
+Nin_virtual               40
+Nt                        4
+Nin                       2800
+[2024-09-13 15:49:56]
+Starting trial f3b36352140381db04ff5caa81da94b0.
+[2024-09-13 15:50:43]
+acc_max_epoch             15
+acc_max_mean              0.7317273020744324
+acc_max_std               0.00570493983104825
+[2024-09-13 15:50:43]
+Finished trial f3b36352140381db04ff5caa81da94b0 after 47.4s
+[2024-09-13 15:51:19]
+125 configs remaining (~1h 40m 21s, ETA: 17:31:41, based on a mean trial duration of 48.2s)
+[2024-09-13 15:51:19]
+========== CONFIG 161 ==========
+Nin_virtual               40
+Nt                        6
+Nin                       4200
+[2024-09-13 15:51:19]
+Starting trial 8102a0e8d3225c57f6e3f90f290bf49e.
+[2024-09-13 15:52:07]
+acc_max_epoch             20
+acc_max_mean              0.8270809054374695
+acc_max_std               0.0050499276258051395
+[2024-09-13 15:52:08]
+Finished trial 8102a0e8d3225c57f6e3f90f290bf49e after 48.1s
+[2024-09-13 15:52:44]
+124 configs remaining (~1h 39m 34s, ETA: 17:32:18, based on a mean trial duration of 48.2s)
+[2024-09-13 15:52:44]
+========== CONFIG 162 ==========
+Nin_virtual               40
+Nt                        8
+Nin                       5600
+[2024-09-13 15:52:44]
+Starting trial a37685124c0e1d18023af891f5b0b991.
+[2024-09-13 15:53:34]
+acc_max_epoch             19
+acc_max_mean              0.8600000739097595
+acc_max_std               0.021387459710240364
+[2024-09-13 15:53:34]
+Finished trial a37685124c0e1d18023af891f5b0b991 after 49.7s
+[2024-09-13 15:54:13]
+123 configs remaining (~1h 38m 47s, ETA: 17:33:01, based on a mean trial duration of 48.2s)
+[2024-09-13 15:54:13]
+========== CONFIG 163 ==========
+Nin_virtual               40
+Nt                        10
+Nin                       7000
+[2024-09-13 15:54:13]
+Starting trial 253ee04e658d07e7042eadd8bbe4779d.
+[2024-09-13 15:55:02]
+acc_max_epoch             20
+acc_max_mean              0.8517577052116394
+acc_max_std               0.011369180865585804
+[2024-09-13 15:55:02]
+Finished trial 253ee04e658d07e7042eadd8bbe4779d after 48.5s
+[2024-09-13 15:55:38]
+122 configs remaining (~1h 38m 0s, ETA: 17:33:39, based on a mean trial duration of 48.2s)
+[2024-09-13 15:55:38]
+========== CONFIG 164 ==========
+Nin_virtual               40
+Nt                        12
+Nin                       8400
+[2024-09-13 15:55:38]
+Starting trial fb138c8b602149732d638b4cdabbd434.
+[2024-09-13 15:56:31]
+acc_max_epoch             20
+acc_max_mean              0.856400728225708
+acc_max_std               0.024042271077632904
+[2024-09-13 15:56:31]
+Finished trial fb138c8b602149732d638b4cdabbd434 after 52.3s
+[2024-09-13 15:57:08]
+121 configs remaining (~1h 37m 13s, ETA: 17:34:22, based on a mean trial duration of 48.2s)
+[2024-09-13 15:57:08]
+========== CONFIG 165 ==========
+Nin_virtual               40
+Nt                        14
+Nin                       9800
+[2024-09-13 15:57:08]
+Starting trial 02a1242eeb8ffd027e43387d28c5e87e.
+[2024-09-13 15:58:02]
+acc_max_epoch             19
+acc_max_mean              0.8557912707328796
+acc_max_std               0.01970529928803444
+[2024-09-13 15:58:02]
+Finished trial 02a1242eeb8ffd027e43387d28c5e87e after 53.8s
+[2024-09-13 15:58:41]
+120 configs remaining (~1h 36m 27s, ETA: 17:35:09, based on a mean trial duration of 48.2s)
+[2024-09-13 15:58:41]
+========== CONFIG 166 ==========
+Nin_virtual               40
+Nt                        16
+Nin                       11200
+[2024-09-13 15:58:41]
+Starting trial 43a04e08ae7b43f1464aa9e11e198404.
+[2024-09-13 15:59:32]
+acc_max_epoch             19
+acc_max_mean              0.8494647741317749
+acc_max_std               0.0036283291410654783
+[2024-09-13 15:59:32]
+Finished trial 43a04e08ae7b43f1464aa9e11e198404 after 51.1s
+[2024-09-13 16:00:12]
+119 configs remaining (~1h 35m 41s, ETA: 17:35:54, based on a mean trial duration of 48.3s)
+[2024-09-13 16:00:12]
+========== CONFIG 167 ==========
+Nin_virtual               40
+Nt                        18
+Nin                       12600
+[2024-09-13 16:00:12]
+Starting trial b462918383f893566c3facccc1bdd7ff.
+[2024-09-13 16:01:04]
+acc_max_epoch             11
+acc_max_mean              0.8384815454483032
+acc_max_std               0.0035232538357377052
+[2024-09-13 16:01:04]
+Finished trial b462918383f893566c3facccc1bdd7ff after 52.2s
+[2024-09-13 16:01:45]
+118 configs remaining (~1h 34m 56s, ETA: 17:36:41, based on a mean trial duration of 48.3s)
+[2024-09-13 16:01:45]
+========== CONFIG 168 ==========
+Nin_virtual               40
+Nt                        20
+Nin                       14000
+[2024-09-13 16:01:45]
+Starting trial 1d356684914c10ea66e7dcb8dce1b581.
+[2024-09-13 16:02:40]
+acc_max_epoch             20
+acc_max_mean              0.8487509489059448
+acc_max_std               0.008017654530704021
+[2024-09-13 16:02:40]
+Finished trial 1d356684914c10ea66e7dcb8dce1b581 after 55.7s
+[2024-09-13 16:03:20]
+117 configs remaining (~1h 34m 9s, ETA: 17:37:29, based on a mean trial duration of 48.3s)
+[2024-09-13 16:03:20]
+========== CONFIG 169 ==========
+Nin_virtual               40
+Nt                        24
+Nin                       16800
+[2024-09-13 16:03:20]
+Starting trial c2919e3a5d00b1195456263ea4c5250f.
+[2024-09-13 16:04:17]
+acc_max_epoch             20
+acc_max_mean              0.8397407531738281
+acc_max_std               0.00892926286906004
+[2024-09-13 16:04:17]
+Finished trial c2919e3a5d00b1195456263ea4c5250f after 56.9s
+[2024-09-13 16:04:58]
+116 configs remaining (~1h 33m 25s, ETA: 17:38:23, based on a mean trial duration of 48.3s)
+[2024-09-13 16:04:58]
+========== CONFIG 170 ==========
+Nin_virtual               40
+Nt                        28
+Nin                       19600
+[2024-09-13 16:04:58]
+Starting trial 63e7afdfcfe54a2ffbeee2183ce0b51e.
+[2024-09-13 16:05:56]
+acc_max_epoch             18
+acc_max_mean              0.8327946662902832
+acc_max_std               0.01569020189344883
+[2024-09-13 16:05:56]
+Finished trial 63e7afdfcfe54a2ffbeee2183ce0b51e after 58.5s
+[2024-09-13 16:06:36]
+115 configs remaining (~1h 32m 43s, ETA: 17:39:19, based on a mean trial duration of 48.4s)
+[2024-09-13 16:06:36]
+========== CONFIG 171 ==========
+Nin_virtual               40
+Nt                        32
+Nin                       22400
+[2024-09-13 16:06:36]
+Starting trial 6bc89702a7d48ec55c4be6309e3b6c24.
+[2024-09-13 16:07:36]
+acc_max_epoch             19
+acc_max_mean              0.8203704357147217
+acc_max_std               0.011985345743596554
+[2024-09-13 16:07:36]
+Finished trial 6bc89702a7d48ec55c4be6309e3b6c24 after 59.9s
+[2024-09-13 16:08:16]
+114 configs remaining (~1h 32m 1s, ETA: 17:40:17, based on a mean trial duration of 48.4s)
+[2024-09-13 16:08:16]
+========== CONFIG 172 ==========
+Nin_virtual               40
+Nt                        40
+Nin                       28000
+[2024-09-13 16:08:16]
+Starting trial 2a5726f66dd877eddc57071d614ae179.
+[2024-09-13 16:09:21]
+acc_max_epoch             20
+acc_max_mean              0.8259057998657227
+acc_max_std               0.009037126787006855
+[2024-09-13 16:09:21]
+Finished trial 2a5726f66dd877eddc57071d614ae179 after 64.8s
+[2024-09-13 16:10:02]
+113 configs remaining (~1h 31m 14s, ETA: 17:41:16, based on a mean trial duration of 48.4s)
+[2024-09-13 16:10:02]
+========== CONFIG 173 ==========
+Nin_virtual               40
+Nt                        48
+Nin                       33600
+[2024-09-13 16:10:02]
+Starting trial b18d676afd748a5b78517ce58f28a863.
+[2024-09-13 16:11:26]
+acc_max_epoch             12
+acc_max_mean              0.8046061396598816
+acc_max_std               0.01385494228452444
+[2024-09-13 16:11:26]
+Finished trial b18d676afd748a5b78517ce58f28a863 after 84.0s
+[2024-09-13 16:12:06]
+112 configs remaining (~1h 30m 36s, ETA: 17:42:43, based on a mean trial duration of 48.5s)
+[2024-09-13 16:12:06]
+========== CONFIG 174 ==========
+Nin_virtual               40
+Nt                        64
+Nin                       44800
+[2024-09-13 16:12:06]
+Starting trial ac7d412f963030089893875cc6b76638.
+[2024-09-13 16:13:24]
+acc_max_epoch             18
+acc_max_mean              0.7984310984611511
+acc_max_std               0.01897088997066021
+[2024-09-13 16:13:24]
+Finished trial ac7d412f963030089893875cc6b76638 after 77.5s
+[2024-09-13 16:14:04]
+111 configs remaining (~1h 29m 51s, ETA: 17:43:55, based on a mean trial duration of 48.6s)
+[2024-09-13 16:14:04]
+========== CONFIG 175 ==========
+Nin_virtual               40
+Nt                        80
+Nin                       56000
+[2024-09-13 16:14:04]
+Starting trial 9b546125fb8d9cdcc680a2597be36416.
+[2024-09-13 16:14:31]
+error                     Traceback (most recent call last):
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py", line 645, in process_config
+                              metrics = func(config)
+                                        ^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 971, in run_theta_ensemble
+                              metrics, perf_metrics = run_theta(
+                                                      ^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 870, in run_theta
+                              metrics, perf_metrics = run(neuron, data_loaders, config, **kwargs)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 615, in run
+                              loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 35874413640 bytes.
+                          --------------------
+                          For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+                          
+[2024-09-13 16:14:31]
+Finished trial 9b546125fb8d9cdcc680a2597be36416 after 26.9s
+[2024-09-13 16:15:08]
+110 configs remaining (~1h 29m 0s, ETA: 17:44:08, based on a mean trial duration of 48.5s)
+[2024-09-13 16:15:08]
+========== CONFIG 176 ==========
+Nin_virtual               40
+Nt                        96
+Nin                       67200
+[2024-09-13 16:15:08]
+Starting trial 81ea73f8b060ad5781b0033504030ae3.
+[2024-09-13 16:15:36]
+error                     Traceback (most recent call last):
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py", line 645, in process_config
+                              metrics = func(config)
+                                        ^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 971, in run_theta_ensemble
+                              metrics, perf_metrics = run_theta(
+                                                      ^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 870, in run_theta
+                              metrics, perf_metrics = run(neuron, data_loaders, config, **kwargs)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 615, in run
+                              loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43042413640 bytes.
+                          --------------------
+                          For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+                          
+[2024-09-13 16:15:36]
+Finished trial 81ea73f8b060ad5781b0033504030ae3 after 27.8s
+[2024-09-13 16:16:16]
+109 configs remaining (~1h 28m 10s, ETA: 17:44:26, based on a mean trial duration of 48.5s)
+[2024-09-13 16:16:16]
+========== CONFIG 177 ==========
+Nin_virtual               40
+Nt                        128
+Nin                       89600
+[2024-09-13 16:16:16]
+Starting trial 60b99ecc1052dce4b10168e34d18c65f.
+[2024-09-13 16:16:45]
+error                     Traceback (most recent call last):
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py", line 645, in process_config
+                              metrics = func(config)
+                                        ^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 971, in run_theta_ensemble
+                              metrics, perf_metrics = run_theta(
+                                                      ^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 870, in run_theta
+                              metrics, perf_metrics = run(neuron, data_loaders, config, **kwargs)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 615, in run
+                              loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 57346413640 bytes.
+                          --------------------
+                          For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+                          
+[2024-09-13 16:16:45]
+Finished trial 60b99ecc1052dce4b10168e34d18c65f after 28.8s
+[2024-09-13 16:17:22]
+108 configs remaining (~1h 27m 20s, ETA: 17:44:43, based on a mean trial duration of 48.5s)
+[2024-09-13 16:17:22]
+========== CONFIG 178 ==========
+Nin_virtual               48
+Nt                        4
+Nin                       2800
+[2024-09-13 16:17:22]
+Starting trial 0b56543de3b42fb9745f363a779ca73b.
+[2024-09-13 16:18:10]
+acc_max_epoch             16
+acc_max_mean              0.7361482381820679
+acc_max_std               0.008873667567968369
+[2024-09-13 16:18:10]
+Finished trial 0b56543de3b42fb9745f363a779ca73b after 47.7s
+[2024-09-13 16:18:47]
+107 configs remaining (~1h 26m 31s, ETA: 17:45:19, based on a mean trial duration of 48.5s)
+[2024-09-13 16:18:47]
+========== CONFIG 179 ==========
+Nin_virtual               48
+Nt                        6
+Nin                       4200
+[2024-09-13 16:18:47]
+Starting trial 99408598ec269b6c2479592b310bc5ae.
+[2024-09-13 16:19:33]
+acc_max_epoch             20
+acc_max_mean              0.8206331133842468
+acc_max_std               0.01630212552845478
+[2024-09-13 16:19:34]
+Finished trial 99408598ec269b6c2479592b310bc5ae after 46.0s
+[2024-09-13 16:20:15]
+106 configs remaining (~1h 25m 43s, ETA: 17:45:59, based on a mean trial duration of 48.5s)
+[2024-09-13 16:20:15]
+========== CONFIG 180 ==========
+Nin_virtual               48
+Nt                        8
+Nin                       5600
+[2024-09-13 16:20:15]
+Starting trial e3666c19982f59e9099b5111b06d1148.
+[2024-09-13 16:21:02]
+acc_max_epoch             18
+acc_max_mean              0.8523232936859131
+acc_max_std               0.009103032760322094
+[2024-09-13 16:21:02]
+Finished trial e3666c19982f59e9099b5111b06d1148 after 47.7s
+[2024-09-13 16:21:43]
+105 configs remaining (~1h 24m 56s, ETA: 17:46:39, based on a mean trial duration of 48.5s)
+[2024-09-13 16:21:43]
+========== CONFIG 181 ==========
+Nin_virtual               48
+Nt                        10
+Nin                       7000
+[2024-09-13 16:21:43]
+Starting trial fcb50bb685eb606ac24bd013241180c2.
+[2024-09-13 16:22:37]
+acc_max_epoch             19
+acc_max_mean              0.8584815859794617
+acc_max_std               0.027317717671394348
+[2024-09-13 16:22:37]
+Finished trial fcb50bb685eb606ac24bd013241180c2 after 53.6s
+[2024-09-13 16:23:14]
+104 configs remaining (~1h 24m 8s, ETA: 17:47:23, based on a mean trial duration of 48.5s)
+[2024-09-13 16:23:14]
+========== CONFIG 182 ==========
+Nin_virtual               48
+Nt                        12
+Nin                       8400
+[2024-09-13 16:23:14]
+Starting trial c49169d60c2dc89224bea43f63986320.
+[2024-09-13 16:24:05]
+acc_max_epoch             17
+acc_max_mean              0.8501617312431335
+acc_max_std               0.012801891192793846
+[2024-09-13 16:24:05]
+Finished trial c49169d60c2dc89224bea43f63986320 after 51.1s
+[2024-09-13 16:24:46]
+103 configs remaining (~1h 23m 20s, ETA: 17:48:07, based on a mean trial duration of 48.5s)
+[2024-09-13 16:24:46]
+========== CONFIG 183 ==========
+Nin_virtual               48
+Nt                        14
+Nin                       9800
+[2024-09-13 16:24:46]
+Starting trial 7563a245c049f31bdf9162976e75c63b.
+[2024-09-13 16:25:39]
+acc_max_epoch             19
+acc_max_mean              0.8497980833053589
+acc_max_std               0.010881414636969566
+[2024-09-13 16:25:39]
+Finished trial 7563a245c049f31bdf9162976e75c63b after 52.7s
+[2024-09-13 16:26:19]
+102 configs remaining (~1h 22m 33s, ETA: 17:48:53, based on a mean trial duration of 48.6s)
+[2024-09-13 16:26:19]
+========== CONFIG 184 ==========
+Nin_virtual               48
+Nt                        16
+Nin                       11200
+[2024-09-13 16:26:19]
+Starting trial fd0c48458bc44b3480894a0078c6477e.
+[2024-09-13 16:27:15]
+acc_max_epoch             20
+acc_max_mean              0.850801408290863
+acc_max_std               0.023768730461597443
+[2024-09-13 16:27:15]
+Finished trial fd0c48458bc44b3480894a0078c6477e after 55.8s
+[2024-09-13 16:27:53]
+101 configs remaining (~1h 21m 46s, ETA: 17:49:39, based on a mean trial duration of 48.6s)
+[2024-09-13 16:27:53]
+========== CONFIG 185 ==========
+Nin_virtual               48
+Nt                        18
+Nin                       12600
+[2024-09-13 16:27:53]
+Starting trial 729db72e2edeab6a743b3c6fdfe31a3f.
+[2024-09-13 16:28:50]
+acc_max_epoch             19
+acc_max_mean              0.8401987552642822
+acc_max_std               0.01044008694589138
+[2024-09-13 16:28:50]
+Finished trial 729db72e2edeab6a743b3c6fdfe31a3f after 57.4s
+[2024-09-13 16:29:28]
+100 configs remaining (~1h 20m 59s, ETA: 17:50:28, based on a mean trial duration of 48.6s)
+[2024-09-13 16:29:28]
+========== CONFIG 186 ==========
+Nin_virtual               48
+Nt                        20
+Nin                       14000
+[2024-09-13 16:29:28]
+Starting trial 62eff923196eb608abc53e48b839dd1b.
+[2024-09-13 16:30:27]
+acc_max_epoch             15
+acc_max_mean              0.8278014063835144
+acc_max_std               0.013218327425420284
+[2024-09-13 16:30:27]
+Finished trial 62eff923196eb608abc53e48b839dd1b after 58.4s
+[2024-09-13 16:31:05]
+99 configs remaining (~1h 20m 13s, ETA: 17:51:18, based on a mean trial duration of 48.6s)
+[2024-09-13 16:31:05]
+========== CONFIG 187 ==========
+Nin_virtual               48
+Nt                        24
+Nin                       16800
+[2024-09-13 16:31:05]
+Starting trial 807c5c9f6dcedd7389db80645937cd2e.
+[2024-09-13 16:32:06]
+acc_max_epoch             20
+acc_max_mean              0.8282794952392578
+acc_max_std               0.008464185521006584
+[2024-09-13 16:32:06]
+Finished trial 807c5c9f6dcedd7389db80645937cd2e after 61.1s
+[2024-09-13 16:32:44]
+98 configs remaining (~1h 19m 28s, ETA: 17:52:12, based on a mean trial duration of 48.7s)
+[2024-09-13 16:32:44]
+========== CONFIG 188 ==========
+Nin_virtual               48
+Nt                        28
+Nin                       19600
+[2024-09-13 16:32:44]
+Starting trial b47bdfc9979bb885f7ee7fb2c53f95d9.
+[2024-09-13 16:33:48]
+acc_max_epoch             14
+acc_max_mean              0.8342728018760681
+acc_max_std               0.006152322515845299
+[2024-09-13 16:33:48]
+Finished trial b47bdfc9979bb885f7ee7fb2c53f95d9 after 64.0s
+[2024-09-13 16:34:26]
+97 configs remaining (~1h 18m 43s, ETA: 17:53:09, based on a mean trial duration of 48.7s)
+[2024-09-13 16:34:26]
+========== CONFIG 189 ==========
+Nin_virtual               48
+Nt                        32
+Nin                       22400
+[2024-09-13 16:34:26]
+Starting trial 19b44e5283b725d837163a99093326c1.
+[2024-09-13 16:35:32]
+acc_max_epoch             19
+acc_max_mean              0.8172895908355713
+acc_max_std               0.00382711342535913
+[2024-09-13 16:35:32]
+Finished trial 19b44e5283b725d837163a99093326c1 after 66.0s
+[2024-09-13 16:36:10]
+96 configs remaining (~1h 17m 59s, ETA: 17:54:09, based on a mean trial duration of 48.7s)
+[2024-09-13 16:36:10]
+========== CONFIG 190 ==========
+Nin_virtual               48
+Nt                        40
+Nin                       28000
+[2024-09-13 16:36:10]
+Starting trial 449014cd32aa0dd2a934e2e4036fa3b1.
+[2024-09-13 16:37:21]
+acc_max_epoch             20
+acc_max_mean              0.8049630522727966
+acc_max_std               0.007631133776158094
+[2024-09-13 16:37:21]
+Finished trial 449014cd32aa0dd2a934e2e4036fa3b1 after 71.3s
+[2024-09-13 16:37:59]
+95 configs remaining (~1h 17m 12s, ETA: 17:55:12, based on a mean trial duration of 48.8s)
+[2024-09-13 16:37:59]
+========== CONFIG 191 ==========
+Nin_virtual               48
+Nt                        48
+Nin                       33600
+[2024-09-13 16:37:59]
+Starting trial 363309a9e6debbddb7a0754b89792c23.
+[2024-09-13 16:39:16]
+acc_max_epoch             14
+acc_max_mean              0.8006701469421387
+acc_max_std               0.011140584014356136
+[2024-09-13 16:39:16]
+Finished trial 363309a9e6debbddb7a0754b89792c23 after 77.4s
+[2024-09-13 16:39:58]
+94 configs remaining (~1h 16m 30s, ETA: 17:56:28, based on a mean trial duration of 48.8s)
+[2024-09-13 16:39:58]
+========== CONFIG 192 ==========
+Nin_virtual               48
+Nt                        64
+Nin                       44800
+[2024-09-13 16:39:58]
+Starting trial e9abc9e4996d990da55dc66c6c7fbc7c.
+[2024-09-13 16:41:23]
+acc_max_epoch             11
+acc_max_mean              0.7765791416168213
+acc_max_std               0.005239942576736212
+[2024-09-13 16:41:23]
+Finished trial e9abc9e4996d990da55dc66c6c7fbc7c after 85.6s
+[2024-09-13 16:42:06]
+93 configs remaining (~1h 15m 49s, ETA: 17:57:55, based on a mean trial duration of 48.9s)
+[2024-09-13 16:42:06]
+========== CONFIG 193 ==========
+Nin_virtual               48
+Nt                        80
+Nin                       56000
+[2024-09-13 16:42:06]
+Starting trial cf0ae718b088aa853c52bbf640b4f2a2.
+[2024-09-13 16:42:33]
+error                     Traceback (most recent call last):
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py", line 645, in process_config
+                              metrics = func(config)
+                                        ^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 971, in run_theta_ensemble
+                              metrics, perf_metrics = run_theta(
+                                                      ^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 870, in run_theta
+                              metrics, perf_metrics = run(neuron, data_loaders, config, **kwargs)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 615, in run
+                              loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43048813640 bytes.
+                          --------------------
+                          For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+                          
+[2024-09-13 16:42:33]
+Finished trial cf0ae718b088aa853c52bbf640b4f2a2 after 27.3s
+[2024-09-13 16:43:12]
+92 configs remaining (~1h 14m 58s, ETA: 17:58:10, based on a mean trial duration of 48.9s)
+[2024-09-13 16:43:12]
+========== CONFIG 194 ==========
+Nin_virtual               48
+Nt                        96
+Nin                       67200
+[2024-09-13 16:43:12]
+Starting trial ca913dfefb94517dc48f57598b350756.
+[2024-09-13 16:43:40]
+error                     Traceback (most recent call last):
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py", line 645, in process_config
+                              metrics = func(config)
+                                        ^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 971, in run_theta_ensemble
+                              metrics, perf_metrics = run_theta(
+                                                      ^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 870, in run_theta
+                              metrics, perf_metrics = run(neuron, data_loaders, config, **kwargs)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 615, in run
+                              loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51650413640 bytes.
+                          --------------------
+                          For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+                          
+[2024-09-13 16:43:40]
+Finished trial ca913dfefb94517dc48f57598b350756 after 28.4s
+[2024-09-13 16:44:21]
+91 configs remaining (~1h 14m 14s, ETA: 17:58:36, based on a mean trial duration of 48.9s)
+[2024-09-13 16:44:21]
+========== CONFIG 195 ==========
+Nin_virtual               48
+Nt                        128
+Nin                       89600
+[2024-09-13 16:44:21]
+Starting trial 97a45f2cb7da2ea39fc48c90672497ab.
+[2024-09-13 16:44:51]
+error                     Traceback (most recent call last):
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py", line 645, in process_config
+                              metrics = func(config)
+                                        ^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 971, in run_theta_ensemble
+                              metrics, perf_metrics = run_theta(
+                                                      ^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 870, in run_theta
+                              metrics, perf_metrics = run(neuron, data_loaders, config, **kwargs)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 615, in run
+                              loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 35516473416 bytes.
+                          --------------------
+                          For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+                          
+[2024-09-13 16:44:51]
+Finished trial 97a45f2cb7da2ea39fc48c90672497ab after 29.4s
+[2024-09-13 16:45:29]
+90 configs remaining (~1h 13m 23s, ETA: 17:58:53, based on a mean trial duration of 48.9s)
+[2024-09-13 16:45:29]
+========== CONFIG 196 ==========
+Nin_virtual               56
+Nt                        4
+Nin                       2800
+[2024-09-13 16:45:29]
+Starting trial eecbb26a1d50595320323f3db295b6a9.
+[2024-09-13 16:46:17]
+acc_max_epoch             15
+acc_max_mean              0.7182964086532593
+acc_max_std               0.028123531490564346
+[2024-09-13 16:46:17]
+Finished trial eecbb26a1d50595320323f3db295b6a9 after 48.4s
+[2024-09-13 16:46:56]
+89 configs remaining (~1h 12m 35s, ETA: 17:59:31, based on a mean trial duration of 48.9s)
+[2024-09-13 16:46:56]
+========== CONFIG 197 ==========
+Nin_virtual               56
+Nt                        6
+Nin                       4200
+[2024-09-13 16:46:56]
+Starting trial a8afd84b39cf288ffa4823c86b39cc03.
+[2024-09-13 16:47:46]
+acc_max_epoch             19
+acc_max_mean              0.8126869201660156
+acc_max_std               0.01067951787263155
+[2024-09-13 16:47:46]
+Finished trial a8afd84b39cf288ffa4823c86b39cc03 after 49.9s
+[2024-09-13 16:48:24]
+88 configs remaining (~1h 11m 46s, ETA: 18:00:11, based on a mean trial duration of 48.9s)
+[2024-09-13 16:48:24]
+========== CONFIG 198 ==========
+Nin_virtual               56
+Nt                        8
+Nin                       5600
+[2024-09-13 16:48:24]
+Starting trial 39df2ae06a704ac49de9a892a730453c.
+[2024-09-13 16:49:16]
+acc_max_epoch             16
+acc_max_mean              0.8376768827438354
+acc_max_std               0.011853580363094807
+[2024-09-13 16:49:16]
+Finished trial 39df2ae06a704ac49de9a892a730453c after 52.3s
+[2024-09-13 16:49:55]
+87 configs remaining (~1h 10m 58s, ETA: 18:00:53, based on a mean trial duration of 48.9s)
+[2024-09-13 16:49:55]
+========== CONFIG 199 ==========
+Nin_virtual               56
+Nt                        10
+Nin                       7000
+[2024-09-13 16:49:55]
+Starting trial 274d68215851c3de8bfd0c2dba88623e.
+[2024-09-13 16:50:49]
+acc_max_epoch             20
+acc_max_mean              0.836905837059021
+acc_max_std               0.010190884582698345
+[2024-09-13 16:50:49]
+Finished trial 274d68215851c3de8bfd0c2dba88623e after 54.2s
+[2024-09-13 16:51:27]
+86 configs remaining (~1h 10m 10s, ETA: 18:01:38, based on a mean trial duration of 49.0s)
+[2024-09-13 16:51:27]
+========== CONFIG 200 ==========
+Nin_virtual               56
+Nt                        12
+Nin                       8400
+[2024-09-13 16:51:27]
+Starting trial 1938f890a5ef4472951cc4ad55d51ac7.
+[2024-09-13 16:52:23]
+acc_max_epoch             19
+acc_max_mean              0.8454713821411133
+acc_max_std               0.009364955127239227
+[2024-09-13 16:52:23]
+Finished trial 1938f890a5ef4472951cc4ad55d51ac7 after 56.1s
+[2024-09-13 16:53:05]
+85 configs remaining (~1h 9m 22s, ETA: 18:02:28, based on a mean trial duration of 49.0s)
+[2024-09-13 16:53:05]
+========== CONFIG 201 ==========
+Nin_virtual               56
+Nt                        14
+Nin                       9800
+[2024-09-13 16:53:05]
+Starting trial 2be56bcebbb03e6b8a296b24ee666cbf.
+[2024-09-13 16:54:00]
+acc_max_epoch             18
+acc_max_mean              0.8348183035850525
+acc_max_std               0.007155625149607658
+[2024-09-13 16:54:00]
+Finished trial 2be56bcebbb03e6b8a296b24ee666cbf after 54.9s
+[2024-09-13 16:54:38]
+84 configs remaining (~1h 8m 34s, ETA: 18:03:13, based on a mean trial duration of 49.0s)
+[2024-09-13 16:54:38]
+========== CONFIG 202 ==========
+Nin_virtual               56
+Nt                        16
+Nin                       11200
+[2024-09-13 16:54:38]
+Starting trial cf0ca2c88715c90c2320c7cb8f495105.
+[2024-09-13 16:55:37]
+acc_max_epoch             20
+acc_max_mean              0.8391549587249756
+acc_max_std               0.016221679747104645
+[2024-09-13 16:55:37]
+Finished trial cf0ca2c88715c90c2320c7cb8f495105 after 58.2s
+[2024-09-13 16:56:18]
+83 configs remaining (~1h 7m 47s, ETA: 18:04:06, based on a mean trial duration of 49.0s)
+[2024-09-13 16:56:18]
+========== CONFIG 203 ==========
+Nin_virtual               56
+Nt                        18
+Nin                       12600
+[2024-09-13 16:56:18]
+Starting trial 0dce7155393c3c20bfa73a852af432f4.
+[2024-09-13 16:57:15]
+acc_max_epoch             19
+acc_max_mean              0.8263872861862183
+acc_max_std               0.02203376404941082
+[2024-09-13 16:57:15]
+Finished trial 0dce7155393c3c20bfa73a852af432f4 after 56.6s
+[2024-09-13 16:57:57]
+82 configs remaining (~1h 6m 59s, ETA: 18:04:57, based on a mean trial duration of 49.0s)
+[2024-09-13 16:57:57]
+========== CONFIG 204 ==========
+Nin_virtual               56
+Nt                        20
+Nin                       14000
+[2024-09-13 16:57:57]
+Starting trial 7a19943ba6bf4034543ef66f62b024a3.
+[2024-09-13 16:58:58]
+acc_max_epoch             18
+acc_max_mean              0.8425590395927429
+acc_max_std               0.008252136409282684
+[2024-09-13 16:58:58]
+Finished trial 7a19943ba6bf4034543ef66f62b024a3 after 60.9s
+[2024-09-13 16:59:37]
+81 configs remaining (~1h 6m 12s, ETA: 18:05:50, based on a mean trial duration of 49.0s)
+[2024-09-13 16:59:37]
+========== CONFIG 205 ==========
+Nin_virtual               56
+Nt                        24
+Nin                       16800
+[2024-09-13 16:59:37]
+Starting trial ef5041e219c61d03fe66fb1259c1dfac.
+[2024-09-13 17:00:41]
+acc_max_epoch             19
+acc_max_mean              0.818959653377533
+acc_max_std               0.02049253322184086
+[2024-09-13 17:00:41]
+Finished trial ef5041e219c61d03fe66fb1259c1dfac after 64.4s
+[2024-09-13 17:01:20]
+80 configs remaining (~1h 5m 25s, ETA: 18:06:46, based on a mean trial duration of 49.1s)
+[2024-09-13 17:01:20]
+========== CONFIG 206 ==========
+Nin_virtual               56
+Nt                        28
+Nin                       19600
+[2024-09-13 17:01:20]
+Starting trial 6221d20d7c2d9591b280978fb0b0c222.
+[2024-09-13 17:02:27]
+acc_max_epoch             20
+acc_max_mean              0.8145691156387329
+acc_max_std               0.008646969683468342
+[2024-09-13 17:02:27]
+Finished trial 6221d20d7c2d9591b280978fb0b0c222 after 67.2s
+[2024-09-13 17:03:06]
+79 configs remaining (~1h 4m 37s, ETA: 18:07:44, based on a mean trial duration of 49.1s)
+[2024-09-13 17:03:06]
+========== CONFIG 207 ==========
+Nin_virtual               56
+Nt                        32
+Nin                       22400
+[2024-09-13 17:03:06]
+Starting trial 439fe5d0207a632d2b9beab27a504688.
+[2024-09-13 17:04:16]
+acc_max_epoch             14
+acc_max_mean              0.8095219135284424
+acc_max_std               0.017728103324770927
+[2024-09-13 17:04:16]
+Finished trial 439fe5d0207a632d2b9beab27a504688 after 70.0s
+[2024-09-13 17:04:55]
+78 configs remaining (~1h 3m 51s, ETA: 18:08:47, based on a mean trial duration of 49.1s)
+[2024-09-13 17:04:55]
+========== CONFIG 208 ==========
+Nin_virtual               56
+Nt                        40
+Nin                       28000
+[2024-09-13 17:04:55]
+Starting trial d0ba07534ae1b20704a1cdfd61565d6e.
+[2024-09-13 17:06:12]
+acc_max_epoch             14
+acc_max_mean              0.7878890037536621
+acc_max_std               0.013541809283196926
+[2024-09-13 17:06:12]
+Finished trial d0ba07534ae1b20704a1cdfd61565d6e after 76.3s
+[2024-09-13 17:06:51]
+77 configs remaining (~1h 3m 5s, ETA: 18:09:57, based on a mean trial duration of 49.2s)
+[2024-09-13 17:06:51]
+========== CONFIG 209 ==========
+Nin_virtual               56
+Nt                        48
+Nin                       33600
+[2024-09-13 17:06:51]
+Starting trial 26fc143cfdc540d3ced300b84ba639c5.
+[2024-09-13 17:08:13]
+acc_max_epoch             11
+acc_max_mean              0.7590101957321167
+acc_max_std               0.010045137256383896
+[2024-09-13 17:08:13]
+Finished trial 26fc143cfdc540d3ced300b84ba639c5 after 82.5s
+[2024-09-13 17:08:53]
+76 configs remaining (~1h 2m 21s, ETA: 18:11:14, based on a mean trial duration of 49.2s)
+[2024-09-13 17:08:53]
+========== CONFIG 210 ==========
+Nin_virtual               56
+Nt                        64
+Nin                       44800
+[2024-09-13 17:08:53]
+Starting trial b827fc50ef8be1538e851cce586e3a00.
+[2024-09-13 17:09:18]
+error                     Traceback (most recent call last):
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py", line 645, in process_config
+                              metrics = func(config)
+                                        ^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 971, in run_theta_ensemble
+                              metrics, perf_metrics = run_theta(
+                                                      ^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 870, in run_theta
+                              metrics, perf_metrics = run(neuron, data_loaders, config, **kwargs)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 615, in run
+                              loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 40188013640 bytes.
+                          --------------------
+                          For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+                          
+[2024-09-13 17:09:18]
+Finished trial b827fc50ef8be1538e851cce586e3a00 after 25.8s
+[2024-09-13 17:10:01]
+75 configs remaining (~1h 1m 33s, ETA: 18:11:34, based on a mean trial duration of 49.2s)
+[2024-09-13 17:10:01]
+========== CONFIG 211 ==========
+Nin_virtual               56
+Nt                        80
+Nin                       56000
+[2024-09-13 17:10:01]
+Starting trial 6a00983e4ea12ff1d417309f18bb565c.
+[2024-09-13 17:10:29]
+error                     Traceback (most recent call last):
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py", line 645, in process_config
+                              metrics = func(config)
+                                        ^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 971, in run_theta_ensemble
+                              metrics, perf_metrics = run_theta(
+                                                      ^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 870, in run_theta
+                              metrics, perf_metrics = run(neuron, data_loaders, config, **kwargs)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 615, in run
+                              loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50223213640 bytes.
+                          --------------------
+                          For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+                          
+[2024-09-13 17:10:29]
+Finished trial 6a00983e4ea12ff1d417309f18bb565c after 28.0s
+[2024-09-13 17:11:08]
+74 configs remaining (~1h 0m 42s, ETA: 18:11:51, based on a mean trial duration of 49.2s)
+[2024-09-13 17:11:08]
+========== CONFIG 212 ==========
+Nin_virtual               56
+Nt                        96
+Nin                       67200
+[2024-09-13 17:11:08]
+Starting trial d9befb40547c448107501a97b5b44f00.
+[2024-09-13 17:11:38]
+error                     Traceback (most recent call last):
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py", line 645, in process_config
+                              metrics = func(config)
+                                        ^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 971, in run_theta_ensemble
+                              metrics, perf_metrics = run_theta(
+                                                      ^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 870, in run_theta
+                              metrics, perf_metrics = run(neuron, data_loaders, config, **kwargs)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 615, in run
+                              loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 60258413640 bytes.
+                          --------------------
+                          For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+                          
+[2024-09-13 17:11:38]
+Finished trial d9befb40547c448107501a97b5b44f00 after 29.6s
+[2024-09-13 17:12:20]
+73 configs remaining (~59m 56s, ETA: 18:12:17, based on a mean trial duration of 49.3s)
+[2024-09-13 17:12:20]
+========== CONFIG 213 ==========
+Nin_virtual               56
+Nt                        128
+Nin                       89600
+[2024-09-13 17:12:20]
+Starting trial 01e913b0466516338e355a65229c156b.
+[2024-09-13 17:13:09]
+error                     Traceback (most recent call last):
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/hyperparam_scan_util.py", line 645, in process_config
+                              metrics = func(config)
+                                        ^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 971, in run_theta_ensemble
+                              metrics, perf_metrics = run_theta(
+                                                      ^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 870, in run_theta
+                              metrics, perf_metrics = run(neuron, data_loaders, config, **kwargs)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            File "/home/s6caweni_hpc/spikegd-carlo/experiments/heidelberg/heidelberg_v01.py", line 615, in run
+                              loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 40157577216 bytes.
+                          --------------------
+                          For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+                          
+[2024-09-13 17:13:09]
+Finished trial 01e913b0466516338e355a65229c156b after 48.8s
+[2024-09-13 17:13:49]
+72 configs remaining (~59m 7s, ETA: 18:12:56, based on a mean trial duration of 49.3s)
+[2024-09-13 17:13:49]
+========== CONFIG 214 ==========
+Nin_virtual               64
+Nt                        4
+Nin                       2800
+[2024-09-13 17:13:49]
+Starting trial 0f52455b9aa22e53fd57b4dfc1d00b6c.
+[2024-09-13 17:14:37]
+acc_max_epoch             15
+acc_max_mean              0.7220472097396851
+acc_max_std               0.004833761136978865
+[2024-09-13 17:14:37]
+Finished trial 0f52455b9aa22e53fd57b4dfc1d00b6c after 48.0s
+[2024-09-13 17:15:20]
+71 configs remaining (~58m 18s, ETA: 18:13:39, based on a mean trial duration of 49.3s)
+[2024-09-13 17:15:20]
+========== CONFIG 215 ==========
+Nin_virtual               64
+Nt                        6
+Nin                       4200
+[2024-09-13 17:15:20]
+Starting trial 36bde1154a6ebb0d6e406fc8223f9f8c.
+[2024-09-13 17:16:13]
+acc_max_epoch             14
+acc_max_mean              0.799986720085144
+acc_max_std               0.014596066437661648
+[2024-09-13 17:16:13]
+Finished trial 36bde1154a6ebb0d6e406fc8223f9f8c after 52.6s
+[2024-09-13 17:16:52]
+70 configs remaining (~57m 29s, ETA: 18:14:21, based on a mean trial duration of 49.3s)
+[2024-09-13 17:16:52]
+========== CONFIG 216 ==========
+Nin_virtual               64
+Nt                        8
+Nin                       5600
+[2024-09-13 17:16:52]
+Starting trial 837bfecaf1924d3c309017ad9826c1f0.
+[2024-09-13 17:17:45]
+acc_max_epoch             20
+acc_max_mean              0.825222373008728
+acc_max_std               0.01022136677056551
+[2024-09-13 17:17:45]
+Finished trial 837bfecaf1924d3c309017ad9826c1f0 after 53.1s
+[2024-09-13 17:18:25]
+69 configs remaining (~56m 40s, ETA: 18:15:05, based on a mean trial duration of 49.3s)
+[2024-09-13 17:18:25]
+========== CONFIG 217 ==========
+Nin_virtual               64
+Nt                        10
+Nin                       7000
+[2024-09-13 17:18:25]
+Starting trial 90cb72988477f7fb06249f474d4c2039.
+[2024-09-13 17:19:21]
+acc_max_epoch             14
+acc_max_mean              0.8281818628311157
+acc_max_std               0.015866979956626892
+[2024-09-13 17:19:21]
+Finished trial 90cb72988477f7fb06249f474d4c2039 after 56.2s
+[2024-09-13 17:20:01]
+68 configs remaining (~55m 51s, ETA: 18:15:52, based on a mean trial duration of 49.3s)
+[2024-09-13 17:20:01]
+========== CONFIG 218 ==========
+Nin_virtual               64
+Nt                        12
+Nin                       8400
+[2024-09-13 17:20:01]
+Starting trial 0af0d3ff9cb281714e17efdb3139d4fd.
+[2024-09-13 17:21:02]
+acc_max_epoch             19
+acc_max_mean              0.8372290134429932
+acc_max_std               0.005187164060771465
+[2024-09-13 17:21:02]
+Finished trial 0af0d3ff9cb281714e17efdb3139d4fd after 61.1s
