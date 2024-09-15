@@ -34,15 +34,13 @@ config_grid = {
     "device_count": len(devices),
     "seed": 0,
     # Neuron
-    "tau": 6 / np.pi,
-    "I0": 5 / 4,
+    "tau": vary(3 / np.pi, 6 / np.pi),
+    "I0": vary(5 / 4 - 1 / 8, 5 / 4, 5 / 4 + 1 / 8),
     "eps": 1e-6,
     # Network
-    "Nin_virtual": vary(
-        1, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 80, 96, 126
-    ),  # #Virtual input neurons = N_bin - 1
-    "Nhidden": vary(100, 200, 300),
-    "Nlayer": vary(2, 3),  # Number of layers
+    "Nin_virtual": vary(1, 4, 8, 16, 32),  # #Virtual input neurons = N_bin - 1
+    "Nhidden": 100,
+    "Nlayer": 2,  # Number of layers
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
@@ -50,14 +48,14 @@ config_grid = {
     "K": 300,  # Maximal number of simulated ordinary spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
-    "gamma": 1e-2,
-    "Nbatch": vary(1000, 2000),
-    "lr": 4e-3,
-    "tau_lr": 1e2,
+    "gamma": vary(1e-3, 1e-2),
+    "Nbatch": 1000,
+    "lr": vary(1e-3, 2e-3, 4e-3, 1e-2),
+    "tau_lr": vary(1e1, 1e2),
     "beta1": 0.9,
     "beta2": 0.999,
     "p_flip": 0.0,
-    "Nepochs": 20,
+    "Nepochs": 40,
     "Ntrain": None,  # Number of training samples
     # SHD Quantization
     # "Nt": vary(2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 80, 96, 128),
