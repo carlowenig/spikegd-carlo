@@ -72,6 +72,7 @@ class SHD(OnlineDataset[SHDSample]):
             self.label_index_arr = _get_dataset_arr(file, "labels", int)
             self.speaker_index_arr = _get_dataset_arr(file, "extra/speaker", int)
 
+            # TODO: Rename to avoid confusion with config["Nsamples"] (ensemble size)
             self.Nsamples = len(self.times_arr)
             self.N = max(units.astype(int).max() for units in self.units_arr) + 1
             self.t_max = max(times.astype(float)[-1] for times in self.times_arr)
