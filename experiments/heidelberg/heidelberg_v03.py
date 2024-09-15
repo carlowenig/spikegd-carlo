@@ -141,7 +141,7 @@ def load_data(datasets: tuple[SHD, SHD], config: dict) -> tuple[DataLoader, Data
     Nbatch: int = config["Nbatch"]
     Nin: int = config["Nin"]
     Nout: int = config["Nout"]
-    Nt: int = config["Nt"]
+    # Nt: int = config["Nt"]
 
     train_set, test_set = datasets
 
