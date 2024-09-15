@@ -107,19 +107,26 @@ def homogenize_dataset(dataset: SHD, config: dict, normalize_trials=True):
     T = config["T"]
 
     # Array containing the spike times or T if no spike
+    # lost_spikes = {}
+    lost_spikes = {}
     x_arr = np.full((N, Nin, Kin), T, dtype=float)
 
-    for i in range(N):
+    for i in trange_script(N):
         times = dataset.times_arr[i]
         neurons = dataset.units_arr[i]
 
         if normalize_trials:
             times, neurons = normalize_times(times, neurons, 0)
 
-        for j, (t, neuron) in enumerate(zip(times, neurons)):
-            if j >= Kin:
-                break
-            x_arr[i, neuron, j] = t
+        for j in range(Nin):
+            spike_times = times[neurons == j]
+            Nspike = min(Kin, len(spike_times))
+            x_arr[i, j, :Nspike] = spike_times[:Nspike]
+            if (Nlost := len(spike_times) - Nspike) > 0:
+                lost_spikes[j] = lost_spikes.get(j, 0) + Nlost
+
+    print("Lost spikes:", dict(enumerate(lost_spikes)))
+    print("Total:", sum(lost_spikes.values()))
 
     # Create tensor dataset
     data = torch.as_tensor(x_arr)
