@@ -1,0 +1,35 @@
+scan_id: main_v2
+id: '20240915_152807'
+name: null
+description: null
+metadata:
+  n_processes: 1
+constants:
+  device_count: 1
+  seed: 0
+  eps: 1.0e-06
+  Nhidden: 100
+  Nlayer: 2
+  Nout: 20
+  w_scale: 0.5
+  T: 2.0
+  K: 300
+  dt: 0.001
+  Nbatch: 1000
+  beta1: 0.9
+  beta2: 0.999
+  p_flip: 0.0
+  Nepochs: 40
+  Ntrain: null
+  Nin: 700
+  Nsamples: 3
+variables:
+- tau
+- I0
+- Nin_virtual
+- gamma
+- lr
+- tau_lr
+started_at: 2024-09-15_15-28-07_036510
+finished_at: null
+duration: null

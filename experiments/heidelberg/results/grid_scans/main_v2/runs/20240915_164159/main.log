@@ -1,0 +1,274 @@
+[2024-09-15 16:41:59]
+CONSTANTS:
+  device_count              1
+  seed                      0
+  eps                       1e-06
+  Nhidden                   100
+  Nlayer                    2
+  Nout                      20
+  w_scale                   0.5
+  T                         2
+  K                         300
+  dt                        0.001
+  Nbatch                    1000
+  beta1                     0.9
+  beta2                     0.999
+  p_flip                    0
+  Nepochs                   40
+  Ntrain                    None
+  Nin                       700
+  Nsamples                  3
+[2024-09-15 16:41:59]
+VARIABLES: tau, I0, Nin_virtual, gamma, lr, tau_lr
+[2024-09-15 16:42:15]
+480 configs remaining (~8h 8m 41s, ETA: 00:50:56, based on a mean trial duration of 61.1s)
+[2024-09-15 16:42:16]
+========== CONFIG 1 ==========
+tau                       1/3 pi^-1
+I0                        1.12
+Nin_virtual               1
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:42:16]
+This config has already been used in trial a6a06b4737ff1561b267f0f9dd66cf0d and finished successfully. Skipping.
+[2024-09-15 16:42:32]
+479 configs remaining (~8h 7m 40s, ETA: 00:50:13, based on a mean trial duration of 61.1s)
+[2024-09-15 16:42:32]
+========== CONFIG 2 ==========
+tau                       1/6 pi^-1
+I0                        1.12
+Nin_virtual               1
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:42:33]
+This config has already been used in trial bbd27a34f32ca98c90d1f785b7b62873 and finished successfully. Skipping.
+[2024-09-15 16:42:49]
+478 configs remaining (~8h 6m 38s, ETA: 00:49:28, based on a mean trial duration of 61.1s)
+[2024-09-15 16:42:49]
+========== CONFIG 3 ==========
+tau                       1/3 pi^-1
+I0                        1.25
+Nin_virtual               1
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:42:49]
+This config has already been used in trial da2c11baa8b45bac4ce423813af41019 and finished successfully. Skipping.
+[2024-09-15 16:43:06]
+477 configs remaining (~8h 5m 37s, ETA: 00:48:44, based on a mean trial duration of 61.1s)
+[2024-09-15 16:43:06]
+========== CONFIG 4 ==========
+tau                       1/3 pi^-1
+I0                        1.38
+Nin_virtual               1
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:43:06]
+This config has already been used in trial bf34bf5e78aad549b28c06ec1e50c45f and finished successfully. Skipping.
+[2024-09-15 16:43:23]
+476 configs remaining (~8h 4m 36s, ETA: 00:48:00, based on a mean trial duration of 61.1s)
+[2024-09-15 16:43:23]
+========== CONFIG 5 ==========
+tau                       1/6 pi^-1
+I0                        1.25
+Nin_virtual               1
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:43:23]
+This config has already been used in trial 0fb44a108ebf5f7065bc3005441b5bca and finished successfully. Skipping.
+[2024-09-15 16:43:40]
+475 configs remaining (~8h 3m 35s, ETA: 00:47:15, based on a mean trial duration of 61.1s)
+[2024-09-15 16:43:40]
+========== CONFIG 6 ==========
+tau                       1/6 pi^-1
+I0                        1.38
+Nin_virtual               1
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:43:40]
+This config has already been used in trial 3f5a024bf5188e4fff216c3334879d1d and finished successfully. Skipping.
+[2024-09-15 16:43:56]
+474 configs remaining (~8h 2m 34s, ETA: 00:46:31, based on a mean trial duration of 61.1s)
+[2024-09-15 16:43:56]
+========== CONFIG 7 ==========
+tau                       1/3 pi^-1
+I0                        1.12
+Nin_virtual               4
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:43:56]
+This config has already been used in trial 49718f65112de77f153d77df8f719869 and finished successfully. Skipping.
+[2024-09-15 16:44:13]
+473 configs remaining (~8h 1m 33s, ETA: 00:45:47, based on a mean trial duration of 61.1s)
+[2024-09-15 16:44:13]
+========== CONFIG 8 ==========
+tau                       1/3 pi^-1
+I0                        1.12
+Nin_virtual               8
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:44:13]
+This config has already been used in trial 36621589ffabce2262e4c3d9471c6e2f and finished successfully. Skipping.
+[2024-09-15 16:44:30]
+472 configs remaining (~8h 0m 32s, ETA: 00:45:02, based on a mean trial duration of 61.1s)
+[2024-09-15 16:44:30]
+========== CONFIG 9 ==========
+tau                       1/3 pi^-1
+I0                        1.12
+Nin_virtual               16
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:44:30]
+This config has already been used in trial ba74331756e4bf553cfbdba8d4ab03d8 and finished successfully. Skipping.
+[2024-09-15 16:44:46]
+471 configs remaining (~7h 59m 31s, ETA: 00:44:18, based on a mean trial duration of 61.1s)
+[2024-09-15 16:44:46]
+========== CONFIG 10 ==========
+tau                       1/3 pi^-1
+I0                        1.12
+Nin_virtual               32
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:44:46]
+This config has already been used in trial 5e50f62b586912f1ac400911b3b45c8e and finished successfully. Skipping.
+[2024-09-15 16:45:03]
+470 configs remaining (~7h 58m 30s, ETA: 00:43:33, based on a mean trial duration of 61.1s)
+[2024-09-15 16:45:03]
+========== CONFIG 11 ==========
+tau                       1/6 pi^-1
+I0                        1.12
+Nin_virtual               4
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:45:03]
+This config has already been used in trial 5ba9ce624f4d5703fe6a382b9d128d5d and finished successfully. Skipping.
+[2024-09-15 16:45:19]
+469 configs remaining (~7h 57m 29s, ETA: 00:42:49, based on a mean trial duration of 61.1s)
+[2024-09-15 16:45:19]
+========== CONFIG 12 ==========
+tau                       1/6 pi^-1
+I0                        1.12
+Nin_virtual               8
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:45:19]
+This config has already been used in trial 98d1c74916505201eb2fda3ffd192b19 and finished successfully. Skipping.
+[2024-09-15 16:45:36]
+468 configs remaining (~7h 56m 28s, ETA: 00:42:04, based on a mean trial duration of 61.1s)
+[2024-09-15 16:45:36]
+========== CONFIG 13 ==========
+tau                       1/6 pi^-1
+I0                        1.12
+Nin_virtual               16
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:45:36]
+This config has already been used in trial 200dea104622d496179cea3741853fe7 and finished successfully. Skipping.
+[2024-09-15 16:45:53]
+467 configs remaining (~7h 55m 27s, ETA: 00:41:20, based on a mean trial duration of 61.1s)
+[2024-09-15 16:45:53]
+========== CONFIG 14 ==========
+tau                       1/6 pi^-1
+I0                        1.12
+Nin_virtual               32
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:45:53]
+This config has already been used in trial 9e73468e3dcb85cd7a7ae1241885473d and finished successfully. Skipping.
+[2024-09-15 16:46:09]
+466 configs remaining (~7h 53m 8s, ETA: 00:39:18, based on a mean trial duration of 60.9s)
+[2024-09-15 16:46:09]
+========== CONFIG 15 ==========
+tau                       1/3 pi^-1
+I0                        1.25
+Nin_virtual               4
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:46:09]
+This config has already been used in trial 0a9edeb70abd6611e7e826d2292d1668 and finished successfully. Skipping.
+[2024-09-15 16:46:26]
+465 configs remaining (~7h 50m 50s, ETA: 00:37:16, based on a mean trial duration of 60.8s)
+[2024-09-15 16:46:26]
+========== CONFIG 16 ==========
+tau                       1/3 pi^-1
+I0                        1.25
+Nin_virtual               8
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:46:26]
+This config has already been used in trial b9cecc588fdba6d2d2e08245585af6c0 and finished successfully. Skipping.
+[2024-09-15 16:46:42]
+464 configs remaining (~7h 49m 49s, ETA: 00:36:32, based on a mean trial duration of 60.8s)
+[2024-09-15 16:46:42]
+========== CONFIG 17 ==========
+tau                       1/3 pi^-1
+I0                        1.25
+Nin_virtual               16
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:46:43]
+This config has already been used in trial 36309aa71c4f7a0a10614ced43c5d150 and finished successfully. Skipping.
+[2024-09-15 16:46:59]
+463 configs remaining (~7h 48m 48s, ETA: 00:35:48, based on a mean trial duration of 60.8s)
+[2024-09-15 16:46:59]
+========== CONFIG 18 ==========
+tau                       1/3 pi^-1
+I0                        1.25
+Nin_virtual               32
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:46:59]
+This config has already been used in trial 2572fc43a8295ebdc3680e0f553c32cb and finished successfully. Skipping.
+[2024-09-15 16:47:16]
+462 configs remaining (~7h 47m 47s, ETA: 00:35:04, based on a mean trial duration of 60.8s)
+[2024-09-15 16:47:16]
+========== CONFIG 19 ==========
+tau                       1/3 pi^-1
+I0                        1.38
+Nin_virtual               4
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:47:16]
+This config has already been used in trial 3f39efa6336c95bc1afaa329c51fbe9d and finished successfully. Skipping.
+[2024-09-15 16:47:32]
+461 configs remaining (~7h 46m 47s, ETA: 00:34:19, based on a mean trial duration of 60.8s)
+[2024-09-15 16:47:32]
+========== CONFIG 20 ==========
+tau                       1/3 pi^-1
+I0                        1.38
+Nin_virtual               8
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:47:32]
+This config has already been used in trial 5bd2db57d425cc63f5400ad0be61d084 and finished successfully. Skipping.
+[2024-09-15 16:47:49]
+460 configs remaining (~7h 45m 46s, ETA: 00:33:35, based on a mean trial duration of 60.8s)
+[2024-09-15 16:47:49]
+========== CONFIG 21 ==========
+tau                       1/3 pi^-1
+I0                        1.38
+Nin_virtual               16
+gamma                     0.001
+lr                        0.001
+tau_lr                    10
+[2024-09-15 16:47:49]
+This config has already been used in trial cc93b3c9796a1935c72b7616ef029185 and finished successfully. Skipping.
