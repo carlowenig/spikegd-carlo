@@ -7,7 +7,7 @@ import jax
 # jax.distributed.initialize()  # type: ignore
 import numpy as np
 
-from heidelberg_v02 import load_datasets, run_theta_ensemble
+from heidelberg_v03 import load_datasets, run_theta_ensemble
 from hyperparam_scan_util import GridScan, vary
 
 assert (
@@ -34,11 +34,11 @@ config_grid = {
     "device_count": len(devices),
     "seed": 0,
     # Neuron
-    "tau": vary(3 / np.pi, 6 / np.pi),
-    "I0": vary(5 / 4 - 1 / 8, 5 / 4, 5 / 4 + 1 / 8),
+    "tau": 6 / np.pi,
+    "I0": 5 / 4,
     "eps": 1e-6,
     # Network
-    "Nin_virtual": vary(1, 4, 8, 16, 32),  # #Virtual input neurons = N_bin - 1
+    # "Nin_virtual": vary(1, 4, 8, 16, 32),  # #Virtual input neurons = N_bin - 1
     "Nhidden": 100,
     "Nlayer": 2,  # Number of layers
     "Nout": 20,
@@ -48,10 +48,10 @@ config_grid = {
     "K": 300,  # Maximal number of simulated ordinary spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
-    "gamma": vary(1e-3, 1e-2),
+    "gamma": 1e-2,
     "Nbatch": 1000,
-    "lr": vary(1e-3, 2e-3, 4e-3, 1e-2),
-    "tau_lr": vary(1e1, 1e2),
+    "lr": 4e-3,
+    "tau_lr": 1e2,
     "beta1": 0.9,
     "beta2": 0.999,
     "p_flip": 0.0,
@@ -62,11 +62,12 @@ config_grid = {
     # "Nin_data": 700,
     # "Nin": computed(lambda Nin_data, Nt: Nin_data * Nt),
     "Nin": 700,
+    "Kin": vary(100, 200, 300),
     # Ensemble
     "Nsamples": 3,
 }
 
-scan = GridScan.load_or_create("main_v2", root="results")
+scan = GridScan.load_or_create("main_v3", root="results")
 
 
 scan.run(
