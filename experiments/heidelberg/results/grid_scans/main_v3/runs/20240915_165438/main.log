@@ -1,0 +1,47 @@
+[2024-09-15 16:54:38]
+CONSTANTS:
+  device_count              1
+  seed                      0
+  tau                       1/6 pi^-1
+  I0                        1.25
+  eps                       1e-06
+  Nhidden                   100
+  Nlayer                    2
+  Nout                      20
+  w_scale                   0.5
+  T                         2
+  K                         300
+  dt                        0.001
+  gamma                     0.01
+  Nbatch                    1000
+  lr                        0.004
+  tau_lr                    100
+  beta1                     0.9
+  beta2                     0.999
+  p_flip                    0
+  Nepochs                   40
+  Ntrain                    None
+  Nin                       700
+  Nsamples                  3
+[2024-09-15 16:54:38]
+VARIABLES: Kin
+[2024-09-15 16:54:38]
+3 configs remaining (could not estimate remaining time)
+[2024-09-15 16:54:38]
+========== CONFIG 1 ==========
+Kin                       100
+[2024-09-15 16:54:38]
+Starting trial 1bf274315257bdec09cf7bb602570960.
+[2024-09-15 16:58:12]
+acc_max_epoch             16
+acc_max_mean              0.0544
+acc_max_std               0.00511
+[2024-09-15 16:58:12]
+Finished trial 1bf274315257bdec09cf7bb602570960 after 214.5s
+[2024-09-15 16:58:12]
+2 configs remaining (~7m 8s, ETA: 17:05:21, based on a mean trial duration of 214.5s)
+[2024-09-15 16:58:12]
+========== CONFIG 2 ==========
+Kin                       200
+[2024-09-15 16:58:12]
+Starting trial cfe50d52504d01e516f96c421261388c.
