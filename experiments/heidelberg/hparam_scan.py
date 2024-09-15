@@ -39,7 +39,7 @@ config_grid = {
     "eps": 1e-6,
     # Network
     "Nin_virtual": vary(
-        1, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 80, 96, 128
+        1, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 80, 96, 126
     ),  # #Virtual input neurons = N_bin - 1
     "Nhidden": vary(100, 200, 300),
     "Nlayer": vary(2, 3),  # Number of layers

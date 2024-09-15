@@ -1,5 +1,5 @@
 scan_id: main_v2
-run_id: '20240914_183818'
+run_id: '20240914_223231'
 config:
   device_count: 1
   seed: 0
@@ -26,98 +26,104 @@ config:
   Nlayer: 2
   Nbatch: 2000
   _index: 113
-started_at: 2024-09-14_20-28-56_566328
-finished_at: 2024-09-14_20-29-42_797963
-duration: 46.23163437843323
+started_at: 2024-09-15_00-33-24_304256
+finished_at: 2024-09-15_00-34-10_512239
+duration: 46.207982540130615
 metrics:
   acc_init_mean: 0.06248148903250694
   acc_init_std: 0.01084139384329319
-  acc_final_mean: 0.4746902883052826
-  acc_final_std: 0.0032280797604471445
+  acc_final_mean: 0.4541986882686615
+  acc_final_std: 0.011174817569553852
   acc_min_epoch: 0
   acc_min_mean: 0.06248148903250694
   acc_min_std: 0.01084139384329319
-  acc_max_epoch: 20
-  acc_max_mean: 0.4746902883052826
-  acc_max_std: 0.0032280797604471445
+  acc_max_epoch: 17
+  acc_max_mean: 0.47480472922325134
+  acc_max_std: 0.009448954835534096
   acc_ord_init_mean: 0.04827272891998291
   acc_ord_init_std: 0.004224623087793589
-  acc_ord_final_mean: 0.22377106547355652
-  acc_ord_final_std: 0.03824852406978607
+  acc_ord_final_mean: 0.19679127633571625
+  acc_ord_final_std: 0.041961055248975754
   acc_ord_min_epoch: 0
   acc_ord_min_mean: 0.04827272891998291
   acc_ord_min_std: 0.004224623087793589
-  acc_ord_max_epoch: 18
-  acc_ord_max_mean: 0.22972729802131653
-  acc_ord_max_std: 0.008013362996280193
+  acc_ord_max_epoch: 19
+  acc_ord_max_mean: 0.23277780413627625
+  acc_ord_max_std: 0.03987042233347893
   activity_init_mean: 0.17504721879959106
   activity_init_std: 0.0031091005075722933
-  activity_final_mean: 0.13819944858551025
-  activity_final_std: 0.0033408531453460455
-  activity_min_epoch: 20
-  activity_min_mean: 0.13819944858551025
-  activity_min_std: 0.0033408531453460455
+  activity_final_mean: 0.1541300117969513
+  activity_final_std: 0.013913469389081001
+  activity_min_epoch: 2
+  activity_min_mean: 0.1494947373867035
+  activity_min_std: 0.011917500756680965
   activity_max_epoch: 0
   activity_max_mean: 0.17504721879959106
   activity_max_std: 0.0031091005075722933
   activity_first_init_mean: 0.17504721879959106
   activity_first_init_std: 0.0031091005075722933
-  activity_first_final_mean: 0.13814111053943634
-  activity_first_final_std: 0.0033279170747846365
-  activity_first_min_epoch: 20
-  activity_first_min_mean: 0.13814111053943634
-  activity_first_min_std: 0.0033279170747846365
+  activity_first_final_mean: 0.1540805548429489
+  activity_first_final_std: 0.013903691433370113
+  activity_first_min_epoch: 2
+  activity_first_min_mean: 0.14914223551750183
+  activity_first_min_std: 0.011805227026343346
   activity_first_max_epoch: 0
   activity_first_max_mean: 0.17504721879959106
   activity_first_max_std: 0.0031091005075722933
+  epoch_time_mean: 0.6116740703582764
+  epoch_time_std: 0.07188618183135986
+  init_compile_time_mean: 0.0005950819468125701
+  init_compile_time_std: 6.798237336624879e-06
+  init_optim_time_mean: 0.001926520257256925
+  init_optim_time_std: 9.489265357842669e-05
+  init_phi0_time_mean: 0.001075579784810543
+  init_phi0_time_std: 0.00040253830957226455
+  init_time_mean: 1.9904483556747437
+  init_time_std: 0.26935267448425293
+  init_weights_time_mean: 0.001224671257659793
+  init_weights_time_std: 0.00032815910526551306
   loss_init_mean: 3.064709186553955
   loss_init_std: 0.007648148573935032
-  loss_final_mean: 1.7366604804992676
-  loss_final_std: 0.011242409236729145
+  loss_final_mean: 1.754234790802002
+  loss_final_std: 0.06458956748247147
   loss_min_epoch: 17
-  loss_min_mean: 1.720651388168335
-  loss_min_std: 0.036460213363170624
+  loss_min_mean: 1.7526261806488037
+  loss_min_std: 0.046788450330495834
   loss_max_epoch: 0
   loss_max_mean: 3.064709186553955
   loss_max_std: 0.007648148573935032
   loss_ord_init_mean: 3.01291561126709
   loss_ord_init_std: 0.0
-  loss_ord_final_mean: 2.9717965126037598
-  loss_ord_final_std: 0.013433150947093964
+  loss_ord_final_mean: 2.985187530517578
+  loss_ord_final_std: 0.005969568155705929
   loss_ord_min_epoch: 4
-  loss_ord_min_mean: 2.8796164989471436
-  loss_ord_min_std: 0.02103792317211628
+  loss_ord_min_mean: 2.887514114379883
+  loss_ord_min_std: 0.019130317494273186
   loss_ord_max_epoch: 0
   loss_ord_max_mean: 3.01291561126709
   loss_ord_max_std: 0.0
-  perf.compilation_time_mean: 0.0006671150913462043
-  perf.compilation_time_std: 8.812057785689831e-05
-  perf.optim_init_time_mean: 0.0025644726119935513
-  perf.optim_init_time_std: 0.0005057146190665662
-  perf.phi0_init_time_mean: 0.0008325654780492187
-  perf.phi0_init_time_std: 0.00024299528740812093
-  perf.weights_init_time_mean: 0.0010092125739902258
-  perf.weights_init_time_std: 0.00010494144225958735
   silent_neurons_init_mean: 0.13833333551883698
   silent_neurons_init_std: 0.027788884937763214
-  silent_neurons_final_mean: 0.5216666460037231
-  silent_neurons_final_std: 0.023570232093334198
+  silent_neurons_final_mean: 0.4933333396911621
+  silent_neurons_final_std: 0.037043534219264984
   silent_neurons_min_epoch: 0
   silent_neurons_min_mean: 0.13833333551883698
   silent_neurons_min_std: 0.027788884937763214
-  silent_neurons_max_epoch: 20
-  silent_neurons_max_mean: 0.5216666460037231
-  silent_neurons_max_std: 0.023570232093334198
+  silent_neurons_max_epoch: 8
+  silent_neurons_max_mean: 0.5083333253860474
+  silent_neurons_max_std: 0.03704352304339409
   silent_neurons_first_init_mean: 0.13833333551883698
   silent_neurons_first_init_std: 0.027788884937763214
-  silent_neurons_first_final_mean: 0.5216666460037231
-  silent_neurons_first_final_std: 0.023570232093334198
+  silent_neurons_first_final_mean: 0.4933333396911621
+  silent_neurons_first_final_std: 0.037043534219264984
   silent_neurons_first_min_epoch: 0
   silent_neurons_first_min_mean: 0.13833333551883698
   silent_neurons_first_min_std: 0.027788884937763214
-  silent_neurons_first_max_epoch: 20
-  silent_neurons_first_max_mean: 0.5216666460037231
-  silent_neurons_first_max_std: 0.023570232093334198
+  silent_neurons_first_max_epoch: 8
+  silent_neurons_first_max_mean: 0.5083333253860474
+  silent_neurons_first_max_std: 0.03704352304339409
+  train_time_mean: 12.233481407165527
+  train_time_std: 1.4377235174179077
   epochs:
   - acc_mean: 0.06248148903250694
     acc_std: 0.01084139384329319
@@ -135,325 +141,325 @@ metrics:
     silent_neurons_std: 0.027788884937763214
     silent_neurons_first_mean: 0.13833333551883698
     silent_neurons_first_std: 0.027788884937763214
-  - acc_mean: 0.10684512555599213
-    acc_std: 0.02761661447584629
-    acc_ord_mean: 0.09871717542409897
-    acc_ord_std: 0.037760499864816666
-    activity_mean: 0.15369999408721924
-    activity_std: 0.010550880804657936
-    activity_first_mean: 0.15363778173923492
-    activity_first_std: 0.010505558922886848
-    loss_mean: 2.971102476119995
-    loss_std: 0.014305030927062035
-    loss_ord_mean: 3.003598690032959
-    loss_ord_std: 0.006652808748185635
+  - acc_mean: 0.10728956758975983
+    acc_std: 0.026994870975613594
+    acc_ord_mean: 0.0988282859325409
+    acc_ord_std: 0.03760463744401932
+    activity_mean: 0.1536950170993805
+    activity_std: 0.010540932416915894
+    activity_first_mean: 0.1536344587802887
+    activity_first_std: 0.010497409850358963
+    loss_mean: 2.9710891246795654
+    loss_std: 0.014268327504396439
+    loss_ord_mean: 3.003592014312744
+    loss_ord_std: 0.006657348480075598
     silent_neurons_mean: 0.4950000047683716
     silent_neurons_std: 0.03240368515253067
     silent_neurons_first_mean: 0.4950000047683716
     silent_neurons_first_std: 0.03240368515253067
-  - acc_mean: 0.1164848655462265
-    acc_std: 0.023971686139702797
-    acc_ord_mean: 0.11637374758720398
-    acc_ord_std: 0.024018459022045135
-    activity_mean: 0.14833110570907593
-    activity_std: 0.010051601566374302
-    activity_first_mean: 0.14802750945091248
-    activity_first_std: 0.009986566379666328
-    loss_mean: 2.8388524055480957
-    loss_std: 0.007246966939419508
-    loss_ord_mean: 2.97288179397583
-    loss_ord_std: 0.011527438648045063
-    silent_neurons_mean: 0.5049999952316284
-    silent_neurons_std: 0.02943921461701393
-    silent_neurons_first_mean: 0.5049999952316284
-    silent_neurons_first_std: 0.02943921461701393
-  - acc_mean: 0.18153199553489685
-    acc_std: 0.020046556368470192
-    acc_ord_mean: 0.17711786925792694
-    acc_ord_std: 0.02215067856013775
-    activity_mean: 0.1537252813577652
-    activity_std: 0.011728616431355476
-    activity_first_mean: 0.15305140614509583
-    activity_first_std: 0.0115909893065691
-    loss_mean: 2.731241226196289
-    loss_std: 0.009074483998119831
-    loss_ord_mean: 2.9076390266418457
-    loss_ord_std: 0.01779748871922493
+  - acc_mean: 0.11566667258739471
+    acc_std: 0.018610671162605286
+    acc_ord_mean: 0.11435692012310028
+    acc_ord_std: 0.01931166835129261
+    activity_mean: 0.1494947373867035
+    activity_std: 0.011917500756680965
+    activity_first_mean: 0.14914223551750183
+    activity_first_std: 0.011805227026343346
+    loss_mean: 2.835641384124756
+    loss_std: 0.009097890928387642
+    loss_ord_mean: 2.9723739624023438
+    loss_ord_std: 0.012911107391119003
     silent_neurons_mean: 0.503333330154419
     silent_neurons_std: 0.03009246289730072
     silent_neurons_first_mean: 0.503333330154419
     silent_neurons_first_std: 0.03009246289730072
-  - acc_mean: 0.18362963199615479
-    acc_std: 0.04280102625489235
-    acc_ord_mean: 0.17477107048034668
-    acc_ord_std: 0.035280149430036545
-    activity_mean: 0.15356165170669556
-    activity_std: 0.009845742955803871
-    activity_first_mean: 0.15276528894901276
-    activity_first_std: 0.009680534712970257
-    loss_mean: 2.6110169887542725
-    loss_std: 0.011155248619616032
-    loss_ord_mean: 2.8796164989471436
-    loss_ord_std: 0.02103792317211628
-    silent_neurons_mean: 0.5049999952316284
-    silent_neurons_std: 0.03240371495485306
-    silent_neurons_first_mean: 0.5049999952316284
-    silent_neurons_first_std: 0.03240371495485306
-  - acc_mean: 0.2132963240146637
-    acc_std: 0.025457683950662613
-    acc_ord_mean: 0.1858619898557663
-    acc_ord_std: 0.010194463655352592
-    activity_mean: 0.15286777913570404
-    activity_std: 0.009507455863058567
-    activity_first_mean: 0.15216417610645294
-    activity_first_std: 0.00954586360603571
-    loss_mean: 2.515017509460449
-    loss_std: 0.013333653099834919
-    loss_ord_mean: 2.895346164703369
-    loss_ord_std: 0.029902789741754532
-    silent_neurons_mean: 0.5066666603088379
-    silent_neurons_std: 0.034721117466688156
-    silent_neurons_first_mean: 0.5066666603088379
-    silent_neurons_first_std: 0.034721117466688156
-  - acc_mean: 0.24635693430900574
-    acc_std: 0.04641720652580261
-    acc_ord_mean: 0.1995791494846344
-    acc_ord_std: 0.034110818058252335
-    activity_mean: 0.1541241705417633
-    activity_std: 0.008139229379594326
-    activity_first_mean: 0.15374916791915894
-    activity_first_std: 0.008123651146888733
-    loss_mean: 2.357560634613037
-    loss_std: 0.026319265365600586
-    loss_ord_mean: 2.9205241203308105
-    loss_ord_std: 0.02023177035152912
-    silent_neurons_mean: 0.5116666555404663
-    silent_neurons_std: 0.03091207519173622
-    silent_neurons_first_mean: 0.5116666555404663
-    silent_neurons_first_std: 0.03091207519173622
-  - acc_mean: 0.2553400993347168
-    acc_std: 0.022157849743962288
-    acc_ord_mean: 0.15985523164272308
-    acc_ord_std: 0.01008894294500351
-    activity_mean: 0.15322890877723694
-    activity_std: 0.00831135269254446
-    activity_first_mean: 0.1531183421611786
-    activity_first_std: 0.008330447599291801
-    loss_mean: 2.2924654483795166
-    loss_std: 0.07850874215364456
-    loss_ord_mean: 2.955726146697998
-    loss_ord_std: 0.0076344492845237255
-    silent_neurons_mean: 0.5099999904632568
-    silent_neurons_std: 0.03188522160053253
-    silent_neurons_first_mean: 0.5116666555404663
-    silent_neurons_first_std: 0.03091207519173622
-  - acc_mean: 0.3105117976665497
-    acc_std: 0.01717492938041687
-    acc_ord_mean: 0.14520877599716187
-    acc_ord_std: 0.027504699304699898
-    activity_mean: 0.1537194401025772
-    activity_std: 0.006644147913902998
-    activity_first_mean: 0.1536569595336914
-    activity_first_std: 0.006647913716733456
-    loss_mean: 2.2115492820739746
-    loss_std: 0.05276470258831978
-    loss_ord_mean: 2.977064847946167
-    loss_ord_std: 0.010038555599749088
-    silent_neurons_mean: 0.5099999904632568
-    silent_neurons_std: 0.0353553481400013
-    silent_neurons_first_mean: 0.5116666555404663
+  - acc_mean: 0.17393605411052704
+    acc_std: 0.021008409559726715
+    acc_ord_mean: 0.17315827310085297
+    acc_ord_std: 0.021290967240929604
+    activity_mean: 0.15552279353141785
+    activity_std: 0.011903122067451477
+    activity_first_mean: 0.15483807027339935
+    activity_first_std: 0.011797429993748665
+    loss_mean: 2.7253828048706055
+    loss_std: 0.00553590152412653
+    loss_ord_mean: 2.9032106399536133
+    loss_ord_std: 0.021235039457678795
+    silent_neurons_mean: 0.5016666650772095
+    silent_neurons_std: 0.03423774242401123
+    silent_neurons_first_mean: 0.5016666650772095
     silent_neurons_first_std: 0.03423774242401123
-  - acc_mean: 0.34574076533317566
-    acc_std: 0.015794258564710617
-    acc_ord_mean: 0.16782492399215698
-    acc_ord_std: 0.00670441472902894
-    activity_mean: 0.1488008350133896
-    activity_std: 0.006754391826689243
-    activity_first_mean: 0.14875251054763794
-    activity_first_std: 0.006757240742444992
-    loss_mean: 2.107797622680664
-    loss_std: 0.048791322857141495
-    loss_ord_mean: 2.96804141998291
-    loss_ord_std: 0.0030489929486066103
-    silent_neurons_mean: 0.5133333206176758
-    silent_neurons_std: 0.033993467688560486
-    silent_neurons_first_mean: 0.5133333206176758
-    silent_neurons_first_std: 0.033993467688560486
-  - acc_mean: 0.3737744688987732
-    acc_std: 0.022302372381091118
-    acc_ord_mean: 0.1622862070798874
-    acc_ord_std: 0.004761287476867437
-    activity_mean: 0.1453113853931427
-    activity_std: 0.006789280101656914
-    activity_first_mean: 0.14526723325252533
-    activity_first_std: 0.006792412605136633
-    loss_mean: 2.0421035289764404
-    loss_std: 0.044453106820583344
-    loss_ord_mean: 2.972871780395508
-    loss_ord_std: 0.005620758049190044
-    silent_neurons_mean: 0.5099999904632568
-    silent_neurons_std: 0.029439212754368782
-    silent_neurons_first_mean: 0.5099999904632568
-    silent_neurons_first_std: 0.029439212754368782
-  - acc_mean: 0.4151582717895508
-    acc_std: 0.016993580386042595
-    acc_ord_mean: 0.18064311146736145
-    acc_ord_std: 0.01841956563293934
-    activity_mean: 0.14672833681106567
-    activity_std: 0.006416902877390385
-    activity_first_mean: 0.14668166637420654
-    activity_first_std: 0.006407728418707848
-    loss_mean: 1.9429068565368652
-    loss_std: 0.06559388339519501
-    loss_ord_mean: 2.9761500358581543
-    loss_ord_std: 0.010528495535254478
-    silent_neurons_mean: 0.5083333253860474
-    silent_neurons_std: 0.033993471413850784
-    silent_neurons_first_mean: 0.5083333253860474
-    silent_neurons_first_std: 0.033993471413850784
-  - acc_mean: 0.3926464915275574
-    acc_std: 0.025604134425520897
-    acc_ord_mean: 0.1669764518737793
-    acc_ord_std: 0.01500799972563982
-    activity_mean: 0.14644889533519745
-    activity_std: 0.0048593198880553246
-    activity_first_mean: 0.14641472697257996
-    activity_first_std: 0.004864138085395098
-    loss_mean: 1.9093327522277832
-    loss_std: 0.023828012868762016
-    loss_ord_mean: 2.9817209243774414
-    loss_ord_std: 0.007992178201675415
-    silent_neurons_mean: 0.5083333253860474
-    silent_neurons_std: 0.025927266106009483
-    silent_neurons_first_mean: 0.5083333253860474
-    silent_neurons_first_std: 0.025927266106009483
-  - acc_mean: 0.43512463569641113
-    acc_std: 0.020704863592982292
-    acc_ord_mean: 0.16822223365306854
-    acc_ord_std: 0.03650592267513275
-    activity_mean: 0.14460110664367676
-    activity_std: 0.0011149677447974682
-    activity_first_mean: 0.14456555247306824
-    activity_first_std: 0.0011019895318895578
-    loss_mean: 1.8515183925628662
-    loss_std: 0.0745067149400711
-    loss_ord_mean: 2.986950397491455
-    loss_ord_std: 0.011271623894572258
+  - acc_mean: 0.18578790128231049
+    acc_std: 0.04759694263339043
+    acc_ord_mean: 0.17910438776016235
+    acc_ord_std: 0.0414959192276001
+    activity_mean: 0.15399113297462463
+    activity_std: 0.010945998132228851
+    activity_first_mean: 0.15324667096138
+    activity_first_std: 0.010786091908812523
+    loss_mean: 2.613945245742798
+    loss_std: 0.01765614002943039
+    loss_ord_mean: 2.887514114379883
+    loss_ord_std: 0.019130317494273186
+    silent_neurons_mean: 0.5016666650772095
+    silent_neurons_std: 0.03423774242401123
+    silent_neurons_first_mean: 0.5016666650772095
+    silent_neurons_first_std: 0.03423774242401123
+  - acc_mean: 0.21282492578029633
+    acc_std: 0.02568211778998375
+    acc_ord_mean: 0.17904041707515717
+    acc_ord_std: 0.010523206554353237
+    activity_mean: 0.15590111911296844
+    activity_std: 0.010923468507826328
+    activity_first_mean: 0.15525361895561218
+    activity_first_std: 0.010972638614475727
+    loss_mean: 2.5088253021240234
+    loss_std: 0.018533142283558846
+    loss_ord_mean: 2.8924434185028076
+    loss_ord_std: 0.02323790267109871
+    silent_neurons_mean: 0.5016666650772095
+    silent_neurons_std: 0.03423774242401123
+    silent_neurons_first_mean: 0.5016666650772095
+    silent_neurons_first_std: 0.03423774242401123
+  - acc_mean: 0.2735353708267212
+    acc_std: 0.026773473247885704
+    acc_ord_mean: 0.18580472469329834
+    acc_ord_std: 0.03887302428483963
+    activity_mean: 0.15765723586082458
+    activity_std: 0.011967578902840614
+    activity_first_mean: 0.1572938859462738
+    activity_first_std: 0.011875766329467297
+    loss_mean: 2.354557991027832
+    loss_std: 0.04348286986351013
+    loss_ord_mean: 2.924637794494629
+    loss_ord_std: 0.022005876526236534
+    silent_neurons_mean: 0.5016666650772095
+    silent_neurons_std: 0.03091207519173622
+    silent_neurons_first_mean: 0.5016666650772095
+    silent_neurons_first_std: 0.03091207519173622
+  - acc_mean: 0.27622562646865845
+    acc_std: 0.020402943715453148
+    acc_ord_mean: 0.1628081053495407
+    acc_ord_std: 0.01603727601468563
+    activity_mean: 0.15577082335948944
+    activity_std: 0.01118278969079256
+    activity_first_mean: 0.15565833449363708
+    activity_first_std: 0.011210770346224308
+    loss_mean: 2.273094892501831
+    loss_std: 0.03558022901415825
+    loss_ord_mean: 2.9528396129608154
+    loss_ord_std: 0.0069984858855605125
     silent_neurons_mean: 0.5049999952316284
-    silent_neurons_std: 0.021602461114525795
+    silent_neurons_std: 0.035590268671512604
     silent_neurons_first_mean: 0.5066666603088379
-    silent_neurons_first_std: 0.02094966545701027
-  - acc_mean: 0.4334007203578949
-    acc_std: 0.014756299555301666
-    acc_ord_mean: 0.17269361019134521
-    acc_ord_std: 0.003740973537787795
-    activity_mean: 0.14186805486679077
-    activity_std: 0.0024521267041563988
-    activity_first_mean: 0.1418372243642807
-    activity_first_std: 0.002457807306200266
-    loss_mean: 1.8613145351409912
-    loss_std: 0.04060905799269676
-    loss_ord_mean: 2.988280773162842
-    loss_ord_std: 0.0070003787986934185
-    silent_neurons_mean: 0.5133333206176758
-    silent_neurons_std: 0.02321399562060833
-    silent_neurons_first_mean: 0.5133333206176758
-    silent_neurons_first_std: 0.02321399562060833
-  - acc_mean: 0.4517037570476532
-    acc_std: 0.0132980952039361
-    acc_ord_mean: 0.215659961104393
-    acc_ord_std: 0.03595486655831337
-    activity_mean: 0.1405739039182663
-    activity_std: 0.0007806589128449559
-    activity_first_mean: 0.14052778482437134
-    activity_first_std: 0.0007995556807145476
-    loss_mean: 1.7487473487854004
-    loss_std: 0.041827816516160965
-    loss_ord_mean: 2.980874538421631
-    loss_ord_std: 0.012303286232054234
-    silent_neurons_mean: 0.5133333206176758
-    silent_neurons_std: 0.015456016175448895
-    silent_neurons_first_mean: 0.5133333206176758
-    silent_neurons_first_std: 0.015456016175448895
-  - acc_mean: 0.44255226850509644
-    acc_std: 0.01491992175579071
-    acc_ord_mean: 0.19706735014915466
-    acc_ord_std: 0.037063367664813995
-    activity_mean: 0.1420261263847351
-    activity_std: 0.0010209970641881227
-    activity_first_mean: 0.14198723435401917
-    activity_first_std: 0.001022616634145379
-    loss_mean: 1.7276008129119873
-    loss_std: 0.008010254241526127
-    loss_ord_mean: 2.987785816192627
-    loss_ord_std: 0.009822502732276917
-    silent_neurons_mean: 0.5099999904632568
-    silent_neurons_std: 0.021213198080658913
-    silent_neurons_first_mean: 0.5099999904632568
-    silent_neurons_first_std: 0.021213198080658913
-  - acc_mean: 0.4704141616821289
-    acc_std: 0.02187037281692028
-    acc_ord_mean: 0.2282121479511261
-    acc_ord_std: 0.03761376440525055
-    activity_mean: 0.14151249825954437
-    activity_std: 0.0020748747047036886
-    activity_first_mean: 0.14146916568279266
-    activity_first_std: 0.002049990464001894
-    loss_mean: 1.720651388168335
-    loss_std: 0.036460213363170624
-    loss_ord_mean: 2.9837284088134766
-    loss_ord_std: 0.013395030051469803
+    silent_neurons_first_std: 0.03423774242401123
+  - acc_mean: 0.3080673813819885
+    acc_std: 0.029522622004151344
+    acc_ord_mean: 0.15504378080368042
+    acc_ord_std: 0.007190048228949308
+    activity_mean: 0.15742501616477966
+    activity_std: 0.011734936386346817
+    activity_first_mean: 0.15736529231071472
+    activity_first_std: 0.011732860468327999
+    loss_mean: 2.1767661571502686
+    loss_std: 0.06223120540380478
+    loss_ord_mean: 2.9730658531188965
+    loss_ord_std: 0.0034302370622754097
+    silent_neurons_mean: 0.5083333253860474
+    silent_neurons_std: 0.03704352304339409
+    silent_neurons_first_mean: 0.5083333253860474
+    silent_neurons_first_std: 0.03704352304339409
+  - acc_mean: 0.334303081035614
+    acc_std: 0.011319727636873722
+    acc_ord_mean: 0.14917173981666565
+    acc_ord_std: 0.00542787229642272
+    activity_mean: 0.154901385307312
+    activity_std: 0.013606083579361439
+    activity_first_mean: 0.15486139059066772
+    activity_first_std: 0.013594587333500385
+    loss_mean: 2.134737491607666
+    loss_std: 0.031183090060949326
+    loss_ord_mean: 2.971918821334839
+    loss_ord_std: 0.010629513300955296
     silent_neurons_mean: 0.5066666603088379
-    silent_neurons_std: 0.023570219054818153
+    silent_neurons_std: 0.04129837453365326
     silent_neurons_first_mean: 0.5066666603088379
-    silent_neurons_first_std: 0.023570219054818153
-  - acc_mean: 0.45319193601608276
-    acc_std: 0.015051609836518764
-    acc_ord_mean: 0.22972729802131653
-    acc_ord_std: 0.008013362996280193
-    activity_mean: 0.14049194753170013
-    activity_std: 0.002214334672316909
-    activity_first_mean: 0.14042918384075165
-    activity_first_std: 0.0022122152149677277
-    loss_mean: 1.7479461431503296
-    loss_std: 0.055790022015571594
-    loss_ord_mean: 2.975982189178467
-    loss_ord_std: 0.010434340685606003
-    silent_neurons_mean: 0.5133333206176758
-    silent_neurons_std: 0.025927266106009483
-    silent_neurons_first_mean: 0.5133333206176758
-    silent_neurons_first_std: 0.025927266106009483
-  - acc_mean: 0.4598047733306885
-    acc_std: 0.011897209100425243
-    acc_ord_mean: 0.21262291073799133
-    acc_ord_std: 0.02757776342332363
-    activity_mean: 0.13857612013816833
-    activity_std: 0.0027820016257464886
-    activity_first_mean: 0.13853083550930023
-    activity_first_std: 0.002789485966786742
-    loss_mean: 1.797611117362976
-    loss_std: 0.07215455919504166
-    loss_ord_mean: 2.9854626655578613
-    loss_ord_std: 0.008577720262110233
-    silent_neurons_mean: 0.5099999904632568
-    silent_neurons_std: 0.02549511007964611
-    silent_neurons_first_mean: 0.5099999904632568
-    silent_neurons_first_std: 0.02549511007964611
-  - acc_mean: 0.4746902883052826
-    acc_std: 0.0032280797604471445
-    acc_ord_mean: 0.22377106547355652
-    acc_ord_std: 0.03824852406978607
-    activity_mean: 0.13819944858551025
-    activity_std: 0.0033408531453460455
-    activity_first_mean: 0.13814111053943634
-    activity_first_std: 0.0033279170747846365
-    loss_mean: 1.7366604804992676
-    loss_std: 0.011242409236729145
-    loss_ord_mean: 2.9717965126037598
-    loss_ord_std: 0.013433150947093964
-    silent_neurons_mean: 0.5216666460037231
-    silent_neurons_std: 0.023570232093334198
-    silent_neurons_first_mean: 0.5216666460037231
-    silent_neurons_first_std: 0.023570232093334198
+    silent_neurons_first_std: 0.04129837453365326
+  - acc_mean: 0.3415219485759735
+    acc_std: 0.02592107094824314
+    acc_ord_mean: 0.17109429836273193
+    acc_ord_std: 0.011856588535010815
+    activity_mean: 0.15656694769859314
+    activity_std: 0.014784971252083778
+    activity_first_mean: 0.15649166703224182
+    activity_first_std: 0.014754652045667171
+    loss_mean: 2.079655170440674
+    loss_std: 0.018944192677736282
+    loss_ord_mean: 2.9607865810394287
+    loss_ord_std: 0.005677567794919014
+    silent_neurons_mean: 0.5016666650772095
+    silent_neurons_std: 0.03771236538887024
+    silent_neurons_first_mean: 0.5016666650772095
+    silent_neurons_first_std: 0.03771236538887024
+  - acc_mean: 0.4219326972961426
+    acc_std: 0.043171726167201996
+    acc_ord_mean: 0.1815185397863388
+    acc_ord_std: 0.01330884825438261
+    activity_mean: 0.15633389353752136
+    activity_std: 0.014967650175094604
+    activity_first_mean: 0.15628832578659058
+    activity_first_std: 0.014961352571845055
+    loss_mean: 1.9321435689926147
+    loss_std: 0.08026048541069031
+    loss_ord_mean: 2.9680495262145996
+    loss_ord_std: 0.004687787499278784
+    silent_neurons_mean: 0.4933333396911621
+    silent_neurons_std: 0.04365267604589462
+    silent_neurons_first_mean: 0.4933333396911621
+    silent_neurons_first_std: 0.04365267604589462
+  - acc_mean: 0.4081549048423767
+    acc_std: 0.014369310811161995
+    acc_ord_mean: 0.16857914626598358
+    acc_ord_std: 0.03949493169784546
+    activity_mean: 0.1558036208152771
+    activity_std: 0.015599033795297146
+    activity_first_mean: 0.1557619571685791
+    activity_first_std: 0.015584670007228851
+    loss_mean: 1.9209692478179932
+    loss_std: 0.03295173868536949
+    loss_ord_mean: 2.9785208702087402
+    loss_ord_std: 0.008497973904013634
+    silent_neurons_mean: 0.4883333146572113
+    silent_neurons_std: 0.03399345651268959
+    silent_neurons_first_mean: 0.49166664481163025
+    silent_neurons_first_std: 0.03472110256552696
+  - acc_mean: 0.4350135028362274
+    acc_std: 0.009331980720162392
+    acc_ord_mean: 0.15335355699062347
+    acc_ord_std: 0.026068054139614105
+    activity_mean: 0.15462195873260498
+    activity_std: 0.01634744368493557
+    activity_first_mean: 0.15458306670188904
+    activity_first_std: 0.01632927730679512
+    loss_mean: 1.8333396911621094
+    loss_std: 0.06989408284425735
+    loss_ord_mean: 2.981779098510742
+    loss_ord_std: 0.013026249594986439
+    silent_neurons_mean: 0.49166667461395264
+    silent_neurons_std: 0.030912047252058983
+    silent_neurons_first_mean: 0.4933333396911621
+    silent_neurons_first_std: 0.0332498773932457
+  - acc_mean: 0.4140976667404175
+    acc_std: 0.000892292766366154
+    acc_ord_mean: 0.1889394223690033
+    acc_ord_std: 0.014458954334259033
+    activity_mean: 0.15590056777000427
+    activity_std: 0.014723717235028744
+    activity_first_mean: 0.15585055947303772
+    activity_first_std: 0.014719685539603233
+    loss_mean: 1.853369116783142
+    loss_std: 0.02446112036705017
+    loss_ord_mean: 2.9765543937683105
+    loss_ord_std: 0.007138719316571951
+    silent_neurons_mean: 0.48666664958000183
+    silent_neurons_std: 0.03423772007226944
+    silent_neurons_first_mean: 0.48666664958000183
+    silent_neurons_first_std: 0.03423772007226944
+  - acc_mean: 0.4669528901576996
+    acc_std: 0.028785189613699913
+    acc_ord_mean: 0.19599664211273193
+    acc_ord_std: 0.020860936492681503
+    activity_mean: 0.15381363034248352
+    activity_std: 0.015002385713160038
+    activity_first_mean: 0.15377113223075867
+    activity_first_std: 0.014984289184212685
+    loss_mean: 1.8235234022140503
+    loss_std: 0.045105304569005966
+    loss_ord_mean: 2.9850540161132812
+    loss_ord_std: 0.010381217114627361
+    silent_neurons_mean: 0.4833333194255829
+    silent_neurons_std: 0.0262466911226511
+    silent_neurons_first_mean: 0.4833333194255829
+    silent_neurons_first_std: 0.0262466911226511
+  - acc_mean: 0.4314950108528137
+    acc_std: 0.03531671315431595
+    acc_ord_mean: 0.21013471484184265
+    acc_ord_std: 0.02833990752696991
+    activity_mean: 0.15239112079143524
+    activity_std: 0.015760259702801704
+    activity_first_mean: 0.152333065867424
+    activity_first_std: 0.015751205384731293
+    loss_mean: 1.7695997953414917
+    loss_std: 0.027637150138616562
+    loss_ord_mean: 2.9856996536254883
+    loss_ord_std: 0.003602988086640835
+    silent_neurons_mean: 0.476666659116745
+    silent_neurons_std: 0.023921167477965355
+    silent_neurons_first_mean: 0.476666659116745
+    silent_neurons_first_std: 0.023921167477965355
+  - acc_mean: 0.47480472922325134
+    acc_std: 0.009448954835534096
+    acc_ord_mean: 0.1834714114665985
+    acc_ord_std: 0.019536839798092842
+    activity_mean: 0.15321777760982513
+    activity_std: 0.015372064895927906
+    activity_first_mean: 0.1531900018453598
+    activity_first_std: 0.015372592024505138
+    loss_mean: 1.7526261806488037
+    loss_std: 0.046788450330495834
+    loss_ord_mean: 2.990434169769287
+    loss_ord_std: 0.00679108826443553
+    silent_neurons_mean: 0.4866666793823242
+    silent_neurons_std: 0.030641278252005577
+    silent_neurons_first_mean: 0.4866666793823242
+    silent_neurons_first_std: 0.030641278252005577
+  - acc_mean: 0.44470712542533875
+    acc_std: 0.05165925249457359
+    acc_ord_mean: 0.20332324504852295
+    acc_ord_std: 0.0184207484126091
+    activity_mean: 0.15267221629619598
+    activity_std: 0.01478186808526516
+    activity_first_mean: 0.1526247262954712
+    activity_first_std: 0.014792132191359997
+    loss_mean: 1.8235094547271729
+    loss_std: 0.12216146290302277
+    loss_ord_mean: 2.9794585704803467
+    loss_ord_std: 0.006573139224201441
+    silent_neurons_mean: 0.4816666543483734
+    silent_neurons_std: 0.03091205470263958
+    silent_neurons_first_mean: 0.4816666543483734
+    silent_neurons_first_std: 0.03091205470263958
+  - acc_mean: 0.4437340497970581
+    acc_std: 0.02631310187280178
+    acc_ord_mean: 0.23277780413627625
+    acc_ord_std: 0.03987042233347893
+    activity_mean: 0.15235167741775513
+    activity_std: 0.014341924339532852
+    activity_first_mean: 0.15229418873786926
+    activity_first_std: 0.014338723383843899
+    loss_mean: 1.7922180891036987
+    loss_std: 0.017684413120150566
+    loss_ord_mean: 2.9755001068115234
+    loss_ord_std: 0.010127998888492584
+    silent_neurons_mean: 0.49166667461395264
+    silent_neurons_std: 0.030912047252058983
+    silent_neurons_first_mean: 0.49166667461395264
+    silent_neurons_first_std: 0.030912047252058983
+  - acc_mean: 0.4541986882686615
+    acc_std: 0.011174817569553852
+    acc_ord_mean: 0.19679127633571625
+    acc_ord_std: 0.041961055248975754
+    activity_mean: 0.1541300117969513
+    activity_std: 0.013913469389081001
+    activity_first_mean: 0.1540805548429489
+    activity_first_std: 0.013903691433370113
+    loss_mean: 1.754234790802002
+    loss_std: 0.06458956748247147
+    loss_ord_mean: 2.985187530517578
+    loss_ord_std: 0.005969568155705929
+    silent_neurons_mean: 0.4933333396911621
+    silent_neurons_std: 0.037043534219264984
+    silent_neurons_first_mean: 0.4933333396911621
+    silent_neurons_first_std: 0.037043534219264984
 error: null
 config_hash: 801d12a1248ff77866253cf8c3472590

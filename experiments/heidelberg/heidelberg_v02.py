@@ -473,6 +473,8 @@ def run(
         A dictionary containing detailed learning dynamics.
     """
 
+    init_start = time.perf_counter()
+
     ### Unpack arguments
     seed: int = config["seed"]
     Nin_virtual: int = config["Nin_virtual"]
@@ -495,13 +497,13 @@ def run(
         trange = range
 
     ### Set up the simulation
-    compilation_start = time.perf_counter()
+    init_compile_start = time.perf_counter()
 
     # Gradient
     @jit
     @partial(value_and_grad, has_aux=True)
     def gradfn(
-        p: list, input: Int[Array, "Batch Nin Nvirt"], labels: Int[Array, " Batch"]
+        p: list, input: Int[Array, "Batch Nin"], labels: Int[Array, " Batch"]
     ) -> tuple[Array, Array]:
         loss, acc = simulatefn(neuron, p, input, labels, config)
         return loss, acc
@@ -517,7 +519,7 @@ def run(
     @jit
     def trial(
         p: list,
-        input: Int[Array, "Batch Nin Nvirt"],
+        input: Int[Array, "Batch Nin"],
         labels: Int[Array, " Batch"],
         opt_state: optax.OptState,
     ) -> tuple:
@@ -532,7 +534,7 @@ def run(
     def jprobefn(p, input, labels):
         return probefn(neuron, p, input, labels, config)
 
-    compilation_time = time.perf_counter() - compilation_start
+    init_compile_time = time.perf_counter() - init_compile_start
 
     def probe(p: list) -> dict:
         metrics = {
@@ -564,13 +566,13 @@ def run(
 
     # Parameters
     key = random.PRNGKey(seed)
-    weights_init_start = time.perf_counter()
+    init_weights_start = time.perf_counter()
     key, weights = init_weights(key, config)
-    weights_init_time = time.perf_counter() - weights_init_start
+    init_weights_time = time.perf_counter() - init_weights_start
 
-    phi0_init_start = time.perf_counter()
+    init_phi0_start = time.perf_counter()
     phi0 = init_phi0(neuron, config)
-    phi0_init_time = time.perf_counter() - phi0_init_start
+    init_phi0_time = time.perf_counter() - init_phi0_start
 
     p = [weights, phi0]
     p_init = [weights, phi0]
@@ -580,46 +582,47 @@ def run(
     schedule = optax.exponential_decay(lr, int(tau_lr * len(train_loader)), 1 / jnp.e)
     optim = optax.adabelief(schedule, b1=beta1, b2=beta2)
     opt_state = optim.init(p)
-    optim_init_time = time.perf_counter() - optim_init_start
+    init_optim_time = time.perf_counter() - optim_init_start
 
     # Metrics
     metrics: dict[str, Array | list] = {k: [v] for k, v in probe(p).items()}
+
+    init_time = time.perf_counter() - init_start
+
+    train_start = time.perf_counter()
 
     # Training
     for epoch in trange(Nepochs):
         for data in train_loader:
             input, labels = jnp.array(data[0]), jnp.array(data[1])
             key, input = flip(key, input)
-
-            # expected_input_shape = (
-            #     config["Nbatch"],
-            #     config["Nin"],
-            #     config["Nin_virtual"],
-            # )
-            # assert (
-            #     input.shape == expected_input_shape
-            # ), f"Expected input shape {expected_input_shape}, got {input.shape}"
-
             loss, acc, p, opt_state = trial(p, input, labels, opt_state)
         # Probe network
         metric = probe(p)
         metrics = {k: v + [metric[k]] for k, v in metrics.items()}
+
+    train_time = time.perf_counter() - train_start
+
     if jnp.any(jnp.isnan(jnp.array(metrics["loss"]))):
         print(
             "Warning: A NaN appeared. "
             "Likely not enough spikes have been simulated. "
             "Try increasing `K`."
         )
+
     metrics = {k: jnp.array(v) for k, v in metrics.items()}
     p_end = p
     metrics["p_init"] = p_init
     metrics["p_end"] = p_end
 
     perf_metrics = {
-        "perf.compilation_time": compilation_time,
-        "perf.weights_init_time": weights_init_time,
-        "perf.phi0_init_time": phi0_init_time,
-        "perf.optim_init_time": optim_init_time,
+        "init_time": init_time,
+        "init_compile_time": init_compile_time,
+        "init_weights_time": init_weights_time,
+        "init_phi0_time": init_phi0_time,
+        "init_optim_time": init_optim_time,
+        "train_time": train_time,
+        "epoch_time": train_time / Nepochs,
     }
 
     return metrics, perf_metrics

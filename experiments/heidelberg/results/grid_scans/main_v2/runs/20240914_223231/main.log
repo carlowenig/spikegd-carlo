@@ -1,0 +1,2904 @@
+[2024-09-14 22:32:31]
+CONSTANTS:
+  device_count              1
+  seed                      0
+  tau                       1/6 pi^-1
+  I0                        1.25
+  eps                       1e-06
+  Nout                      20
+  w_scale                   0.5
+  T                         2
+  K                         300
+  dt                        0.001
+  gamma                     0.01
+  lr                        0.004
+  tau_lr                    100
+  beta1                     0.9
+  beta2                     0.999
+  p_flip                    0
+  Nepochs                   20
+  Ntrain                    None
+  Nin                       700
+  Nsamples                  3
+[2024-09-14 22:32:31]
+VARIABLES: Nin_virtual, Nhidden, Nlayer, Nbatch
+[2024-09-14 22:32:31]
+180 configs remaining (could not estimate remaining time)
+[2024-09-14 22:32:31]
+========== CONFIG 1 ==========
+Nin_virtual               1
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:32:31]
+Starting trial 229658eec3de88b4a098ced6ba7837dd.
+[2024-09-14 22:33:21]
+acc_max_epoch             14
+acc_max_mean              0.414
+acc_max_std               0.0164
+[2024-09-14 22:33:22]
+Finished trial 229658eec3de88b4a098ced6ba7837dd after 50.7s
+[2024-09-14 22:33:22]
+179 configs remaining (~2h 31m 23s, ETA: 01:04:45, based on a mean trial duration of 50.7s)
+[2024-09-14 22:33:22]
+========== CONFIG 2 ==========
+Nin_virtual               2
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:33:22]
+Starting trial 6390296fc81cb9be98b8305f17e7b2c3.
+[2024-09-14 22:34:01]
+acc_max_epoch             20
+acc_max_mean              0.424
+acc_max_std               0.0307
+[2024-09-14 22:34:01]
+Finished trial 6390296fc81cb9be98b8305f17e7b2c3 after 38.9s
+[2024-09-14 22:34:01]
+178 configs remaining (~2h 13m 1s, ETA: 00:47:02, based on a mean trial duration of 44.8s)
+[2024-09-14 22:34:01]
+========== CONFIG 3 ==========
+Nin_virtual               4
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:34:01]
+Starting trial e514ce13adfcf8305065f1758de3a80e.
+[2024-09-14 22:34:40]
+acc_max_epoch             17
+acc_max_mean              0.427
+acc_max_std               0.0134
+[2024-09-14 22:34:40]
+Finished trial e514ce13adfcf8305065f1758de3a80e after 39.2s
+[2024-09-14 22:34:41]
+177 configs remaining (~2h 6m 45s, ETA: 00:41:26, based on a mean trial duration of 43.0s)
+[2024-09-14 22:34:41]
+========== CONFIG 4 ==========
+Nin_virtual               8
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:34:41]
+Starting trial 5640b3ab5008bf0a3378d569ef00703a.
+[2024-09-14 22:35:24]
+acc_max_epoch             20
+acc_max_mean              0.527
+acc_max_std               0.0248
+[2024-09-14 22:35:24]
+Finished trial 5640b3ab5008bf0a3378d569ef00703a after 43.1s
+[2024-09-14 22:35:24]
+176 configs remaining (~2h 6m 7s, ETA: 00:41:32, based on a mean trial duration of 43.0s)
+[2024-09-14 22:35:24]
+========== CONFIG 5 ==========
+Nin_virtual               12
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:35:24]
+Starting trial 301ad517f2e7cfc1bfef7f377fc4b042.
+[2024-09-14 22:36:10]
+acc_max_epoch             20
+acc_max_mean              0.536
+acc_max_std               0.0284
+[2024-09-14 22:36:10]
+Finished trial 301ad517f2e7cfc1bfef7f377fc4b042 after 46.4s
+[2024-09-14 22:36:10]
+175 configs remaining (~2h 7m 24s, ETA: 00:43:35, based on a mean trial duration of 43.7s)
+[2024-09-14 22:36:10]
+========== CONFIG 6 ==========
+Nin_virtual               16
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:36:10]
+Starting trial eb05a07ca7866fa49f9a4d3bcee204fc.
+[2024-09-14 22:36:59]
+acc_max_epoch             15
+acc_max_mean              0.505
+acc_max_std               0.0237
+[2024-09-14 22:36:59]
+Finished trial eb05a07ca7866fa49f9a4d3bcee204fc after 48.6s
+[2024-09-14 22:36:59]
+174 configs remaining (~2h 9m 3s, ETA: 00:46:03, based on a mean trial duration of 44.5s)
+[2024-09-14 22:36:59]
+========== CONFIG 7 ==========
+Nin_virtual               24
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:36:59]
+Starting trial 3dee4bc06c47339a9b8882e908831549.
+[2024-09-14 22:37:49]
+acc_max_epoch             20
+acc_max_mean              0.499
+acc_max_std               0.0174
+[2024-09-14 22:37:49]
+Finished trial 3dee4bc06c47339a9b8882e908831549 after 50.1s
+[2024-09-14 22:37:50]
+173 configs remaining (~2h 10m 38s, ETA: 00:48:28, based on a mean trial duration of 45.3s)
+[2024-09-14 22:37:50]
+========== CONFIG 8 ==========
+Nin_virtual               32
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:37:50]
+Starting trial 72b8ea6ebcfcb6b05b47457212d672b5.
+[2024-09-14 22:38:42]
+acc_max_epoch             17
+acc_max_mean              0.485
+acc_max_std               0.00877
+[2024-09-14 22:38:42]
+Finished trial 72b8ea6ebcfcb6b05b47457212d672b5 after 52.8s
+[2024-09-14 22:38:43]
+172 configs remaining (~2h 12m 34s, ETA: 00:51:17, based on a mean trial duration of 46.2s)
+[2024-09-14 22:38:43]
+========== CONFIG 9 ==========
+Nin_virtual               40
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:38:43]
+Starting trial fba1e02db8cf61ac4234d5670d96d03a.
+[2024-09-14 22:39:37]
+acc_max_epoch             20
+acc_max_mean              0.461
+acc_max_std               0.02
+[2024-09-14 22:39:37]
+Finished trial fba1e02db8cf61ac4234d5670d96d03a after 53.8s
+[2024-09-14 22:39:37]
+171 configs remaining (~2h 14m 10s, ETA: 00:53:48, based on a mean trial duration of 47.1s)
+[2024-09-14 22:39:37]
+========== CONFIG 10 ==========
+Nin_virtual               48
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:39:37]
+Starting trial b258cc8e77af4b357f588283b155dd1b.
+[2024-09-14 22:40:30]
+acc_max_epoch             17
+acc_max_mean              0.48
+acc_max_std               0.0222
+[2024-09-14 22:40:30]
+Finished trial b258cc8e77af4b357f588283b155dd1b after 53.1s
+[2024-09-14 22:40:30]
+170 configs remaining (~2h 15m 6s, ETA: 00:55:37, based on a mean trial duration of 47.7s)
+[2024-09-14 22:40:30]
+========== CONFIG 11 ==========
+Nin_virtual               56
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:40:30]
+Starting trial e5891568abed137409324b90c1232972.
+[2024-09-14 22:41:26]
+acc_max_epoch             17
+acc_max_mean              0.46
+acc_max_std               0.0119
+[2024-09-14 22:41:26]
+Finished trial e5891568abed137409324b90c1232972 after 55.8s
+[2024-09-14 22:41:26]
+169 configs remaining (~2h 16m 22s, ETA: 00:57:49, based on a mean trial duration of 48.4s)
+[2024-09-14 22:41:26]
+========== CONFIG 12 ==========
+Nin_virtual               64
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:41:26]
+Starting trial 02c491b62b1461e630a9c29b130622a6.
+[2024-09-14 22:42:23]
+acc_max_epoch             17
+acc_max_mean              0.454
+acc_max_std               0.0389
+[2024-09-14 22:42:23]
+Finished trial 02c491b62b1461e630a9c29b130622a6 after 56.4s
+[2024-09-14 22:42:23]
+168 configs remaining (~2h 17m 25s, ETA: 00:59:49, based on a mean trial duration of 49.1s)
+[2024-09-14 22:42:23]
+========== CONFIG 13 ==========
+Nin_virtual               80
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:42:23]
+Starting trial 0e64a104bfdfa26a9bec9d825122f66e.
+[2024-09-14 22:43:21]
+acc_max_epoch             17
+acc_max_mean              0.475
+acc_max_std               0.0091
+[2024-09-14 22:43:21]
+Finished trial 0e64a104bfdfa26a9bec9d825122f66e after 58.1s
+[2024-09-14 22:43:22]
+167 configs remaining (~2h 18m 33s, ETA: 01:01:55, based on a mean trial duration of 49.8s)
+[2024-09-14 22:43:22]
+========== CONFIG 14 ==========
+Nin_virtual               96
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:43:22]
+Starting trial 4d66538a65f631380c8d876ba7abc0d9.
+[2024-09-14 22:44:22]
+acc_max_epoch             17
+acc_max_mean              0.464
+acc_max_std               0.0127
+[2024-09-14 22:44:22]
+Finished trial 4d66538a65f631380c8d876ba7abc0d9 after 60.3s
+[2024-09-14 22:44:23]
+166 configs remaining (~2h 19m 48s, ETA: 01:04:11, based on a mean trial duration of 50.5s)
+[2024-09-14 22:44:23]
+========== CONFIG 15 ==========
+Nin_virtual               126
+Nhidden                   100
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:44:23]
+Starting trial 0fa1c1a260871b2540a0a17944c43682.
+[2024-09-14 22:45:25]
+acc_max_epoch             20
+acc_max_mean              0.489
+acc_max_std               0.00594
+[2024-09-14 22:45:25]
+Finished trial 0fa1c1a260871b2540a0a17944c43682 after 61.9s
+[2024-09-14 22:45:26]
+165 configs remaining (~2h 21m 2s, ETA: 01:06:28, based on a mean trial duration of 51.3s)
+[2024-09-14 22:45:26]
+========== CONFIG 16 ==========
+Nin_virtual               1
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:45:26]
+Starting trial c4e8a3aee8e841d928e5c6bc8ab0f8ad.
+[2024-09-14 22:46:16]
+acc_max_epoch             18
+acc_max_mean              0.404
+acc_max_std               0.0096
+[2024-09-14 22:46:16]
+Finished trial c4e8a3aee8e841d928e5c6bc8ab0f8ad after 49.9s
+[2024-09-14 22:46:16]
+164 configs remaining (~2h 19m 57s, ETA: 01:06:14, based on a mean trial duration of 51.2s)
+[2024-09-14 22:46:16]
+========== CONFIG 17 ==========
+Nin_virtual               1
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:46:16]
+Starting trial d804f150aeeffabc77fbc08227cf2217.
+[2024-09-14 22:47:13]
+acc_max_epoch             17
+acc_max_mean              0.415
+acc_max_std               0.00623
+[2024-09-14 22:47:13]
+Finished trial d804f150aeeffabc77fbc08227cf2217 after 56.4s
+[2024-09-14 22:47:13]
+163 configs remaining (~2h 19m 55s, ETA: 01:07:09, based on a mean trial duration of 51.5s)
+[2024-09-14 22:47:13]
+========== CONFIG 18 ==========
+Nin_virtual               2
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:47:13]
+Starting trial 8fd948ddd537172b0a191caf6dcc39a1.
+[2024-09-14 22:47:57]
+acc_max_epoch             18
+acc_max_mean              0.457
+acc_max_std               0.0107
+[2024-09-14 22:47:57]
+Finished trial 8fd948ddd537172b0a191caf6dcc39a1 after 43.9s
+[2024-09-14 22:47:58]
+162 configs remaining (~2h 17m 55s, ETA: 01:05:54, based on a mean trial duration of 51.1s)
+[2024-09-14 22:47:58]
+========== CONFIG 19 ==========
+Nin_virtual               2
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:47:58]
+Starting trial 1fcd871a697dd207e8e2038c513c44ca.
+[2024-09-14 22:48:47]
+acc_max_epoch             20
+acc_max_mean              0.443
+acc_max_std               0.0276
+[2024-09-14 22:48:47]
+Finished trial 1fcd871a697dd207e8e2038c513c44ca after 49.5s
+[2024-09-14 22:48:48]
+161 configs remaining (~2h 16m 51s, ETA: 01:05:39, based on a mean trial duration of 51.0s)
+[2024-09-14 22:48:48]
+========== CONFIG 20 ==========
+Nin_virtual               4
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:48:48]
+Starting trial 90ca81fd9053f26d74d7b61f3ca20ee8.
+[2024-09-14 22:49:34]
+acc_max_epoch             17
+acc_max_mean              0.425
+acc_max_std               0.00502
+[2024-09-14 22:49:34]
+Finished trial 90ca81fd9053f26d74d7b61f3ca20ee8 after 45.7s
+[2024-09-14 22:49:34]
+160 configs remaining (~2h 15m 17s, ETA: 01:04:52, based on a mean trial duration of 50.7s)
+[2024-09-14 22:49:34]
+========== CONFIG 21 ==========
+Nin_virtual               4
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:49:34]
+Starting trial d3728785ba3b672d971f1dd55c3e80fe.
+[2024-09-14 22:50:28]
+acc_max_epoch             20
+acc_max_mean              0.421
+acc_max_std               0.00164
+[2024-09-14 22:50:28]
+Finished trial d3728785ba3b672d971f1dd55c3e80fe after 53.6s
+[2024-09-14 22:50:29]
+159 configs remaining (~2h 14m 48s, ETA: 01:05:17, based on a mean trial duration of 50.9s)
+[2024-09-14 22:50:29]
+========== CONFIG 22 ==========
+Nin_virtual               8
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:50:29]
+Starting trial 61aa83c23df06e447a38c92b8e5f7f52.
+[2024-09-14 22:51:20]
+acc_max_epoch             12
+acc_max_mean              0.517
+acc_max_std               0.0314
+[2024-09-14 22:51:20]
+Finished trial 61aa83c23df06e447a38c92b8e5f7f52 after 51.7s
+[2024-09-14 22:51:21]
+158 configs remaining (~2h 14m 3s, ETA: 01:05:24, based on a mean trial duration of 50.9s)
+[2024-09-14 22:51:21]
+========== CONFIG 23 ==========
+Nin_virtual               8
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:51:21]
+Starting trial 953b336600c328f108f33c78263a4b60.
+[2024-09-14 22:52:22]
+acc_max_epoch             18
+acc_max_mean              0.526
+acc_max_std               0.0348
+[2024-09-14 22:52:22]
+Finished trial 953b336600c328f108f33c78263a4b60 after 60.7s
+[2024-09-14 22:52:23]
+157 configs remaining (~2h 14m 19s, ETA: 01:06:42, based on a mean trial duration of 51.3s)
+[2024-09-14 22:52:23]
+========== CONFIG 24 ==========
+Nin_virtual               12
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:52:23]
+Starting trial c3e0d0d185ff8cbc75056d65a8eec26a.
+[2024-09-14 22:53:17]
+acc_max_epoch             16
+acc_max_mean              0.526
+acc_max_std               0.0137
+[2024-09-14 22:53:17]
+Finished trial c3e0d0d185ff8cbc75056d65a8eec26a after 54.0s
+[2024-09-14 22:53:18]
+156 configs remaining (~2h 13m 45s, ETA: 01:07:03, based on a mean trial duration of 51.4s)
+[2024-09-14 22:53:18]
+========== CONFIG 25 ==========
+Nin_virtual               12
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:53:18]
+Starting trial 97e7fa623fb7e963c3ba5f1606aa1f0a.
+[2024-09-14 22:54:21]
+acc_max_epoch             17
+acc_max_mean              0.513
+acc_max_std               0.0357
+[2024-09-14 22:54:21]
+Finished trial 97e7fa623fb7e963c3ba5f1606aa1f0a after 63.5s
+[2024-09-14 22:54:22]
+155 configs remaining (~2h 14m 8s, ETA: 01:08:30, based on a mean trial duration of 51.9s)
+[2024-09-14 22:54:22]
+========== CONFIG 26 ==========
+Nin_virtual               16
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:54:22]
+Starting trial 68ef8078d29f3e76cfaffdad4a999ff0.
+[2024-09-14 22:55:17]
+acc_max_epoch             18
+acc_max_mean              0.507
+acc_max_std               0.0429
+[2024-09-14 22:55:17]
+Finished trial 68ef8078d29f3e76cfaffdad4a999ff0 after 55.4s
+[2024-09-14 22:55:18]
+154 configs remaining (~2h 13m 36s, ETA: 01:08:55, based on a mean trial duration of 52.1s)
+[2024-09-14 22:55:18]
+========== CONFIG 27 ==========
+Nin_virtual               16
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:55:18]
+Starting trial 43429ba98db77b3fe5fd01900d8df6ae.
+[2024-09-14 22:56:23]
+acc_max_epoch             16
+acc_max_mean              0.498
+acc_max_std               0.0156
+[2024-09-14 22:56:23]
+Finished trial 43429ba98db77b3fe5fd01900d8df6ae after 65.1s
+[2024-09-14 22:56:24]
+153 configs remaining (~2h 13m 58s, ETA: 01:10:22, based on a mean trial duration of 52.5s)
+[2024-09-14 22:56:24]
+========== CONFIG 28 ==========
+Nin_virtual               24
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:56:24]
+Starting trial 3563d75e3db15869ab869409ee891fe4.
+[2024-09-14 22:57:22]
+acc_max_epoch             14
+acc_max_mean              0.5
+acc_max_std               0.0276
+[2024-09-14 22:57:22]
+Finished trial 3563d75e3db15869ab869409ee891fe4 after 57.5s
+[2024-09-14 22:57:23]
+152 configs remaining (~2h 13m 32s, ETA: 01:10:55, based on a mean trial duration of 52.7s)
+[2024-09-14 22:57:23]
+========== CONFIG 29 ==========
+Nin_virtual               24
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:57:23]
+Starting trial f4f754aac9d6c1c2fd963f571b3a3b8f.
+[2024-09-14 22:58:29]
+acc_max_epoch             17
+acc_max_mean              0.465
+acc_max_std               0.013
+[2024-09-14 22:58:29]
+Finished trial f4f754aac9d6c1c2fd963f571b3a3b8f after 66.8s
+[2024-09-14 22:58:30]
+151 configs remaining (~2h 13m 53s, ETA: 01:12:24, based on a mean trial duration of 53.2s)
+[2024-09-14 22:58:30]
+========== CONFIG 30 ==========
+Nin_virtual               32
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:58:30]
+Starting trial 3f3a498468761cf1cf46d6ebf5476a6e.
+[2024-09-14 22:59:30]
+acc_max_epoch             20
+acc_max_mean              0.479
+acc_max_std               0.0138
+[2024-09-14 22:59:30]
+Finished trial 3f3a498468761cf1cf46d6ebf5476a6e after 59.1s
+[2024-09-14 22:59:31]
+150 configs remaining (~2h 13m 29s, ETA: 01:13:00, based on a mean trial duration of 53.4s)
+[2024-09-14 22:59:31]
+========== CONFIG 31 ==========
+Nin_virtual               32
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 22:59:31]
+Starting trial 8d1c28cd48bc925f55777e058369ed34.
+[2024-09-14 23:00:41]
+acc_max_epoch             17
+acc_max_mean              0.469
+acc_max_std               0.0288
+[2024-09-14 23:00:41]
+Finished trial 8d1c28cd48bc925f55777e058369ed34 after 70.2s
+[2024-09-14 23:00:42]
+149 configs remaining (~2h 13m 56s, ETA: 01:14:39, based on a mean trial duration of 53.9s)
+[2024-09-14 23:00:42]
+========== CONFIG 32 ==========
+Nin_virtual               40
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:00:42]
+Starting trial 529e2d87bdb15b2a9b9161d4ec21ffde.
+[2024-09-14 23:01:43]
+acc_max_epoch             18
+acc_max_mean              0.462
+acc_max_std               0.0342
+[2024-09-14 23:01:43]
+Finished trial 529e2d87bdb15b2a9b9161d4ec21ffde after 61.4s
+[2024-09-14 23:01:44]
+148 configs remaining (~2h 13m 37s, ETA: 01:15:22, based on a mean trial duration of 54.2s)
+[2024-09-14 23:01:44]
+========== CONFIG 33 ==========
+Nin_virtual               40
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:01:44]
+Starting trial e2facbb19938a93132f7e4fb781b63b1.
+[2024-09-14 23:02:57]
+acc_max_epoch             20
+acc_max_mean              0.469
+acc_max_std               0.0152
+[2024-09-14 23:02:57]
+Finished trial e2facbb19938a93132f7e4fb781b63b1 after 72.9s
+[2024-09-14 23:02:58]
+147 configs remaining (~2h 14m 6s, ETA: 01:17:05, based on a mean trial duration of 54.7s)
+[2024-09-14 23:02:58]
+========== CONFIG 34 ==========
+Nin_virtual               48
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:02:58]
+Starting trial 9499b0cc953eae32efddda897c986fc2.
+[2024-09-14 23:04:00]
+acc_max_epoch             20
+acc_max_mean              0.478
+acc_max_std               0.0288
+[2024-09-14 23:04:00]
+Finished trial 9499b0cc953eae32efddda897c986fc2 after 61.5s
+[2024-09-14 23:04:01]
+146 configs remaining (~2h 13m 40s, ETA: 01:17:42, based on a mean trial duration of 54.9s)
+[2024-09-14 23:04:01]
+========== CONFIG 35 ==========
+Nin_virtual               48
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:04:01]
+Starting trial 66e30434b1388c026074b4015c5a2158.
+[2024-09-14 23:05:16]
+acc_max_epoch             20
+acc_max_mean              0.459
+acc_max_std               0.00943
+[2024-09-14 23:05:16]
+Finished trial 66e30434b1388c026074b4015c5a2158 after 74.9s
+[2024-09-14 23:05:17]
+145 configs remaining (~2h 14m 8s, ETA: 01:19:26, based on a mean trial duration of 55.5s)
+[2024-09-14 23:05:17]
+========== CONFIG 36 ==========
+Nin_virtual               56
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:05:17]
+Starting trial 7ff7a73345633eaa2ca2bdb740cd5dfa.
+[2024-09-14 23:06:21]
+acc_max_epoch             20
+acc_max_mean              0.47
+acc_max_std               0.0179
+[2024-09-14 23:06:21]
+Finished trial 7ff7a73345633eaa2ca2bdb740cd5dfa after 64.1s
+[2024-09-14 23:06:23]
+144 configs remaining (~2h 13m 47s, ETA: 01:20:10, based on a mean trial duration of 55.7s)
+[2024-09-14 23:06:23]
+========== CONFIG 37 ==========
+Nin_virtual               56
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:06:23]
+Starting trial bcfb47b2a72ecbdbf818883c8b084cf6.
+[2024-09-14 23:07:37]
+acc_max_epoch             15
+acc_max_mean              0.449
+acc_max_std               0.034
+[2024-09-14 23:07:37]
+Finished trial bcfb47b2a72ecbdbf818883c8b084cf6 after 74.9s
+[2024-09-14 23:07:39]
+143 configs remaining (~2h 14m 5s, ETA: 01:21:45, based on a mean trial duration of 56.3s)
+[2024-09-14 23:07:39]
+========== CONFIG 38 ==========
+Nin_virtual               64
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:07:39]
+Starting trial 7dda815e3b9ef2e22457769e9c2808eb.
+[2024-09-14 23:08:44]
+acc_max_epoch             19
+acc_max_mean              0.473
+acc_max_std               0.0178
+[2024-09-14 23:08:44]
+Finished trial 7dda815e3b9ef2e22457769e9c2808eb after 65.1s
+[2024-09-14 23:08:45]
+142 configs remaining (~2h 13m 42s, ETA: 01:22:27, based on a mean trial duration of 56.5s)
+[2024-09-14 23:08:45]
+========== CONFIG 39 ==========
+Nin_virtual               64
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:08:45]
+Starting trial b9e243bb5bc4bc2f0162d5c3972e793f.
+[2024-09-14 23:10:03]
+acc_max_epoch             17
+acc_max_mean              0.461
+acc_max_std               0.00213
+[2024-09-14 23:10:03]
+Finished trial b9e243bb5bc4bc2f0162d5c3972e793f after 78.0s
+[2024-09-14 23:10:04]
+141 configs remaining (~2h 14m 3s, ETA: 01:24:08, based on a mean trial duration of 57.0s)
+[2024-09-14 23:10:04]
+========== CONFIG 40 ==========
+Nin_virtual               80
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:10:04]
+Starting trial 2ab42c2b7bf194f4b9102070898878a9.
+[2024-09-14 23:11:10]
+acc_max_epoch             17
+acc_max_mean              0.451
+acc_max_std               0.0271
+[2024-09-14 23:11:10]
+Finished trial 2ab42c2b7bf194f4b9102070898878a9 after 65.9s
+[2024-09-14 23:11:12]
+140 configs remaining (~2h 13m 37s, ETA: 01:24:50, based on a mean trial duration of 57.3s)
+[2024-09-14 23:11:12]
+========== CONFIG 41 ==========
+Nin_virtual               80
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:11:12]
+Starting trial 72150c24e62409999f79316d9f25319f.
+[2024-09-14 23:12:33]
+acc_max_epoch             18
+acc_max_mean              0.329
+acc_max_std               0.202
+[2024-09-14 23:12:33]
+Finished trial 72150c24e62409999f79316d9f25319f after 80.7s
+[2024-09-14 23:12:34]
+139 configs remaining (~2h 13m 59s, ETA: 01:26:34, based on a mean trial duration of 57.8s)
+[2024-09-14 23:12:34]
+========== CONFIG 42 ==========
+Nin_virtual               96
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:12:34]
+Starting trial 9caa00801c70105fef3fe5cadc509d89.
+[2024-09-14 23:13:43]
+acc_max_epoch             20
+acc_max_mean              0.468
+acc_max_std               0.0136
+[2024-09-14 23:13:43]
+Finished trial 9caa00801c70105fef3fe5cadc509d89 after 69.4s
+[2024-09-14 23:13:45]
+138 configs remaining (~2h 13m 40s, ETA: 01:27:25, based on a mean trial duration of 58.1s)
+[2024-09-14 23:13:45]
+========== CONFIG 43 ==========
+Nin_virtual               96
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:13:45]
+Starting trial 4d4c0e24d73066b17c1fbecadb90492f.
+[2024-09-14 23:15:06]
+acc_max_epoch             20
+acc_max_mean              0.186
+acc_max_std               0.203
+[2024-09-14 23:15:06]
+Finished trial 4d4c0e24d73066b17c1fbecadb90492f after 81.4s
+[2024-09-14 23:15:08]
+137 configs remaining (~2h 13m 56s, ETA: 01:29:04, based on a mean trial duration of 58.7s)
+[2024-09-14 23:15:08]
+========== CONFIG 44 ==========
+Nin_virtual               126
+Nhidden                   200
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:15:08]
+Starting trial 3e12e37297ea8d1b32f01615485b5eff.
+[2024-09-14 23:16:19]
+acc_max_epoch             18
+acc_max_mean              0.494
+acc_max_std               0.00792
+[2024-09-14 23:16:19]
+Finished trial 3e12e37297ea8d1b32f01615485b5eff after 71.2s
+[2024-09-14 23:16:20]
+136 configs remaining (~2h 13m 36s, ETA: 01:29:57, based on a mean trial duration of 58.9s)
+[2024-09-14 23:16:20]
+========== CONFIG 45 ==========
+Nin_virtual               126
+Nhidden                   300
+Nlayer                    2
+Nbatch                    1000
+[2024-09-14 23:16:20]
+Starting trial e90960eea1eff5bc5efd33c3fd5a49b4.
+[2024-09-14 23:17:43]
+acc_max_epoch             12
+acc_max_mean              0.0492
+acc_max_std               0.00462
+[2024-09-14 23:17:43]
+Finished trial e90960eea1eff5bc5efd33c3fd5a49b4 after 82.8s
+[2024-09-14 23:17:45]
+135 configs remaining (~2h 13m 48s, ETA: 01:31:34, based on a mean trial duration of 59.5s)
+[2024-09-14 23:17:45]
+========== CONFIG 46 ==========
+Nin_virtual               1
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:17:45]
+Starting trial f5b98ed35bab7dcf30ad39abc6c0c9f6.
+[2024-09-14 23:18:29]
+acc_max_epoch             19
+acc_max_mean              0.399
+acc_max_std               0.0136
+[2024-09-14 23:18:29]
+Finished trial f5b98ed35bab7dcf30ad39abc6c0c9f6 after 44.2s
+[2024-09-14 23:18:31]
+134 configs remaining (~2h 12m 4s, ETA: 01:30:36, based on a mean trial duration of 59.1s)
+[2024-09-14 23:18:31]
+========== CONFIG 47 ==========
+Nin_virtual               2
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:18:31]
+Starting trial 3f83101bd4c93cb900a9a80a3d281e82.
+[2024-09-14 23:19:09]
+acc_max_epoch             19
+acc_max_mean              0.466
+acc_max_std               0.0321
+[2024-09-14 23:19:09]
+Finished trial 3f83101bd4c93cb900a9a80a3d281e82 after 38.4s
+[2024-09-14 23:19:11]
+133 configs remaining (~2h 10m 7s, ETA: 01:29:18, based on a mean trial duration of 58.7s)
+[2024-09-14 23:19:11]
+========== CONFIG 48 ==========
+Nin_virtual               4
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:19:11]
+Starting trial 7df7b230a96df636434189ead7752054.
+[2024-09-14 23:19:53]
+acc_max_epoch             19
+acc_max_mean              0.445
+acc_max_std               0.0109
+[2024-09-14 23:19:53]
+Finished trial 7df7b230a96df636434189ead7752054 after 42.7s
+[2024-09-14 23:19:55]
+132 configs remaining (~2h 8m 24s, ETA: 01:28:20, based on a mean trial duration of 58.4s)
+[2024-09-14 23:19:55]
+========== CONFIG 49 ==========
+Nin_virtual               8
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:19:55]
+Starting trial 4fcceaa7811ebcbf8b3c7124e922c99d.
+[2024-09-14 23:20:45]
+acc_max_epoch             20
+acc_max_mean              0.536
+acc_max_std               0.0194
+[2024-09-14 23:20:45]
+Finished trial 4fcceaa7811ebcbf8b3c7124e922c99d after 50.2s
+[2024-09-14 23:20:47]
+131 configs remaining (~2h 7m 4s, ETA: 01:27:51, based on a mean trial duration of 58.2s)
+[2024-09-14 23:20:47]
+========== CONFIG 50 ==========
+Nin_virtual               12
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:20:47]
+Starting trial 09ed87b44273b16a5ae84cfbc37e8246.
+[2024-09-14 23:21:37]
+acc_max_epoch             20
+acc_max_mean              0.532
+acc_max_std               0.00811
+[2024-09-14 23:21:37]
+Finished trial 09ed87b44273b16a5ae84cfbc37e8246 after 50.0s
+[2024-09-14 23:21:39]
+130 configs remaining (~2h 5m 44s, ETA: 01:27:23, based on a mean trial duration of 58.0s)
+[2024-09-14 23:21:39]
+========== CONFIG 51 ==========
+Nin_virtual               16
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:21:39]
+Starting trial feadbc74cec9eb1b450f21de1ff1f1f4.
+[2024-09-14 23:22:33]
+acc_max_epoch             19
+acc_max_mean              0.529
+acc_max_std               0.0131
+[2024-09-14 23:22:33]
+Finished trial feadbc74cec9eb1b450f21de1ff1f1f4 after 53.9s
+[2024-09-14 23:22:34]
+129 configs remaining (~2h 4m 36s, ETA: 01:27:11, based on a mean trial duration of 58.0s)
+[2024-09-14 23:22:34]
+========== CONFIG 52 ==========
+Nin_virtual               24
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:22:34]
+Starting trial 51fe328c31e8da723eb804394ee9869e.
+[2024-09-14 23:23:29]
+acc_max_epoch             20
+acc_max_mean              0.514
+acc_max_std               0.00766
+[2024-09-14 23:23:29]
+Finished trial 51fe328c31e8da723eb804394ee9869e after 54.8s
+[2024-09-14 23:23:31]
+128 configs remaining (~2h 3m 30s, ETA: 01:27:02, based on a mean trial duration of 57.9s)
+[2024-09-14 23:23:31]
+========== CONFIG 53 ==========
+Nin_virtual               32
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:23:31]
+Starting trial 70c1fddf8f4675267c56982f4663e3a0.
+[2024-09-14 23:24:30]
+acc_max_epoch             16
+acc_max_mean              0.476
+acc_max_std               0.0483
+[2024-09-14 23:24:31]
+Finished trial 70c1fddf8f4675267c56982f4663e3a0 after 59.4s
+[2024-09-14 23:24:32]
+127 configs remaining (~2h 2m 36s, ETA: 01:27:09, based on a mean trial duration of 57.9s)
+[2024-09-14 23:24:32]
+========== CONFIG 54 ==========
+Nin_virtual               40
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:24:32]
+Starting trial 0fa5f6d23104161f810578658e5fd0c4.
+[2024-09-14 23:25:34]
+acc_max_epoch             20
+acc_max_mean              0.51
+acc_max_std               0.0101
+[2024-09-14 23:25:34]
+Finished trial 0fa5f6d23104161f810578658e5fd0c4 after 61.3s
+[2024-09-14 23:25:36]
+126 configs remaining (~2h 1m 46s, ETA: 01:27:22, based on a mean trial duration of 58.0s)
+[2024-09-14 23:25:36]
+========== CONFIG 55 ==========
+Nin_virtual               48
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:25:36]
+Starting trial a5034e1b5bc35c4329d683277e6ade66.
+[2024-09-14 23:26:35]
+acc_max_epoch             20
+acc_max_mean              0.509
+acc_max_std               0.0413
+[2024-09-14 23:26:35]
+Finished trial a5034e1b5bc35c4329d683277e6ade66 after 59.0s
+[2024-09-14 23:26:36]
+125 configs remaining (~2h 0m 50s, ETA: 01:27:27, based on a mean trial duration of 58.0s)
+[2024-09-14 23:26:36]
+========== CONFIG 56 ==========
+Nin_virtual               56
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:26:36]
+Starting trial d6471878429f26cb3d66c71e9c5552a0.
+[2024-09-14 23:27:40]
+acc_max_epoch             19
+acc_max_mean              0.474
+acc_max_std               0.03
+[2024-09-14 23:27:40]
+Finished trial d6471878429f26cb3d66c71e9c5552a0 after 63.7s
+[2024-09-14 23:27:42]
+124 configs remaining (~2h 0m 5s, ETA: 01:27:47, based on a mean trial duration of 58.1s)
+[2024-09-14 23:27:42]
+========== CONFIG 57 ==========
+Nin_virtual               64
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:27:42]
+Starting trial 461624a0b5988834a8e7739b4c449660.
+[2024-09-14 23:28:45]
+acc_max_epoch             20
+acc_max_mean              0.478
+acc_max_std               0.00771
+[2024-09-14 23:28:45]
+Finished trial 461624a0b5988834a8e7739b4c449660 after 62.6s
+[2024-09-14 23:28:47]
+123 configs remaining (~1h 59m 16s, ETA: 01:28:03, based on a mean trial duration of 58.2s)
+[2024-09-14 23:28:47]
+========== CONFIG 58 ==========
+Nin_virtual               80
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:28:47]
+Starting trial 6b895d3ddcb981ca0ab82f0660843e71.
+[2024-09-14 23:29:54]
+acc_max_epoch             19
+acc_max_mean              0.482
+acc_max_std               0.00995
+[2024-09-14 23:29:54]
+Finished trial 6b895d3ddcb981ca0ab82f0660843e71 after 67.3s
+[2024-09-14 23:29:56]
+122 configs remaining (~1h 58m 37s, ETA: 01:28:34, based on a mean trial duration of 58.3s)
+[2024-09-14 23:29:56]
+========== CONFIG 59 ==========
+Nin_virtual               96
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:29:56]
+Starting trial 2386cf011bc7c817d3faac995e8f0fad.
+[2024-09-14 23:31:05]
+acc_max_epoch             19
+acc_max_mean              0.487
+acc_max_std               0.015
+[2024-09-14 23:31:05]
+Finished trial 2386cf011bc7c817d3faac995e8f0fad after 69.1s
+[2024-09-14 23:31:07]
+121 configs remaining (~1h 58m 1s, ETA: 01:29:08, based on a mean trial duration of 58.5s)
+[2024-09-14 23:31:07]
+========== CONFIG 60 ==========
+Nin_virtual               126
+Nhidden                   100
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:31:07]
+Starting trial 9f0100a83b6b9144284ae6f72aa2df94.
+[2024-09-14 23:32:16]
+acc_max_epoch             19
+acc_max_mean              0.504
+acc_max_std               0.00321
+[2024-09-14 23:32:16]
+Finished trial 9f0100a83b6b9144284ae6f72aa2df94 after 68.9s
+[2024-09-14 23:32:18]
+120 configs remaining (~1h 57m 23s, ETA: 01:29:42, based on a mean trial duration of 58.7s)
+[2024-09-14 23:32:18]
+========== CONFIG 61 ==========
+Nin_virtual               1
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:32:18]
+Starting trial 35fb21585539614553797dd585c60ee2.
+[2024-09-14 23:33:09]
+acc_max_epoch             20
+acc_max_mean              0.434
+acc_max_std               0.00532
+[2024-09-14 23:33:10]
+Finished trial 35fb21585539614553797dd585c60ee2 after 51.6s
+[2024-09-14 23:33:12]
+119 configs remaining (~1h 56m 11s, ETA: 01:29:23, based on a mean trial duration of 58.6s)
+[2024-09-14 23:33:12]
+========== CONFIG 62 ==========
+Nin_virtual               1
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:33:12]
+Starting trial 9895afd3a603d56d791f1e600e8070dd.
+[2024-09-14 23:34:15]
+acc_max_epoch             20
+acc_max_mean              0.425
+acc_max_std               0.00639
+[2024-09-14 23:34:15]
+Finished trial 9895afd3a603d56d791f1e600e8070dd after 63.6s
+[2024-09-14 23:34:17]
+118 configs remaining (~1h 55m 22s, ETA: 01:29:39, based on a mean trial duration of 58.7s)
+[2024-09-14 23:34:17]
+========== CONFIG 63 ==========
+Nin_virtual               2
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:34:17]
+Starting trial 56af9966a4d6953efab535c58052dde1.
+[2024-09-14 23:35:09]
+acc_max_epoch             20
+acc_max_mean              0.437
+acc_max_std               0.0134
+[2024-09-14 23:35:09]
+Finished trial 56af9966a4d6953efab535c58052dde1 after 51.6s
+[2024-09-14 23:35:11]
+117 configs remaining (~1h 54m 10s, ETA: 01:29:21, based on a mean trial duration of 58.5s)
+[2024-09-14 23:35:11]
+========== CONFIG 64 ==========
+Nin_virtual               2
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:35:11]
+Starting trial e7ac9198cb439f4fce2de7476ab20480.
+[2024-09-14 23:36:16]
+acc_max_epoch             20
+acc_max_mean              0.428
+acc_max_std               0.0193
+[2024-09-14 23:36:16]
+Finished trial e7ac9198cb439f4fce2de7476ab20480 after 64.7s
+[2024-09-14 23:36:18]
+116 configs remaining (~1h 53m 22s, ETA: 01:29:41, based on a mean trial duration of 58.6s)
+[2024-09-14 23:36:18]
+========== CONFIG 65 ==========
+Nin_virtual               4
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:36:18]
+Starting trial f2f6c945eabdf02c7346ff8ecce27a3a.
+[2024-09-14 23:37:12]
+acc_max_epoch             20
+acc_max_mean              0.427
+acc_max_std               0.0262
+[2024-09-14 23:37:12]
+Finished trial f2f6c945eabdf02c7346ff8ecce27a3a after 54.1s
+[2024-09-14 23:37:14]
+115 configs remaining (~1h 52m 16s, ETA: 01:29:30, based on a mean trial duration of 58.6s)
+[2024-09-14 23:37:14]
+========== CONFIG 66 ==========
+Nin_virtual               4
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:37:14]
+Starting trial 6d24e7314458e1865a14dd3ac07ef1f0.
+[2024-09-14 23:38:25]
+acc_max_epoch             20
+acc_max_mean              0.449
+acc_max_std               0.0224
+[2024-09-14 23:38:25]
+Finished trial 6d24e7314458e1865a14dd3ac07ef1f0 after 70.6s
+[2024-09-14 23:38:27]
+114 configs remaining (~1h 51m 38s, ETA: 01:30:06, based on a mean trial duration of 58.8s)
+[2024-09-14 23:38:27]
+========== CONFIG 67 ==========
+Nin_virtual               8
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:38:27]
+Starting trial f0a88063c83acc800e8c809fe331eea6.
+[2024-09-14 23:39:30]
+acc_max_epoch             19
+acc_max_mean              0.525
+acc_max_std               0.0207
+[2024-09-14 23:39:30]
+Finished trial f0a88063c83acc800e8c809fe331eea6 after 62.9s
+[2024-09-14 23:39:32]
+113 configs remaining (~1h 50m 46s, ETA: 01:30:19, based on a mean trial duration of 58.8s)
+[2024-09-14 23:39:32]
+========== CONFIG 68 ==========
+Nin_virtual               8
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:39:32]
+Starting trial 543ed57bc1c95ca9869bdb9828fe8b73.
+[2024-09-14 23:40:56]
+acc_max_epoch             20
+acc_max_mean              0.498
+acc_max_std               0.0435
+[2024-09-14 23:40:56]
+Finished trial 543ed57bc1c95ca9869bdb9828fe8b73 after 83.6s
+[2024-09-14 23:40:58]
+112 configs remaining (~1h 50m 28s, ETA: 01:31:27, based on a mean trial duration of 59.2s)
+[2024-09-14 23:40:58]
+========== CONFIG 69 ==========
+Nin_virtual               12
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:40:58]
+Starting trial 559e47985fea0bbbf157a0ed3dc5a192.
+[2024-09-14 23:42:05]
+acc_max_epoch             20
+acc_max_mean              0.541
+acc_max_std               0.0333
+[2024-09-14 23:42:05]
+Finished trial 559e47985fea0bbbf157a0ed3dc5a192 after 66.2s
+[2024-09-14 23:42:07]
+111 configs remaining (~1h 49m 40s, ETA: 01:31:48, based on a mean trial duration of 59.3s)
+[2024-09-14 23:42:07]
+========== CONFIG 70 ==========
+Nin_virtual               12
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:42:07]
+Starting trial e838aea5599757dbcc9d08abd397768c.
+[2024-09-14 23:43:35]
+acc_max_epoch             20
+acc_max_mean              0.503
+acc_max_std               0.0318
+[2024-09-14 23:43:35]
+Finished trial e838aea5599757dbcc9d08abd397768c after 88.0s
+[2024-09-14 23:43:37]
+110 configs remaining (~1h 49m 26s, ETA: 01:33:04, based on a mean trial duration of 59.7s)
+[2024-09-14 23:43:37]
+========== CONFIG 71 ==========
+Nin_virtual               16
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:43:37]
+Starting trial 8928ba232574eb4bd50bea13b74c2302.
+[2024-09-14 23:44:47]
+acc_max_epoch             20
+acc_max_mean              0.519
+acc_max_std               0.0175
+[2024-09-14 23:44:47]
+Finished trial 8928ba232574eb4bd50bea13b74c2302 after 69.9s
+[2024-09-14 23:44:50]
+109 configs remaining (~1h 48m 42s, ETA: 01:33:32, based on a mean trial duration of 59.8s)
+[2024-09-14 23:44:50]
+========== CONFIG 72 ==========
+Nin_virtual               16
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:44:50]
+Starting trial 257822045bb10d123d9567eb52a65dd2.
+[2024-09-14 23:46:19]
+acc_max_epoch             20
+acc_max_mean              0.522
+acc_max_std               0.0282
+[2024-09-14 23:46:19]
+Finished trial 257822045bb10d123d9567eb52a65dd2 after 88.9s
+[2024-09-14 23:46:21]
+108 configs remaining (~1h 48m 26s, ETA: 01:34:47, based on a mean trial duration of 60.2s)
+[2024-09-14 23:46:21]
+========== CONFIG 73 ==========
+Nin_virtual               24
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:46:21]
+Starting trial 8f01e7d883e097c5bb676ad5ac7ad51c.
+[2024-09-14 23:47:35]
+acc_max_epoch             19
+acc_max_mean              0.354
+acc_max_std               0.221
+[2024-09-14 23:47:35]
+Finished trial 8f01e7d883e097c5bb676ad5ac7ad51c after 73.5s
+[2024-09-14 23:47:37]
+107 configs remaining (~1h 47m 45s, ETA: 01:35:23, based on a mean trial duration of 60.4s)
+[2024-09-14 23:47:37]
+========== CONFIG 74 ==========
+Nin_virtual               24
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:47:37]
+Starting trial 1c30305a44372f5d3df2011303a7ba77.
+[2024-09-14 23:49:10]
+acc_max_epoch             17
+acc_max_mean              0.192
+acc_max_std               0.206
+[2024-09-14 23:49:10]
+Finished trial 1c30305a44372f5d3df2011303a7ba77 after 92.6s
+[2024-09-14 23:49:12]
+106 configs remaining (~1h 47m 31s, ETA: 01:36:43, based on a mean trial duration of 60.9s)
+[2024-09-14 23:49:12]
+========== CONFIG 75 ==========
+Nin_virtual               32
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:49:12]
+Starting trial 91e8893ad204ad9177f0aaf4dd251c47.
+[2024-09-14 23:50:28]
+acc_max_epoch             2
+acc_max_mean              0.142
+acc_max_std               0.0127
+[2024-09-14 23:50:28]
+Finished trial 91e8893ad204ad9177f0aaf4dd251c47 after 75.8s
+[2024-09-14 23:50:31]
+105 configs remaining (~1h 46m 51s, ETA: 01:37:22, based on a mean trial duration of 61.1s)
+[2024-09-14 23:50:31]
+========== CONFIG 76 ==========
+Nin_virtual               32
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:50:31]
+Starting trial e68366ec1fefc98bfffa26c62dc63826.
+[2024-09-14 23:52:08]
+acc_max_epoch             2
+acc_max_mean              0.0989
+acc_max_std               0.0337
+[2024-09-14 23:52:08]
+Finished trial e68366ec1fefc98bfffa26c62dc63826 after 97.6s
+[2024-09-14 23:52:11]
+104 configs remaining (~1h 46m 40s, ETA: 01:38:51, based on a mean trial duration of 61.5s)
+[2024-09-14 23:52:11]
+========== CONFIG 77 ==========
+Nin_virtual               40
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:52:11]
+Starting trial a011c10c28418ee3735eda0b0a4dc330.
+[2024-09-14 23:53:28]
+acc_max_epoch             2
+acc_max_mean              0.149
+acc_max_std               0.0171
+[2024-09-14 23:53:28]
+Finished trial a011c10c28418ee3735eda0b0a4dc330 after 76.8s
+[2024-09-14 23:53:30]
+103 configs remaining (~1h 45m 59s, ETA: 01:39:29, based on a mean trial duration of 61.7s)
+[2024-09-14 23:53:30]
+========== CONFIG 78 ==========
+Nin_virtual               40
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:53:30]
+Starting trial 09e22841645814b2903f00d942ef65ac.
+[2024-09-14 23:55:12]
+acc_max_epoch             2
+acc_max_mean              0.0677
+acc_max_std               0.0283
+[2024-09-14 23:55:12]
+Finished trial 09e22841645814b2903f00d942ef65ac after 101.3s
+[2024-09-14 23:55:14]
+102 configs remaining (~1h 45m 49s, ETA: 01:41:03, based on a mean trial duration of 62.2s)
+[2024-09-14 23:55:14]
+========== CONFIG 79 ==========
+Nin_virtual               48
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:55:14]
+Starting trial f0699ffd025a290f85df168139e667ce.
+[2024-09-14 23:56:33]
+acc_max_epoch             2
+acc_max_mean              0.137
+acc_max_std               0.0213
+[2024-09-14 23:56:33]
+Finished trial f0699ffd025a290f85df168139e667ce after 78.8s
+[2024-09-14 23:56:36]
+101 configs remaining (~1h 45m 8s, ETA: 01:41:44, based on a mean trial duration of 62.5s)
+[2024-09-14 23:56:36]
+========== CONFIG 80 ==========
+Nin_virtual               48
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:56:36]
+Starting trial f9a0bb068a3df4be316a34ea9d387055.
+[2024-09-14 23:58:20]
+acc_max_epoch             2
+acc_max_mean              0.0658
+acc_max_std               0.0256
+[2024-09-14 23:58:20]
+Finished trial f9a0bb068a3df4be316a34ea9d387055 after 104.3s
+[2024-09-14 23:58:23]
+100 configs remaining (~1h 44m 57s, ETA: 01:43:21, based on a mean trial duration of 63.0s)
+[2024-09-14 23:58:23]
+========== CONFIG 81 ==========
+Nin_virtual               56
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:58:23]
+Starting trial 01afceedb61e7fe0be95f2f084b305ba.
+[2024-09-14 23:59:46]
+acc_max_epoch             2
+acc_max_mean              0.136
+acc_max_std               0.0217
+[2024-09-14 23:59:46]
+Finished trial 01afceedb61e7fe0be95f2f084b305ba after 82.8s
+[2024-09-14 23:59:48]
+99 configs remaining (~1h 44m 19s, ETA: 01:44:08, based on a mean trial duration of 63.2s)
+[2024-09-14 23:59:48]
+========== CONFIG 82 ==========
+Nin_virtual               56
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-14 23:59:48]
+Starting trial 5da896240d19822d4e121ecfe9954e97.
+[2024-09-15 00:01:33]
+acc_max_epoch             2
+acc_max_mean              0.0841
+acc_max_std               0.0514
+[2024-09-15 00:01:33]
+Finished trial 5da896240d19822d4e121ecfe9954e97 after 105.0s
+[2024-09-15 00:01:36]
+98 configs remaining (~1h 44m 5s, ETA: 01:45:42, based on a mean trial duration of 63.7s)
+[2024-09-15 00:01:36]
+========== CONFIG 83 ==========
+Nin_virtual               64
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-15 00:01:36]
+Starting trial 517c3300a0753c437e0ab25e3ea531be.
+[2024-09-15 00:03:01]
+acc_max_epoch             2
+acc_max_mean              0.134
+acc_max_std               0.0148
+[2024-09-15 00:03:01]
+Finished trial 517c3300a0753c437e0ab25e3ea531be after 84.3s
+[2024-09-15 00:03:03]
+97 configs remaining (~1h 43m 26s, ETA: 01:46:30, based on a mean trial duration of 64.0s)
+[2024-09-15 00:03:03]
+========== CONFIG 84 ==========
+Nin_virtual               64
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-15 00:03:03]
+Starting trial 74eaca5f264eca11f46688ede5f8c8af.
+[2024-09-15 00:04:50]
+acc_max_epoch             2
+acc_max_mean              0.0651
+acc_max_std               0.0247
+[2024-09-15 00:04:50]
+Finished trial 74eaca5f264eca11f46688ede5f8c8af after 106.5s
+[2024-09-15 00:04:53]
+96 configs remaining (~1h 43m 10s, ETA: 01:48:04, based on a mean trial duration of 64.5s)
+[2024-09-15 00:04:53]
+========== CONFIG 85 ==========
+Nin_virtual               80
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-15 00:04:53]
+Starting trial bceacd34ffe91f4c9a2ae3a838f55fe7.
+[2024-09-15 00:06:21]
+acc_max_epoch             2
+acc_max_mean              0.142
+acc_max_std               0.0121
+[2024-09-15 00:06:21]
+Finished trial bceacd34ffe91f4c9a2ae3a838f55fe7 after 88.4s
+[2024-09-15 00:06:24]
+95 configs remaining (~1h 42m 32s, ETA: 01:48:57, based on a mean trial duration of 64.8s)
+[2024-09-15 00:06:24]
+========== CONFIG 86 ==========
+Nin_virtual               80
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-15 00:06:24]
+Starting trial e6afd3ae7fd105fce222493d953989af.
+[2024-09-15 00:08:17]
+acc_max_epoch             2
+acc_max_mean              0.0956
+acc_max_std               0.037
+[2024-09-15 00:08:17]
+Finished trial e6afd3ae7fd105fce222493d953989af after 112.4s
+[2024-09-15 00:08:20]
+94 configs remaining (~1h 42m 20s, ETA: 01:50:40, based on a mean trial duration of 65.3s)
+[2024-09-15 00:08:20]
+========== CONFIG 87 ==========
+Nin_virtual               96
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-15 00:08:20]
+Starting trial 41017cbd127c849856ca890ce4369172.
+[2024-09-15 00:09:51]
+acc_max_epoch             2
+acc_max_mean              0.136
+acc_max_std               0.0196
+[2024-09-15 00:09:51]
+Finished trial 41017cbd127c849856ca890ce4369172 after 91.2s
+[2024-09-15 00:09:54]
+93 configs remaining (~1h 41m 42s, ETA: 01:51:36, based on a mean trial duration of 65.6s)
+[2024-09-15 00:09:54]
+========== CONFIG 88 ==========
+Nin_virtual               96
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-15 00:09:54]
+Starting trial bad1c94d080f198b4d84eb7694e461a8.
+[2024-09-15 00:11:52]
+acc_max_epoch             2
+acc_max_mean              0.07
+acc_max_std               0.0315
+[2024-09-15 00:11:52]
+Finished trial bad1c94d080f198b4d84eb7694e461a8 after 118.5s
+[2024-09-15 00:11:55]
+92 configs remaining (~1h 41m 32s, ETA: 01:53:27, based on a mean trial duration of 66.2s)
+[2024-09-15 00:11:55]
+========== CONFIG 89 ==========
+Nin_virtual               126
+Nhidden                   200
+Nlayer                    3
+Nbatch                    1000
+[2024-09-15 00:11:55]
+Starting trial 12aa47170e115de4e2a3a924b1533ea1.
+[2024-09-15 00:13:24]
+acc_max_epoch             2
+acc_max_mean              0.11
+acc_max_std               0.0476
+[2024-09-15 00:13:24]
+Finished trial 12aa47170e115de4e2a3a924b1533ea1 after 89.1s
+[2024-09-15 00:13:27]
+91 configs remaining (~1h 40m 49s, ETA: 01:54:17, based on a mean trial duration of 66.5s)
+[2024-09-15 00:13:27]
+========== CONFIG 90 ==========
+Nin_virtual               126
+Nhidden                   300
+Nlayer                    3
+Nbatch                    1000
+[2024-09-15 00:13:27]
+Starting trial c7306a97ce0f26e1cb059a53bcf217f7.
+[2024-09-15 00:15:25]
+acc_max_epoch             1
+acc_max_mean              0.0792
+acc_max_std               0.0391
+[2024-09-15 00:15:25]
+Finished trial c7306a97ce0f26e1cb059a53bcf217f7 after 117.3s
+[2024-09-15 00:15:28]
+90 configs remaining (~1h 40m 33s, ETA: 01:56:02, based on a mean trial duration of 67.0s)
+[2024-09-15 00:15:28]
+========== CONFIG 91 ==========
+Nin_virtual               1
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:15:28]
+Starting trial 5a0ca13dfb1a5fce3d97921bb8551059.
+[2024-09-15 00:16:04]
+acc_max_epoch             20
+acc_max_mean              0.392
+acc_max_std               0.0177
+[2024-09-15 00:16:04]
+Finished trial 5a0ca13dfb1a5fce3d97921bb8551059 after 36.4s
+[2024-09-15 00:16:10]
+89 configs remaining (~1h 38m 56s, ETA: 01:55:07, based on a mean trial duration of 66.7s)
+[2024-09-15 00:16:10]
+========== CONFIG 92 ==========
+Nin_virtual               2
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:16:10]
+Starting trial 7228d200e258d30b81ae42b360cda465.
+[2024-09-15 00:16:40]
+acc_max_epoch             20
+acc_max_mean              0.386
+acc_max_std               0.0239
+[2024-09-15 00:16:40]
+Finished trial 7228d200e258d30b81ae42b360cda465 after 29.8s
+[2024-09-15 00:16:43]
+88 configs remaining (~1h 37m 14s, ETA: 01:53:57, based on a mean trial duration of 66.3s)
+[2024-09-15 00:16:43]
+========== CONFIG 93 ==========
+Nin_virtual               4
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:16:43]
+Starting trial f87065e30cc08a040ac666be6b28dc26.
+[2024-09-15 00:17:16]
+acc_max_epoch             20
+acc_max_mean              0.37
+acc_max_std               0.0138
+[2024-09-15 00:17:16]
+Finished trial f87065e30cc08a040ac666be6b28dc26 after 33.4s
+[2024-09-15 00:17:19]
+87 configs remaining (~1h 35m 37s, ETA: 01:52:57, based on a mean trial duration of 66.0s)
+[2024-09-15 00:17:19]
+========== CONFIG 94 ==========
+Nin_virtual               8
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:17:19]
+Starting trial 6fd9ddc2382f22930162d0cfbec1cc80.
+[2024-09-15 00:17:57]
+acc_max_epoch             20
+acc_max_mean              0.447
+acc_max_std               0.028
+[2024-09-15 00:17:58]
+Finished trial 6fd9ddc2382f22930162d0cfbec1cc80 after 38.2s
+[2024-09-15 00:18:01]
+86 configs remaining (~1h 34m 6s, ETA: 01:52:07, based on a mean trial duration of 65.7s)
+[2024-09-15 00:18:01]
+========== CONFIG 95 ==========
+Nin_virtual               12
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:18:01]
+Starting trial 239e1d7f4f6c207995561ab59ce3f9c2.
+[2024-09-15 00:18:38]
+acc_max_epoch             20
+acc_max_mean              0.455
+acc_max_std               0.0263
+[2024-09-15 00:18:38]
+Finished trial 239e1d7f4f6c207995561ab59ce3f9c2 after 36.8s
+[2024-09-15 00:18:41]
+85 configs remaining (~1h 32m 34s, ETA: 01:51:16, based on a mean trial duration of 65.4s)
+[2024-09-15 00:18:41]
+========== CONFIG 96 ==========
+Nin_virtual               16
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:18:41]
+Starting trial 0ddc7c6fe6bef243b6d21f290562afd0.
+[2024-09-15 00:19:22]
+acc_max_epoch             20
+acc_max_mean              0.479
+acc_max_std               0.0329
+[2024-09-15 00:19:22]
+Finished trial 0ddc7c6fe6bef243b6d21f290562afd0 after 40.8s
+[2024-09-15 00:19:25]
+84 configs remaining (~1h 31m 8s, ETA: 01:50:33, based on a mean trial duration of 65.1s)
+[2024-09-15 00:19:25]
+========== CONFIG 97 ==========
+Nin_virtual               24
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:19:25]
+Starting trial 276dfd788a57429bbd70cc006374fa7b.
+[2024-09-15 00:20:08]
+acc_max_epoch             20
+acc_max_mean              0.466
+acc_max_std               0.0253
+[2024-09-15 00:20:08]
+Finished trial 276dfd788a57429bbd70cc006374fa7b after 42.9s
+[2024-09-15 00:20:11]
+83 configs remaining (~1h 29m 43s, ETA: 01:49:55, based on a mean trial duration of 64.9s)
+[2024-09-15 00:20:11]
+========== CONFIG 98 ==========
+Nin_virtual               32
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:20:11]
+Starting trial 73d25e0b5d0001e7a26e5a7b95150553.
+[2024-09-15 00:20:54]
+acc_max_epoch             20
+acc_max_mean              0.457
+acc_max_std               0.0273
+[2024-09-15 00:20:54]
+Finished trial 73d25e0b5d0001e7a26e5a7b95150553 after 42.7s
+[2024-09-15 00:20:59]
+82 configs remaining (~1h 28m 20s, ETA: 01:49:20, based on a mean trial duration of 64.6s)
+[2024-09-15 00:20:59]
+========== CONFIG 99 ==========
+Nin_virtual               40
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:20:59]
+Starting trial 7bbad960ac66e912b1c3272ae763a109.
+[2024-09-15 00:21:44]
+acc_max_epoch             19
+acc_max_mean              0.433
+acc_max_std               0.0147
+[2024-09-15 00:21:44]
+Finished trial 7bbad960ac66e912b1c3272ae763a109 after 44.3s
+[2024-09-15 00:21:47]
+81 configs remaining (~1h 26m 59s, ETA: 01:48:46, based on a mean trial duration of 64.4s)
+[2024-09-15 00:21:47]
+========== CONFIG 100 ==========
+Nin_virtual               48
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:21:47]
+Starting trial d3ef4eb2fc80b6ebf188042b9927f15e.
+[2024-09-15 00:22:33]
+acc_max_epoch             18
+acc_max_mean              0.417
+acc_max_std               0.011
+[2024-09-15 00:22:33]
+Finished trial d3ef4eb2fc80b6ebf188042b9927f15e after 45.7s
+[2024-09-15 00:22:36]
+80 configs remaining (~1h 25m 39s, ETA: 01:48:16, based on a mean trial duration of 64.2s)
+[2024-09-15 00:22:36]
+========== CONFIG 101 ==========
+Nin_virtual               56
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:22:36]
+Starting trial d7ed0cc9f12b82e4c6a80bbc7287fc03.
+[2024-09-15 00:23:25]
+acc_max_epoch             19
+acc_max_mean              0.42
+acc_max_std               0.0264
+[2024-09-15 00:23:25]
+Finished trial d7ed0cc9f12b82e4c6a80bbc7287fc03 after 48.5s
+[2024-09-15 00:23:28]
+79 configs remaining (~1h 24m 23s, ETA: 01:47:52, based on a mean trial duration of 64.1s)
+[2024-09-15 00:23:28]
+========== CONFIG 102 ==========
+Nin_virtual               64
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:23:28]
+Starting trial c71c105a30f1218960a5a043e01b1ff7.
+[2024-09-15 00:24:16]
+acc_max_epoch             13
+acc_max_mean              0.423
+acc_max_std               0.00351
+[2024-09-15 00:24:16]
+Finished trial c71c105a30f1218960a5a043e01b1ff7 after 47.3s
+[2024-09-15 00:24:19]
+78 configs remaining (~1h 23m 6s, ETA: 01:47:25, based on a mean trial duration of 63.9s)
+[2024-09-15 00:24:19]
+========== CONFIG 103 ==========
+Nin_virtual               80
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:24:19]
+Starting trial 8d1755c9012c903161c4959df6a146bf.
+[2024-09-15 00:25:10]
+acc_max_epoch             17
+acc_max_mean              0.435
+acc_max_std               0.0165
+[2024-09-15 00:25:10]
+Finished trial 8d1755c9012c903161c4959df6a146bf after 51.1s
+[2024-09-15 00:25:14]
+77 configs remaining (~1h 21m 52s, ETA: 01:47:06, based on a mean trial duration of 63.8s)
+[2024-09-15 00:25:14]
+========== CONFIG 104 ==========
+Nin_virtual               96
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:25:14]
+Starting trial 038f0d77867be8148306f723a6e57e98.
+[2024-09-15 00:26:06]
+acc_max_epoch             20
+acc_max_mean              0.443
+acc_max_std               0.0243
+[2024-09-15 00:26:06]
+Finished trial 038f0d77867be8148306f723a6e57e98 after 52.5s
+[2024-09-15 00:26:10]
+76 configs remaining (~1h 20m 40s, ETA: 01:46:51, based on a mean trial duration of 63.7s)
+[2024-09-15 00:26:10]
+========== CONFIG 105 ==========
+Nin_virtual               126
+Nhidden                   100
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:26:10]
+Starting trial 8697faf69354c78bdaa9d320df029c42.
+[2024-09-15 00:27:05]
+acc_max_epoch             18
+acc_max_mean              0.438
+acc_max_std               0.028
+[2024-09-15 00:27:05]
+Finished trial 8697faf69354c78bdaa9d320df029c42 after 54.9s
+[2024-09-15 00:27:08]
+75 configs remaining (~1h 19m 30s, ETA: 01:46:39, based on a mean trial duration of 63.6s)
+[2024-09-15 00:27:08]
+========== CONFIG 106 ==========
+Nin_virtual               1
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:27:08]
+Starting trial 62c53e8b278a6a258111957456c675e6.
+[2024-09-15 00:27:47]
+acc_max_epoch             20
+acc_max_mean              0.387
+acc_max_std               0.0547
+[2024-09-15 00:27:47]
+Finished trial 62c53e8b278a6a258111957456c675e6 after 38.3s
+[2024-09-15 00:27:50]
+74 configs remaining (~1h 18m 9s, ETA: 01:46:00, based on a mean trial duration of 63.4s)
+[2024-09-15 00:27:50]
+========== CONFIG 107 ==========
+Nin_virtual               1
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:27:50]
+Starting trial 2b6a0ca40cd720e6f0c9d285241e8933.
+[2024-09-15 00:28:37]
+acc_max_epoch             17
+acc_max_mean              0.382
+acc_max_std               0.029
+[2024-09-15 00:28:37]
+Finished trial 2b6a0ca40cd720e6f0c9d285241e8933 after 46.4s
+[2024-09-15 00:28:40]
+73 configs remaining (~1h 16m 54s, ETA: 01:45:35, based on a mean trial duration of 63.2s)
+[2024-09-15 00:28:40]
+========== CONFIG 108 ==========
+Nin_virtual               2
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:28:40]
+Starting trial be049c1ba87db18802d0913c244a975b.
+[2024-09-15 00:29:18]
+acc_max_epoch             17
+acc_max_mean              0.419
+acc_max_std               0.0105
+[2024-09-15 00:29:18]
+Finished trial be049c1ba87db18802d0913c244a975b after 37.4s
+[2024-09-15 00:29:21]
+72 configs remaining (~1h 15m 34s, ETA: 01:44:55, based on a mean trial duration of 63.0s)
+[2024-09-15 00:29:21]
+========== CONFIG 109 ==========
+Nin_virtual               2
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:29:21]
+Starting trial 127067326c798fe6eb5a482408822fa9.
+[2024-09-15 00:30:03]
+acc_max_epoch             19
+acc_max_mean              0.383
+acc_max_std               0.0164
+[2024-09-15 00:30:03]
+Finished trial 127067326c798fe6eb5a482408822fa9 after 41.6s
+[2024-09-15 00:30:07]
+71 configs remaining (~1h 14m 17s, ETA: 01:44:24, based on a mean trial duration of 62.8s)
+[2024-09-15 00:30:07]
+========== CONFIG 110 ==========
+Nin_virtual               4
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:30:07]
+Starting trial 66fcebb2e6499d24d8cc23409645e991.
+[2024-09-15 00:30:46]
+acc_max_epoch             20
+acc_max_mean              0.393
+acc_max_std               0.0257
+[2024-09-15 00:30:46]
+Finished trial 66fcebb2e6499d24d8cc23409645e991 after 39.4s
+[2024-09-15 00:30:50]
+70 configs remaining (~1h 12m 59s, ETA: 01:43:49, based on a mean trial duration of 62.6s)
+[2024-09-15 00:30:50]
+========== CONFIG 111 ==========
+Nin_virtual               4
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:30:50]
+Starting trial d0822a32c722f6c680ab38d6135fcc7c.
+[2024-09-15 00:31:37]
+acc_max_epoch             17
+acc_max_mean              0.378
+acc_max_std               0.0101
+[2024-09-15 00:31:37]
+Finished trial d0822a32c722f6c680ab38d6135fcc7c after 46.8s
+[2024-09-15 00:31:40]
+69 configs remaining (~1h 11m 47s, ETA: 01:43:28, based on a mean trial duration of 62.4s)
+[2024-09-15 00:31:40]
+========== CONFIG 112 ==========
+Nin_virtual               8
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:31:40]
+Starting trial 1e8f744ddd78e795ac8610d3e590887f.
+[2024-09-15 00:32:25]
+acc_max_epoch             20
+acc_max_mean              0.473
+acc_max_std               0.0285
+[2024-09-15 00:32:25]
+Finished trial 1e8f744ddd78e795ac8610d3e590887f after 44.3s
+[2024-09-15 00:32:29]
+68 configs remaining (~1h 10m 33s, ETA: 01:43:02, based on a mean trial duration of 62.3s)
+[2024-09-15 00:32:29]
+========== CONFIG 113 ==========
+Nin_virtual               8
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:32:29]
+Starting trial 3c4fdd5dcb72d884bd766604a4c2ffca.
+[2024-09-15 00:33:20]
+acc_max_epoch             20
+acc_max_mean              0.455
+acc_max_std               0.00668
+[2024-09-15 00:33:20]
+Finished trial 3c4fdd5dcb72d884bd766604a4c2ffca after 51.4s
+[2024-09-15 00:33:24]
+67 configs remaining (~1h 9m 25s, ETA: 01:42:49, based on a mean trial duration of 62.2s)
+[2024-09-15 00:33:24]
+========== CONFIG 114 ==========
+Nin_virtual               12
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:33:24]
+Starting trial 801d12a1248ff77866253cf8c3472590.
+[2024-09-15 00:34:10]
+acc_max_epoch             17
+acc_max_mean              0.475
+acc_max_std               0.00945
+[2024-09-15 00:34:10]
+Finished trial 801d12a1248ff77866253cf8c3472590 after 46.2s
+[2024-09-15 00:34:14]
+66 configs remaining (~1h 8m 13s, ETA: 01:42:28, based on a mean trial duration of 62.0s)
+[2024-09-15 00:34:14]
+========== CONFIG 115 ==========
+Nin_virtual               12
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:34:14]
+Starting trial 81d07a96bd5d5efabedeba085a91bdc7.
+[2024-09-15 00:35:10]
+acc_max_epoch             19
+acc_max_mean              0.447
+acc_max_std               0.0256
+[2024-09-15 00:35:10]
+Finished trial 81d07a96bd5d5efabedeba085a91bdc7 after 56.1s
+[2024-09-15 00:35:14]
+65 configs remaining (~1h 7m 8s, ETA: 01:42:22, based on a mean trial duration of 62.0s)
+[2024-09-15 00:35:14]
+========== CONFIG 116 ==========
+Nin_virtual               16
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:35:14]
+Starting trial bf6ff5c43d04e30d905b036207a8e374.
+[2024-09-15 00:35:59]
+acc_max_epoch             20
+acc_max_mean              0.48
+acc_max_std               0.0278
+[2024-09-15 00:35:59]
+Finished trial bf6ff5c43d04e30d905b036207a8e374 after 45.1s
+[2024-09-15 00:36:03]
+64 configs remaining (~1h 5m 57s, ETA: 01:42:00, based on a mean trial duration of 61.8s)
+[2024-09-15 00:36:03]
+========== CONFIG 117 ==========
+Nin_virtual               16
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:36:03]
+Starting trial e528936a498d232e9bf24517fd0aadbc.
+[2024-09-15 00:37:00]
+acc_max_epoch             20
+acc_max_mean              0.447
+acc_max_std               0.0231
+[2024-09-15 00:37:00]
+Finished trial e528936a498d232e9bf24517fd0aadbc after 57.4s
+[2024-09-15 00:37:04]
+63 configs remaining (~1h 4m 52s, ETA: 01:41:57, based on a mean trial duration of 61.8s)
+[2024-09-15 00:37:04]
+========== CONFIG 118 ==========
+Nin_virtual               24
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:37:04]
+Starting trial 54422c8303d40bdd38b0bf72fb69c684.
+[2024-09-15 00:37:54]
+acc_max_epoch             20
+acc_max_mean              0.465
+acc_max_std               0.0113
+[2024-09-15 00:37:54]
+Finished trial 54422c8303d40bdd38b0bf72fb69c684 after 49.8s
+[2024-09-15 00:37:58]
+62 configs remaining (~1h 3m 44s, ETA: 01:41:43, based on a mean trial duration of 61.7s)
+[2024-09-15 00:37:58]
+========== CONFIG 119 ==========
+Nin_virtual               24
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:37:58]
+Starting trial ff1a658864b3439484498de2ffd36050.
+[2024-09-15 00:38:56]
+acc_max_epoch             19
+acc_max_mean              0.447
+acc_max_std               0.00502
+[2024-09-15 00:38:56]
+Finished trial ff1a658864b3439484498de2ffd36050 after 58.1s
+[2024-09-15 00:39:00]
+61 configs remaining (~1h 2m 41s, ETA: 01:41:42, based on a mean trial duration of 61.7s)
+[2024-09-15 00:39:00]
+========== CONFIG 120 ==========
+Nin_virtual               32
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:39:00]
+Starting trial 97ca9e7600ea276cffae3f857ec0ff28.
+[2024-09-15 00:39:52]
+acc_max_epoch             18
+acc_max_mean              0.454
+acc_max_std               0.0446
+[2024-09-15 00:39:52]
+Finished trial 97ca9e7600ea276cffae3f857ec0ff28 after 51.4s
+[2024-09-15 00:39:56]
+60 configs remaining (~1h 1m 34s, ETA: 01:41:30, based on a mean trial duration of 61.6s)
+[2024-09-15 00:39:56]
+========== CONFIG 121 ==========
+Nin_virtual               32
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:39:56]
+Starting trial c20c2d912f9f54b88e40de9087f489e4.
+[2024-09-15 00:40:59]
+acc_max_epoch             17
+acc_max_mean              0.422
+acc_max_std               0.0153
+[2024-09-15 00:40:59]
+Finished trial c20c2d912f9f54b88e40de9087f489e4 after 62.8s
+[2024-09-15 00:41:03]
+59 configs remaining (~1h 0m 33s, ETA: 01:41:36, based on a mean trial duration of 61.6s)
+[2024-09-15 00:41:03]
+========== CONFIG 122 ==========
+Nin_virtual               40
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:41:03]
+Starting trial 8059f435300a70b3d21d1e783e9e2fd2.
+[2024-09-15 00:41:56]
+acc_max_epoch             17
+acc_max_mean              0.459
+acc_max_std               0.0177
+[2024-09-15 00:41:56]
+Finished trial 8059f435300a70b3d21d1e783e9e2fd2 after 52.8s
+[2024-09-15 00:42:00]
+58 configs remaining (~59m 27s, ETA: 01:41:28, based on a mean trial duration of 61.5s)
+[2024-09-15 00:42:00]
+========== CONFIG 123 ==========
+Nin_virtual               40
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:42:00]
+Starting trial 0f495bda05a404b4f7133b6170324098.
+[2024-09-15 00:43:03]
+acc_max_epoch             14
+acc_max_mean              0.406
+acc_max_std               0.0428
+[2024-09-15 00:43:03]
+Finished trial 0f495bda05a404b4f7133b6170324098 after 62.6s
+[2024-09-15 00:43:07]
+57 configs remaining (~58m 26s, ETA: 01:41:34, based on a mean trial duration of 61.5s)
+[2024-09-15 00:43:07]
+========== CONFIG 124 ==========
+Nin_virtual               48
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:43:07]
+Starting trial af7a9a68f3e14b360d4f85fb0ad33841.
+[2024-09-15 00:44:01]
+acc_max_epoch             17
+acc_max_mean              0.449
+acc_max_std               0.0131
+[2024-09-15 00:44:01]
+Finished trial af7a9a68f3e14b360d4f85fb0ad33841 after 54.5s
+[2024-09-15 00:44:05]
+56 configs remaining (~57m 22s, ETA: 01:41:28, based on a mean trial duration of 61.5s)
+[2024-09-15 00:44:05]
+========== CONFIG 125 ==========
+Nin_virtual               48
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:44:05]
+Starting trial 32796f3b821b408b45dbcbcbd46841b7.
+[2024-09-15 00:45:12]
+acc_max_epoch             16
+acc_max_mean              0.433
+acc_max_std               0.0207
+[2024-09-15 00:45:12]
+Finished trial 32796f3b821b408b45dbcbcbd46841b7 after 66.6s
+[2024-09-15 00:45:16]
+55 configs remaining (~56m 22s, ETA: 01:41:39, based on a mean trial duration of 61.5s)
+[2024-09-15 00:45:16]
+========== CONFIG 126 ==========
+Nin_virtual               56
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:45:16]
+Starting trial 6af8d180f055fa9a1e0d3ec754fed2f0.
+[2024-09-15 00:46:10]
+acc_max_epoch             20
+acc_max_mean              0.432
+acc_max_std               0.0223
+[2024-09-15 00:46:10]
+Finished trial 6af8d180f055fa9a1e0d3ec754fed2f0 after 53.7s
+[2024-09-15 00:46:14]
+54 configs remaining (~55m 17s, ETA: 01:41:32, based on a mean trial duration of 61.4s)
+[2024-09-15 00:46:14]
+========== CONFIG 127 ==========
+Nin_virtual               56
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:46:14]
+Starting trial 844beffbae18007e384400ba3dd65e0e.
+[2024-09-15 00:47:23]
+acc_max_epoch             20
+acc_max_mean              0.424
+acc_max_std               0.0726
+[2024-09-15 00:47:23]
+Finished trial 844beffbae18007e384400ba3dd65e0e after 68.7s
+[2024-09-15 00:47:27]
+53 configs remaining (~54m 19s, ETA: 01:41:47, based on a mean trial duration of 61.5s)
+[2024-09-15 00:47:27]
+========== CONFIG 128 ==========
+Nin_virtual               64
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:47:27]
+Starting trial 656597aa85176827e93ffaf390e0eb8c.
+[2024-09-15 00:48:24]
+acc_max_epoch             20
+acc_max_mean              0.444
+acc_max_std               0.0193
+[2024-09-15 00:48:24]
+Finished trial 656597aa85176827e93ffaf390e0eb8c after 56.9s
+[2024-09-15 00:48:29]
+52 configs remaining (~53m 16s, ETA: 01:41:45, based on a mean trial duration of 61.5s)
+[2024-09-15 00:48:29]
+========== CONFIG 129 ==========
+Nin_virtual               64
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:48:29]
+Starting trial de49f1fca040b5edd145a3354379246a.
+[2024-09-15 00:49:39]
+acc_max_epoch             20
+acc_max_mean              0.44
+acc_max_std               0.00955
+[2024-09-15 00:49:39]
+Finished trial de49f1fca040b5edd145a3354379246a after 69.9s
+[2024-09-15 00:49:43]
+51 configs remaining (~52m 18s, ETA: 01:42:01, based on a mean trial duration of 61.5s)
+[2024-09-15 00:49:43]
+========== CONFIG 130 ==========
+Nin_virtual               80
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:49:43]
+Starting trial 35b85a0f5804cd09d9e4648b50039c5c.
+[2024-09-15 00:50:40]
+acc_max_epoch             17
+acc_max_mean              0.429
+acc_max_std               0.0064
+[2024-09-15 00:50:40]
+Finished trial 35b85a0f5804cd09d9e4648b50039c5c after 57.3s
+[2024-09-15 00:50:45]
+50 configs remaining (~51m 14s, ETA: 01:42:00, based on a mean trial duration of 61.5s)
+[2024-09-15 00:50:45]
+========== CONFIG 131 ==========
+Nin_virtual               80
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:50:45]
+Starting trial 2f269ac255de1eb92f5261f4f263db27.
+[2024-09-15 00:51:58]
+acc_max_epoch             16
+acc_max_mean              0.411
+acc_max_std               0.0161
+[2024-09-15 00:51:58]
+Finished trial 2f269ac255de1eb92f5261f4f263db27 after 73.5s
+[2024-09-15 00:52:03]
+49 configs remaining (~50m 17s, ETA: 01:42:21, based on a mean trial duration of 61.6s)
+[2024-09-15 00:52:03]
+========== CONFIG 132 ==========
+Nin_virtual               96
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:52:03]
+Starting trial dcdc321fdccc4fc20799c830a8f38810.
+[2024-09-15 00:53:05]
+acc_max_epoch             20
+acc_max_mean              0.428
+acc_max_std               0.0105
+[2024-09-15 00:53:05]
+Finished trial dcdc321fdccc4fc20799c830a8f38810 after 61.8s
+[2024-09-15 00:53:09]
+48 configs remaining (~49m 16s, ETA: 01:42:26, based on a mean trial duration of 61.6s)
+[2024-09-15 00:53:09]
+========== CONFIG 133 ==========
+Nin_virtual               96
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:53:09]
+Starting trial 5c0c3c77262931fa370bae78c59bcf90.
+[2024-09-15 00:54:23]
+acc_max_epoch             20
+acc_max_mean              0.431
+acc_max_std               0.0292
+[2024-09-15 00:54:23]
+Finished trial 5c0c3c77262931fa370bae78c59bcf90 after 73.5s
+[2024-09-15 00:54:28]
+47 configs remaining (~48m 19s, ETA: 01:42:47, based on a mean trial duration of 61.7s)
+[2024-09-15 00:54:28]
+========== CONFIG 134 ==========
+Nin_virtual               126
+Nhidden                   200
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:54:28]
+Starting trial cdab9beb8edd20d0a3294f48439830c1.
+[2024-09-15 00:55:31]
+acc_max_epoch             20
+acc_max_mean              0.447
+acc_max_std               0.0115
+[2024-09-15 00:55:31]
+Finished trial cdab9beb8edd20d0a3294f48439830c1 after 63.4s
+[2024-09-15 00:55:36]
+46 configs remaining (~47m 17s, ETA: 01:42:54, based on a mean trial duration of 61.7s)
+[2024-09-15 00:55:36]
+========== CONFIG 135 ==========
+Nin_virtual               126
+Nhidden                   300
+Nlayer                    2
+Nbatch                    2000
+[2024-09-15 00:55:36]
+Starting trial 8ebcbd873a05c9999004ac4a66599b66.
+[2024-09-15 00:56:52]
+acc_max_epoch             1
+acc_max_mean              0.065
+acc_max_std               0.0262
+[2024-09-15 00:56:52]
+Finished trial 8ebcbd873a05c9999004ac4a66599b66 after 76.6s
+[2024-09-15 00:56:57]
+45 configs remaining (~46m 21s, ETA: 01:43:18, based on a mean trial duration of 61.8s)
+[2024-09-15 00:56:57]
+========== CONFIG 136 ==========
+Nin_virtual               1
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 00:56:57]
+Starting trial e7c6e261afa1d60879c3280566531051.
+[2024-09-15 00:57:39]
+acc_max_epoch             20
+acc_max_mean              0.376
+acc_max_std               0.0336
+[2024-09-15 00:57:39]
+Finished trial e7c6e261afa1d60879c3280566531051 after 41.9s
+[2024-09-15 00:57:43]
+44 configs remaining (~45m 12s, ETA: 01:42:56, based on a mean trial duration of 61.7s)
+[2024-09-15 00:57:43]
+========== CONFIG 137 ==========
+Nin_virtual               2
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 00:57:43]
+Starting trial 71974ab2e7f0f29b42479e4072bdbeab.
+[2024-09-15 00:58:21]
+acc_max_epoch             17
+acc_max_mean              0.355
+acc_max_std               0.0195
+[2024-09-15 00:58:22]
+Finished trial 71974ab2e7f0f29b42479e4072bdbeab after 38.1s
+[2024-09-15 00:58:26]
+43 configs remaining (~44m 3s, ETA: 01:42:30, based on a mean trial duration of 61.5s)
+[2024-09-15 00:58:26]
+========== CONFIG 138 ==========
+Nin_virtual               4
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 00:58:26]
+Starting trial 8a3981a901277ca47d029c6e39d2f0d5.
+[2024-09-15 00:59:09]
+acc_max_epoch             14
+acc_max_mean              0.337
+acc_max_std               0.0387
+[2024-09-15 00:59:09]
+Finished trial 8a3981a901277ca47d029c6e39d2f0d5 after 42.5s
+[2024-09-15 00:59:13]
+42 configs remaining (~42m 56s, ETA: 01:42:10, based on a mean trial duration of 61.3s)
+[2024-09-15 00:59:13]
+========== CONFIG 139 ==========
+Nin_virtual               8
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 00:59:13]
+Starting trial 1825c992eab9990eaca7073aef1a57aa.
+[2024-09-15 01:00:03]
+acc_max_epoch             20
+acc_max_mean              0.435
+acc_max_std               0.0264
+[2024-09-15 01:00:03]
+Finished trial 1825c992eab9990eaca7073aef1a57aa after 49.1s
+[2024-09-15 01:00:07]
+41 configs remaining (~41m 51s, ETA: 01:41:59, based on a mean trial duration of 61.3s)
+[2024-09-15 01:00:07]
+========== CONFIG 140 ==========
+Nin_virtual               12
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:00:07]
+Starting trial 05237035cd38228f196cc66cd1c176e7.
+[2024-09-15 01:00:58]
+acc_max_epoch             20
+acc_max_mean              0.45
+acc_max_std               0.0178
+[2024-09-15 01:00:58]
+Finished trial 05237035cd38228f196cc66cd1c176e7 after 50.4s
+[2024-09-15 01:01:03]
+40 configs remaining (~40m 47s, ETA: 01:41:50, based on a mean trial duration of 61.2s)
+[2024-09-15 01:01:03]
+========== CONFIG 141 ==========
+Nin_virtual               16
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:01:03]
+Starting trial dc58cbdb5754ab9a126a9bebd17a788c.
+[2024-09-15 01:01:52]
+acc_max_epoch             20
+acc_max_mean              0.455
+acc_max_std               0.0221
+[2024-09-15 01:01:52]
+Finished trial dc58cbdb5754ab9a126a9bebd17a788c after 49.9s
+[2024-09-15 01:01:57]
+39 configs remaining (~39m 43s, ETA: 01:41:40, based on a mean trial duration of 61.1s)
+[2024-09-15 01:01:57]
+========== CONFIG 142 ==========
+Nin_virtual               24
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:01:57]
+Starting trial 80cce9362b37c94d7605ee892fa3837b.
+[2024-09-15 01:02:52]
+acc_max_epoch             18
+acc_max_mean              0.458
+acc_max_std               0.0361
+[2024-09-15 01:02:52]
+Finished trial 80cce9362b37c94d7605ee892fa3837b after 55.1s
+[2024-09-15 01:02:57]
+38 configs remaining (~38m 40s, ETA: 01:41:38, based on a mean trial duration of 61.1s)
+[2024-09-15 01:02:57]
+========== CONFIG 143 ==========
+Nin_virtual               32
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:02:57]
+Starting trial 5b4a0ca35d8c75819b0e47b59d507d9d.
+[2024-09-15 01:03:55]
+acc_max_epoch             20
+acc_max_mean              0.45
+acc_max_std               0.0249
+[2024-09-15 01:03:55]
+Finished trial 5b4a0ca35d8c75819b0e47b59d507d9d after 58.0s
+[2024-09-15 01:04:00]
+37 configs remaining (~37m 38s, ETA: 01:41:39, based on a mean trial duration of 61.0s)
+[2024-09-15 01:04:00]
+========== CONFIG 144 ==========
+Nin_virtual               40
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:04:00]
+Starting trial e6d67997268a29aa6cee4c1301e4584d.
+[2024-09-15 01:04:57]
+acc_max_epoch             19
+acc_max_mean              0.442
+acc_max_std               0.0291
+[2024-09-15 01:04:57]
+Finished trial e6d67997268a29aa6cee4c1301e4584d after 57.0s
+[2024-09-15 01:05:05]
+36 configs remaining (~36m 36s, ETA: 01:41:41, based on a mean trial duration of 61.0s)
+[2024-09-15 01:05:05]
+========== CONFIG 145 ==========
+Nin_virtual               48
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:05:05]
+Starting trial 5af007364c1b1b9d98b5722fbfbd554f.
+[2024-09-15 01:06:02]
+acc_max_epoch             19
+acc_max_mean              0.437
+acc_max_std               0.0117
+[2024-09-15 01:06:02]
+Finished trial 5af007364c1b1b9d98b5722fbfbd554f after 56.9s
+[2024-09-15 01:06:06]
+35 configs remaining (~35m 34s, ETA: 01:41:41, based on a mean trial duration of 61.0s)
+[2024-09-15 01:06:06]
+========== CONFIG 146 ==========
+Nin_virtual               56
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:06:06]
+Starting trial 145b867828f0eafc06fc0bf02655b5ce.
+[2024-09-15 01:07:09]
+acc_max_epoch             19
+acc_max_mean              0.433
+acc_max_std               0.0351
+[2024-09-15 01:07:09]
+Finished trial 145b867828f0eafc06fc0bf02655b5ce after 62.8s
+[2024-09-15 01:07:14]
+34 configs remaining (~34m 33s, ETA: 01:41:48, based on a mean trial duration of 61.0s)
+[2024-09-15 01:07:14]
+========== CONFIG 147 ==========
+Nin_virtual               64
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:07:14]
+Starting trial b9b4ac147f57de69c27e97f1056a9ad4.
+[2024-09-15 01:08:18]
+acc_max_epoch             20
+acc_max_mean              0.412
+acc_max_std               0.0248
+[2024-09-15 01:08:18]
+Finished trial b9b4ac147f57de69c27e97f1056a9ad4 after 63.4s
+[2024-09-15 01:08:23]
+33 configs remaining (~33m 33s, ETA: 01:41:56, based on a mean trial duration of 61.0s)
+[2024-09-15 01:08:23]
+========== CONFIG 148 ==========
+Nin_virtual               80
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:08:23]
+Starting trial c57a7b310eaaed7eb9313cf7c3794766.
+[2024-09-15 01:09:26]
+acc_max_epoch             20
+acc_max_mean              0.443
+acc_max_std               0.0418
+[2024-09-15 01:09:26]
+Finished trial c57a7b310eaaed7eb9313cf7c3794766 after 63.7s
+[2024-09-15 01:09:32]
+32 configs remaining (~32m 32s, ETA: 01:42:04, based on a mean trial duration of 61.0s)
+[2024-09-15 01:09:32]
+========== CONFIG 149 ==========
+Nin_virtual               96
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:09:32]
+Starting trial b9affe525f4177763fde32fa110e246e.
+[2024-09-15 01:10:40]
+acc_max_epoch             19
+acc_max_mean              0.454
+acc_max_std               0.0494
+[2024-09-15 01:10:40]
+Finished trial b9affe525f4177763fde32fa110e246e after 68.1s
+[2024-09-15 01:10:45]
+31 configs remaining (~31m 33s, ETA: 01:42:18, based on a mean trial duration of 61.1s)
+[2024-09-15 01:10:45]
+========== CONFIG 150 ==========
+Nin_virtual               126
+Nhidden                   100
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:10:45]
+Starting trial 4efc414ae934ccb870350edd4f7de814.
+[2024-09-15 01:11:54]
+acc_max_epoch             20
+acc_max_mean              0.436
+acc_max_std               0.0342
+[2024-09-15 01:11:54]
+Finished trial 4efc414ae934ccb870350edd4f7de814 after 69.2s
+[2024-09-15 01:11:59]
+30 configs remaining (~30m 33s, ETA: 01:42:33, based on a mean trial duration of 61.1s)
+[2024-09-15 01:11:59]
+========== CONFIG 151 ==========
+Nin_virtual               1
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:11:59]
+Starting trial c99e495529f7bc3182c32d8413d8aa47.
+[2024-09-15 01:12:51]
+acc_max_epoch             20
+acc_max_mean              0.363
+acc_max_std               0.0358
+[2024-09-15 01:12:51]
+Finished trial c99e495529f7bc3182c32d8413d8aa47 after 52.0s
+[2024-09-15 01:12:56]
+29 configs remaining (~29m 31s, ETA: 01:42:27, based on a mean trial duration of 61.1s)
+[2024-09-15 01:12:56]
+========== CONFIG 152 ==========
+Nin_virtual               1
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:12:56]
+Starting trial f1703c513941a3cb084e85f76df35828.
+[2024-09-15 01:13:57]
+acc_max_epoch             20
+acc_max_mean              0.333
+acc_max_std               0.0183
+[2024-09-15 01:13:57]
+Finished trial f1703c513941a3cb084e85f76df35828 after 61.0s
+[2024-09-15 01:14:02]
+28 configs remaining (~28m 29s, ETA: 01:42:32, based on a mean trial duration of 61.1s)
+[2024-09-15 01:14:02]
+========== CONFIG 153 ==========
+Nin_virtual               2
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:14:02]
+Starting trial 79d81f275f8f989a9f99664e8443f446.
+[2024-09-15 01:14:54]
+acc_max_epoch             20
+acc_max_mean              0.382
+acc_max_std               0.0282
+[2024-09-15 01:14:54]
+Finished trial 79d81f275f8f989a9f99664e8443f446 after 51.9s
+[2024-09-15 01:15:00]
+27 configs remaining (~27m 27s, ETA: 01:42:27, based on a mean trial duration of 61.0s)
+[2024-09-15 01:15:00]
+========== CONFIG 154 ==========
+Nin_virtual               2
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:15:00]
+Starting trial e4f32a799b90d52acbe325b5d32ae14c.
+[2024-09-15 01:16:05]
+acc_max_epoch             20
+acc_max_mean              0.327
+acc_max_std               0.0258
+[2024-09-15 01:16:05]
+Finished trial e4f32a799b90d52acbe325b5d32ae14c after 65.0s
+[2024-09-15 01:16:10]
+26 configs remaining (~26m 26s, ETA: 01:42:37, based on a mean trial duration of 61.0s)
+[2024-09-15 01:16:10]
+========== CONFIG 155 ==========
+Nin_virtual               4
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:16:10]
+Starting trial b42232d66f61e64349d60bfb7ee6f372.
+[2024-09-15 01:17:05]
+acc_max_epoch             20
+acc_max_mean              0.361
+acc_max_std               0.07
+[2024-09-15 01:17:05]
+Finished trial b42232d66f61e64349d60bfb7ee6f372 after 55.3s
+[2024-09-15 01:17:11]
+25 configs remaining (~25m 24s, ETA: 01:42:36, based on a mean trial duration of 61.0s)
+[2024-09-15 01:17:11]
+========== CONFIG 156 ==========
+Nin_virtual               4
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:17:11]
+Starting trial ad41e9b008a2d775cb692466f122fea1.
+[2024-09-15 01:18:19]
+acc_max_epoch             20
+acc_max_mean              0.323
+acc_max_std               0.0131
+[2024-09-15 01:18:19]
+Finished trial ad41e9b008a2d775cb692466f122fea1 after 68.0s
+[2024-09-15 01:18:24]
+24 configs remaining (~24m 25s, ETA: 01:42:49, based on a mean trial duration of 61.0s)
+[2024-09-15 01:18:24]
+========== CONFIG 157 ==========
+Nin_virtual               8
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:18:24]
+Starting trial c79b394300744e9b9ad47cc86b79dcfd.
+[2024-09-15 01:19:28]
+acc_max_epoch             20
+acc_max_mean              0.409
+acc_max_std               0.0233
+[2024-09-15 01:19:28]
+Finished trial c79b394300744e9b9ad47cc86b79dcfd after 64.4s
+[2024-09-15 01:19:34]
+23 configs remaining (~23m 24s, ETA: 01:42:58, based on a mean trial duration of 61.1s)
+[2024-09-15 01:19:34]
+========== CONFIG 158 ==========
+Nin_virtual               8
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:19:34]
+Starting trial 05da75c8196c0c0b687ae85e26772b4d.
+[2024-09-15 01:20:57]
+acc_max_epoch             20
+acc_max_mean              0.36
+acc_max_std               0.0447
+[2024-09-15 01:20:57]
+Finished trial 05da75c8196c0c0b687ae85e26772b4d after 83.7s
+[2024-09-15 01:21:03]
+22 configs remaining (~22m 26s, ETA: 01:43:29, based on a mean trial duration of 61.2s)
+[2024-09-15 01:21:03]
+========== CONFIG 159 ==========
+Nin_virtual               12
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:21:03]
+Starting trial 569b2ad0312f6f624d4027460ff2fd6f.
+[2024-09-15 01:22:10]
+acc_max_epoch             20
+acc_max_mean              0.435
+acc_max_std               0.00688
+[2024-09-15 01:22:10]
+Finished trial 569b2ad0312f6f624d4027460ff2fd6f after 67.3s
+[2024-09-15 01:22:16]
+21 configs remaining (~21m 26s, ETA: 01:43:42, based on a mean trial duration of 61.2s)
+[2024-09-15 01:22:16]
+========== CONFIG 160 ==========
+Nin_virtual               12
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:22:16]
+Starting trial 397167ce8b8854a5c95098b6e88498e8.
+[2024-09-15 01:23:41]
+acc_max_epoch             20
+acc_max_mean              0.361
+acc_max_std               0.0233
+[2024-09-15 01:23:41]
+Finished trial 397167ce8b8854a5c95098b6e88498e8 after 85.4s
+[2024-09-15 01:23:47]
+20 configs remaining (~20m 27s, ETA: 01:44:15, based on a mean trial duration of 61.4s)
+[2024-09-15 01:23:47]
+========== CONFIG 161 ==========
+Nin_virtual               16
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:23:47]
+Starting trial 0cfd67419437807e891055e8abcc1e28.
+[2024-09-15 01:24:55]
+acc_max_epoch             20
+acc_max_mean              0.455
+acc_max_std               0.0368
+[2024-09-15 01:24:55]
+Finished trial 0cfd67419437807e891055e8abcc1e28 after 68.9s
+[2024-09-15 01:25:01]
+19 configs remaining (~19m 27s, ETA: 01:44:28, based on a mean trial duration of 61.4s)
+[2024-09-15 01:25:01]
+========== CONFIG 162 ==========
+Nin_virtual               16
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:25:01]
+Starting trial a5095de38bf7de2c06d4a7d1333a78f0.
+[2024-09-15 01:26:32]
+acc_max_epoch             20
+acc_max_mean              0.379
+acc_max_std               0.0219
+[2024-09-15 01:26:32]
+Finished trial a5095de38bf7de2c06d4a7d1333a78f0 after 90.6s
+[2024-09-15 01:26:37]
+18 configs remaining (~18m 29s, ETA: 01:45:06, based on a mean trial duration of 61.6s)
+[2024-09-15 01:26:37]
+========== CONFIG 163 ==========
+Nin_virtual               24
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:26:37]
+Starting trial f8fdee82fa13ed2d1c4da5fe9d199174.
+[2024-09-15 01:27:50]
+acc_max_epoch             17
+acc_max_mean              0.181
+acc_max_std               0.19
+[2024-09-15 01:27:50]
+Finished trial f8fdee82fa13ed2d1c4da5fe9d199174 after 72.5s
+[2024-09-15 01:27:55]
+17 configs remaining (~17m 28s, ETA: 01:45:24, based on a mean trial duration of 61.7s)
+[2024-09-15 01:27:55]
+========== CONFIG 164 ==========
+Nin_virtual               24
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:27:55]
+Starting trial 431d7d4f6ce43a5668e360c59c80b9ee.
+[2024-09-15 01:29:27]
+acc_max_epoch             3
+acc_max_mean              0.135
+acc_max_std               0.0202
+[2024-09-15 01:29:27]
+Finished trial 431d7d4f6ce43a5668e360c59c80b9ee after 92.0s
+[2024-09-15 01:29:33]
+16 configs remaining (~16m 30s, ETA: 01:46:03, based on a mean trial duration of 61.9s)
+[2024-09-15 01:29:33]
+========== CONFIG 165 ==========
+Nin_virtual               32
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:29:33]
+Starting trial 7444f8a717a18b7326a04cc0718ab49d.
+[2024-09-15 01:30:48]
+acc_max_epoch             3
+acc_max_mean              0.132
+acc_max_std               0.026
+[2024-09-15 01:30:48]
+Finished trial 7444f8a717a18b7326a04cc0718ab49d after 75.2s
+[2024-09-15 01:30:54]
+15 configs remaining (~15m 29s, ETA: 01:46:23, based on a mean trial duration of 62.0s)
+[2024-09-15 01:30:54]
+========== CONFIG 166 ==========
+Nin_virtual               32
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:30:54]
+Starting trial e8314b2fe1d0617bf0c2f0b06ed87f53.
+[2024-09-15 01:32:32]
+acc_max_epoch             3
+acc_max_mean              0.127
+acc_max_std               0.0259
+[2024-09-15 01:32:32]
+Finished trial e8314b2fe1d0617bf0c2f0b06ed87f53 after 98.3s
+[2024-09-15 01:32:38]
+14 configs remaining (~14m 30s, ETA: 01:47:08, based on a mean trial duration of 62.2s)
+[2024-09-15 01:32:38]
+========== CONFIG 167 ==========
+Nin_virtual               40
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:32:38]
+Starting trial 2031156672ffe3f6e4dc44b07c57c56b.
+[2024-09-15 01:33:55]
+acc_max_epoch             3
+acc_max_mean              0.122
+acc_max_std               0.0332
+[2024-09-15 01:33:55]
+Finished trial 2031156672ffe3f6e4dc44b07c57c56b after 77.6s
+[2024-09-15 01:34:01]
+13 configs remaining (~13m 29s, ETA: 01:47:31, based on a mean trial duration of 62.3s)
+[2024-09-15 01:34:01]
+========== CONFIG 168 ==========
+Nin_virtual               40
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:34:01]
+Starting trial 740558c1b2c0dcb86e7a9a2cd683ab4d.
+[2024-09-15 01:35:40]
+acc_max_epoch             3
+acc_max_mean              0.136
+acc_max_std               0.00904
+[2024-09-15 01:35:40]
+Finished trial 740558c1b2c0dcb86e7a9a2cd683ab4d after 99.0s
+[2024-09-15 01:35:46]
+12 configs remaining (~12m 29s, ETA: 01:48:16, based on a mean trial duration of 62.5s)
+[2024-09-15 01:35:46]
+========== CONFIG 169 ==========
+Nin_virtual               48
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:35:46]
+Starting trial a1c3348dd565e91f34d22bc83d6fd660.
+[2024-09-15 01:37:05]
+acc_max_epoch             3
+acc_max_mean              0.139
+acc_max_std               0.0242
+[2024-09-15 01:37:05]
+Finished trial a1c3348dd565e91f34d22bc83d6fd660 after 79.6s
+[2024-09-15 01:37:11]
+11 configs remaining (~11m 28s, ETA: 01:48:40, based on a mean trial duration of 62.6s)
+[2024-09-15 01:37:11]
+========== CONFIG 170 ==========
+Nin_virtual               48
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:37:11]
+Starting trial 9c0654a6425e4f468f89f007f7e35197.
+[2024-09-15 01:38:56]
+acc_max_epoch             3
+acc_max_mean              0.143
+acc_max_std               0.0127
+[2024-09-15 01:38:56]
+Finished trial 9c0654a6425e4f468f89f007f7e35197 after 104.5s
+[2024-09-15 01:39:02]
+10 configs remaining (~10m 28s, ETA: 01:49:30, based on a mean trial duration of 62.8s)
+[2024-09-15 01:39:02]
+========== CONFIG 171 ==========
+Nin_virtual               56
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:39:02]
+Starting trial f476780d577d57285bdf746c639c7c26.
+[2024-09-15 01:40:24]
+acc_max_epoch             3
+acc_max_mean              0.0991
+acc_max_std               0.0392
+[2024-09-15 01:40:24]
+Finished trial f476780d577d57285bdf746c639c7c26 after 81.9s
+[2024-09-15 01:40:29]
+9 configs remaining (~9m 26s, ETA: 01:49:56, based on a mean trial duration of 62.9s)
+[2024-09-15 01:40:29]
+========== CONFIG 172 ==========
+Nin_virtual               56
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:40:29]
+Starting trial 82412bf461f24cf9f04e0f29f5f59c0f.
+[2024-09-15 01:42:15]
+acc_max_epoch             3
+acc_max_mean              0.136
+acc_max_std               0.00381
+[2024-09-15 01:42:15]
+Finished trial 82412bf461f24cf9f04e0f29f5f59c0f after 105.6s
+[2024-09-15 01:42:21]
+8 configs remaining (~8m 25s, ETA: 01:50:47, based on a mean trial duration of 63.2s)
+[2024-09-15 01:42:21]
+========== CONFIG 173 ==========
+Nin_virtual               64
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:42:21]
+Starting trial e903dafa08dd622d0411437b7094f2e1.
+[2024-09-15 01:43:45]
+acc_max_epoch             3
+acc_max_mean              0.126
+acc_max_std               0.0352
+[2024-09-15 01:43:45]
+Finished trial e903dafa08dd622d0411437b7094f2e1 after 84.0s
+[2024-09-15 01:43:51]
+7 configs remaining (~7m 23s, ETA: 01:51:14, based on a mean trial duration of 63.3s)
+[2024-09-15 01:43:51]
+========== CONFIG 174 ==========
+Nin_virtual               64
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:43:51]
+Starting trial 9175a98eaa63dc5035a9a2e99924c989.
+[2024-09-15 01:45:41]
+acc_max_epoch             3
+acc_max_mean              0.12
+acc_max_std               0.0145
+[2024-09-15 01:45:41]
+Finished trial 9175a98eaa63dc5035a9a2e99924c989 after 109.9s
+[2024-09-15 01:45:47]
+6 configs remaining (~6m 21s, ETA: 01:52:08, based on a mean trial duration of 63.6s)
+[2024-09-15 01:45:47]
+========== CONFIG 175 ==========
+Nin_virtual               80
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:45:47]
+Starting trial abd6de6fb9cb0f8e2d374715530f2035.
+[2024-09-15 01:47:13]
+acc_max_epoch             3
+acc_max_mean              0.141
+acc_max_std               0.0262
+[2024-09-15 01:47:13]
+Finished trial abd6de6fb9cb0f8e2d374715530f2035 after 85.9s
+[2024-09-15 01:47:19]
+5 configs remaining (~5m 18s, ETA: 01:52:37, based on a mean trial duration of 63.7s)
+[2024-09-15 01:47:19]
+========== CONFIG 176 ==========
+Nin_virtual               80
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:47:19]
+Starting trial f57b38a6d719034f248726b9f378e662.
+[2024-09-15 01:49:16]
+acc_max_epoch             3
+acc_max_mean              0.127
+acc_max_std               0.0145
+[2024-09-15 01:49:16]
+Finished trial f57b38a6d719034f248726b9f378e662 after 116.6s
+[2024-09-15 01:49:22]
+4 configs remaining (~4m 16s, ETA: 01:53:38, based on a mean trial duration of 64.0s)
+[2024-09-15 01:49:22]
+========== CONFIG 177 ==========
+Nin_virtual               96
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:49:22]
+Starting trial 22cb5fd938d0b1019201adbb3a362ccb.
+[2024-09-15 01:50:53]
+acc_max_epoch             3
+acc_max_mean              0.141
+acc_max_std               0.0352
+[2024-09-15 01:50:53]
+Finished trial 22cb5fd938d0b1019201adbb3a362ccb after 91.3s
+[2024-09-15 01:50:59]
+3 configs remaining (~3m 12s, ETA: 01:54:12, based on a mean trial duration of 64.2s)
+[2024-09-15 01:50:59]
+========== CONFIG 178 ==========
+Nin_virtual               96
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:50:59]
+Starting trial 7d5000524530f9d51ad24dcdb5b5fe65.
+[2024-09-15 01:52:59]
+acc_max_epoch             3
+acc_max_mean              0.132
+acc_max_std               0.0186
+[2024-09-15 01:52:59]
+Finished trial 7d5000524530f9d51ad24dcdb5b5fe65 after 120.1s
+[2024-09-15 01:53:05]
+2 configs remaining (~2m 8s, ETA: 01:55:14, based on a mean trial duration of 64.5s)
+[2024-09-15 01:53:05]
+========== CONFIG 179 ==========
+Nin_virtual               126
+Nhidden                   200
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:53:05]
+Starting trial f848d556003d520cef26f1d208efa96d.
+[2024-09-15 01:54:34]
+acc_max_epoch             3
+acc_max_mean              0.108
+acc_max_std               0.0142
+[2024-09-15 01:54:34]
+Finished trial f848d556003d520cef26f1d208efa96d after 88.4s
+[2024-09-15 01:54:40]
+1 configs remaining (~1m 4s, ETA: 01:55:45, based on a mean trial duration of 64.6s)
+[2024-09-15 01:54:40]
+========== CONFIG 180 ==========
+Nin_virtual               126
+Nhidden                   300
+Nlayer                    3
+Nbatch                    2000
+[2024-09-15 01:54:40]
+Starting trial 8755de635e1812db737392fddd103541.
+[2024-09-15 01:56:39]
+acc_max_epoch             17
+acc_max_mean              0.0923
+acc_max_std               0.0636
+[2024-09-15 01:56:39]
+Finished trial 8755de635e1812db737392fddd103541 after 118.6s
