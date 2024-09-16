@@ -24,7 +24,7 @@ from spikegd.utils.plotting import formatter, petroff10
 ############################
 
 
-def normalize_times(times, neurons, dt, t_max=1, signal_percentage=0.05):
+def normalize_times(times, neurons, dt=0, t_max=1, signal_percentage=0.05):
     N_signal = int(len(times) * signal_percentage)
 
     start = times[N_signal] - dt
@@ -100,7 +100,7 @@ def normalize_times(times, neurons, dt, t_max=1, signal_percentage=0.05):
 #     return TensorDataset(data, targets)
 
 
-def homogenize_dataset(dataset: SHD, config: dict, normalize_trials=True):
+def homogenize_dataset(dataset: SHD, config: dict):
     N = dataset.Nsamples
     Kin = config["Kin"]  # max number of input spikes per neuron
     Nin = config["Nin"]
@@ -124,6 +124,12 @@ def homogenize_dataset(dataset: SHD, config: dict, normalize_trials=True):
     )
     print("Kin:", Kin)
 
+    _normalize_times = config["normalize_times"]
+    normalize_times_signal_percentage = config.get(
+        "normalize_times_signal_percentage", 0.05
+    )
+    normalize_times_dt = config.get("normalize_times_dt", 0)
+
     for i in trange_script(N):
         times = dataset.times_arr[i]
         neurons = dataset.units_arr[i]
@@ -131,8 +137,13 @@ def homogenize_dataset(dataset: SHD, config: dict, normalize_trials=True):
 
         Nspike_total = len(times)
 
-        if normalize_trials:
-            times, neurons = normalize_times(times, neurons, 0)
+        if _normalize_times:
+            times, neurons = normalize_times(
+                times,
+                neurons,
+                dt=normalize_times_dt,
+                signal_percentage=normalize_times_signal_percentage,
+            )
 
         Nlost_norm_vals.append(Nspike_total - len(times))
         Nspike_total = len(times)

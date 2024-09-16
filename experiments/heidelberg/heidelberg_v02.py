@@ -10,11 +10,11 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
+from shd import SHD
 from torch.utils.data import DataLoader, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
-from shd import SHD
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
@@ -34,9 +34,7 @@ def normalize_times(times, neurons, dt, t_max=1, signal_percentage=0.05):
     return new_times[mask], neurons[mask]
 
 
-def quantize_dataset(
-    dataset: SHD, config: dict, dtype=torch.int8, normalize_trials=True
-):
+def quantize_dataset(dataset: SHD, config: dict, dtype=torch.int8):
     sample_indices = range(dataset.Nsamples)
     Nin_virtual = config["Nin_virtual"]
     N_bin = Nin_virtual
@@ -46,11 +44,17 @@ def quantize_dataset(
             f"Number of bins N_bin = {N_bin} exceeds maximum value for {dtype}: {torch.iinfo(dtype).max}"
         )
 
-    t_max = config.get("tmax", 1 if normalize_trials else dataset.t_max + 1e-6)
+    _normalize_times = config["normalize_times"]
+    normalize_times_signal_percentage = config.get(
+        "normalize_times_signal_percentage", 0.05
+    )
+
+    t_max = config.get("tmax", 1 if _normalize_times else dataset.t_max + 1e-6)
 
     N_in = dataset.N  # Number of input neurons
     X_arr = np.zeros((len(sample_indices), N_in, Nin_virtual), dtype=np.int32)
     dt = t_max / N_bin
+    normalize_times_dt = config.get("normalize_times_dt", dt)
 
     bin_edges = np.arange(0, t_max + dt / 2, dt)
     assert bin_edges.shape == (
@@ -61,8 +65,14 @@ def quantize_dataset(
         times = dataset.times_arr[sample_index]
         neurons = dataset.units_arr[sample_index]
 
-        if normalize_trials:
-            times, neurons = normalize_times(times, neurons, dt, t_max)
+        if _normalize_times:
+            times, neurons = normalize_times(
+                times,
+                neurons,
+                dt=normalize_times_dt,
+                t_max=t_max,
+                signal_percentage=normalize_times_signal_percentage,
+            )
 
         # Use numpy's digitize to bin the spike times
         binned_spikes = np.digitize(times, bin_edges) - 1
