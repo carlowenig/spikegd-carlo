@@ -102,26 +102,16 @@ def normalize_times(times, neurons, dt=0, t_max=1, signal_percentage=0.05):
 
 def homogenize_dataset(dataset: SHD, config: dict):
     N = dataset.Nsamples
-    Kin = config["Kin"]  # max number of input spikes per neuron
+    # Kin = config["Kin"]  # max number of input spikes per neuron
+    Kin = max(len(times) for times in dataset.times_arr)
     Nin = config["Nin"]
-    T = config["T"]
+    # Tfallback = config["Tfallback"]
 
     # Array containing the spike times or T if no spike
     # lost_spikes = {}
-    times_arr = np.full((N, Kin), T, dtype=float)
-    neurons_arr = np.full((N, Kin), -1, dtype=int)
+    times_arr = np.full((N, Kin), jnp.inf, dtype=float)
+    neurons_arr = np.full((N, Kin), 0, dtype=int)
 
-    Nlost_norm_vals = []
-    Nlost_cap_vals = []
-
-    print(
-        "Mean number of spikes per trial:",
-        np.mean([len(times) for times in dataset.times_arr]),
-    )
-    print(
-        "Max number of spikes per trial:",
-        max(len(times) for times in dataset.times_arr),
-    )
     print("Kin:", Kin)
 
     _normalize_times = config["normalize_times"]
@@ -135,8 +125,6 @@ def homogenize_dataset(dataset: SHD, config: dict):
         neurons = dataset.units_arr[i]
         assert len(times) == len(neurons)
 
-        Nspike_total = len(times)
-
         if _normalize_times:
             times, neurons = normalize_times(
                 times,
@@ -145,27 +133,8 @@ def homogenize_dataset(dataset: SHD, config: dict):
                 signal_percentage=normalize_times_signal_percentage,
             )
 
-        Nlost_norm_vals.append(Nspike_total - len(times))
-        Nspike_total = len(times)
-
-        # remove spikes over Kin
-        times = times[:Kin]
-        neurons = neurons[:Kin]
-
-        Nlost_cap_vals.append(Nspike_total - len(times))
-
         times_arr[i, : len(times)] = times
         neurons_arr[i, : len(neurons)] = neurons
-
-        # for j in range(Nin):
-        #     spike_times = times[neurons == j]
-        #     Nspike = min(Kin, len(spike_times))
-        #     x_arr[i, j, :Nspike] = spike_times[:Nspike]
-        #     if (Nlost := len(spike_times) - Nspike) > 0:
-        #         lost_spikes[j] = lost_spikes.get(j, 0) + Nlost
-
-    print("Mean lost spikes due to normalization:", np.mean(Nlost_norm_vals))
-    print("Mean lost spikes due to Kin-cap:", np.mean(Nlost_cap_vals))
 
     # Create tensor dataset
     times_tensor = torch.as_tensor(times_arr)
@@ -179,6 +148,12 @@ def load_datasets(root: str, verbose: bool = False) -> tuple[SHD, SHD]:
     train_set = SHD(root, mode="train", download=False, verbose=verbose)
     test_set = SHD(root, mode="test", download=False, verbose=verbose)
     return train_set, test_set
+
+
+# def collate_batch(batch_samples: list[SHDSample]):
+#     inputs = [(sample.times, sample.units) for sample in batch_samples]
+#     labels = [sample.label_index for sample in batch_samples]
+#     return inputs, labels
 
 
 def load_data(datasets: tuple[SHD, SHD], config: dict) -> tuple[DataLoader, DataLoader]:
@@ -294,15 +269,14 @@ def init_phi0(neuron: AbstractPhaseOscNeuron, config: dict) -> Array:
 def eventffwd(
     neuron: AbstractPhaseOscNeuron,
     p: list,
-    times_in: Float[Array, " Nspikes"],
-    neurons_in: Int[Array, " Nspikes"],
+    times_in: Float[Array, " Kin"],
+    neurons_in: Int[Array, " Kin"],
     config: dict,
 ) -> tuple:
     """
     Simulates a feedforward network with time-to-first-spike input encoding.
     """
     ### Unpack arguments
-    Kin: int = config["Kin"]
     Nin: int = config["Nin"]
     Nhidden: int = config["Nhidden"]
     Nlayer: int = config["Nlayer"]  # currently has to be at least 2 (1hidden)
@@ -426,14 +400,14 @@ def lossfn(
 def simulatefn(
     neuron: AbstractPseudoPhaseOscNeuron,
     p: list,
-    input: tuple[Float[Array, "Batch Nspikes"], Int[Array, "Batch Nspikes"]],
+    times_in: Float[Array, "Batch Kin"],
+    neurons_in: Int[Array, "Batch Kin"],
     labels: Int[Array, " Batch"],
     config: dict,
 ) -> tuple[Array, Array]:
     """
     Simulates the network and computes the loss and accuracy for batched input.
     """
-    times_in, neurons_in = input
     outs = vmap(eventffwd, in_axes=(None, None, 0, 0, None))(
         neuron, p, times_in, neurons_in, config
     )
@@ -447,7 +421,8 @@ def simulatefn(
 def probefn(
     neuron: AbstractPseudoPhaseOscNeuron,
     p: list,
-    input: tuple[Float[Array, "Batch Nspikes"], Int[Array, "Batch Nspikes"]],
+    times_in: Float[Array, "Batch Kin"],
+    neurons_in: Int[Array, "Batch Kin"],
     labels: Int[Array, " Batch"],
     config: dict,
 ) -> tuple:
@@ -477,7 +452,6 @@ def probefn(
         return lossfn(t_outs, labels, config)
 
     ### Run network
-    times_in, neurons_in = input
     outs = batch_eventffwd(times_in, neurons_in)
     times: Array = outs[0]
     spike_in: Array = outs[1]
@@ -614,10 +588,11 @@ def run(
     @partial(value_and_grad, has_aux=True)
     def gradfn(
         p: list,
-        input: tuple[Float[Array, "Batch Nspikes"], Int[Array, "Batch Nspikes"]],
+        times_in: Float[Array, "Batch Kin"],
+        neurons_in: Int[Array, "Batch Kin"],
         labels: Int[Array, " Batch"],
     ) -> tuple[Array, Array]:
-        loss, acc = simulatefn(neuron, p, input, labels, config)
+        loss, acc = simulatefn(neuron, p, times_in, neurons_in, labels, config)
         return loss, acc
 
     # Regularization
@@ -631,11 +606,12 @@ def run(
     @jit
     def trial(
         p: list,
-        input: tuple[Float[Array, "Batch Nspikes"], Int[Array, "Batch Nspikes"]],
+        times_in: Float[Array, "Batch Kin"],
+        neurons_in: Int[Array, "Batch Kin"],
         labels: Int[Array, " Batch"],
         opt_state: optax.OptState,
     ) -> tuple:
-        (loss, acc), grad = gradfn(p, input, labels)
+        (loss, acc), grad = gradfn(p, times_in, neurons_in, labels)
         updates, opt_state = optim.update(grad, opt_state)
         p = optax.apply_updates(p, updates)  # type: ignore
         p[1] = jnp.clip(p[1], 0, theta)
@@ -643,8 +619,8 @@ def run(
 
     # Probe network
     @jit
-    def jprobefn(p, input, labels):
-        return probefn(neuron, p, input, labels, config)
+    def jprobefn(p, times_in, neurons_in, labels):
+        return probefn(neuron, p, times_in, neurons_in, labels, config)
 
     init_compile_time = time.perf_counter() - init_compile_start
 
@@ -668,7 +644,7 @@ def run(
                 jnp.array(data[1]),
                 jnp.array(data[2]),
             )
-            metric, silent = jprobefn(p, (times_in, neurons_in), labels)
+            metric, silent = jprobefn(p, times_in, neurons_in, labels)
             metrics = {k: metrics[k] + metric[k] / steps for k in metrics}
             silents = {k: silents[k] & silent[k] for k in silents}
         for k, v in silents.items():
@@ -716,9 +692,7 @@ def run(
                 jnp.array(data[2]),
             )
             # key, input = flip(key, input)
-            loss, acc, p, opt_state = trial(
-                p, (times_in, neurons_in), labels, opt_state
-            )
+            loss, acc, p, opt_state = trial(p, times_in, neurons_in, labels, opt_state)
         # Probe network
         metric = probe(p)
         metrics = {k: v + [metric[k]] for k, v in metrics.items()}
@@ -789,7 +763,7 @@ def run_example(
         jnp.array(neurons_in[2]),
         jnp.array(label[2]),
     )
-    out = jeventffwd(p, input)
+    out = jeventffwd(p, times_in, neurons_in)
     t_outs = joutfn(out, p)
 
     ### Prepare results
