@@ -121,6 +121,7 @@ class AbstractNeuron(ABC):
         else:
             order = jnp.argsort(spikes_in[0])
             spikes_in = (spikes_in[0][order], spikes_in[1][order])
+            # Add infinite spike at the end to avoid index out of bounds
             spikes_in = (jnp.append(spikes_in[0], jnp.inf), jnp.append(spikes_in[1], 0))
 
         ### Run simulation
