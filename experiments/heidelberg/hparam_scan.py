@@ -39,8 +39,8 @@ config_grid = {
     "eps": 1e-6,
     # Network
     # "Nin_virtual": vary(1, 4, 8, 16, 32),  # #Virtual input neurons = N_bin - 1
-    "Nhidden": 100,
-    "Nlayer": 2,  # Number of layers
+    "Nhidden": vary(100, 200, 300),
+    "Nlayer": vary(2, 3),  # Number of layers
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
@@ -50,19 +50,19 @@ config_grid = {
     # Training
     "gamma": 1e-2,
     "Nbatch": 1000,
-    "lr": 4e-3,
+    "lr": vary(1e-3, 4e-3, 1e-2),
     "tau_lr": 1e2,
     "beta1": 0.9,
     "beta2": 0.999,
     "p_flip": 0.0,
-    "Nepochs": 40,
+    "Nepochs": 100,
     "Ntrain": None,  # Number of training samples
     # SHD Quantization
     # "Nt": vary(2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 80, 96, 128),
     # "Nin_data": 700,
     # "Nin": computed(lambda Nin_data, Nt: Nin_data * Nt),
     "Nin": 700,
-    "Kin": vary(100, 200, 300),
+    "Kin": 80,
     # Ensemble
     "Nsamples": 3,
 }

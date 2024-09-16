@@ -1,4 +1,4 @@
-[2024-09-15 16:54:38]
+[2024-09-15 18:10:16]
 CONSTANTS:
   device_count              1
   seed                      0
@@ -22,26 +22,20 @@ CONSTANTS:
   Nepochs                   40
   Ntrain                    None
   Nin                       700
+  Kin                       80
   Nsamples                  3
-[2024-09-15 16:54:38]
-VARIABLES: Kin
-[2024-09-15 16:54:38]
-3 configs remaining (could not estimate remaining time)
-[2024-09-15 16:54:38]
+[2024-09-15 18:10:16]
+VARIABLES: 
+[2024-09-15 18:10:16]
+1 configs remaining (could not estimate remaining time)
+[2024-09-15 18:10:16]
 ========== CONFIG 1 ==========
-Kin                       100
-[2024-09-15 16:54:38]
-Starting trial 1bf274315257bdec09cf7bb602570960.
-[2024-09-15 16:58:12]
-acc_max_epoch             16
-acc_max_mean              0.0544
-acc_max_std               0.00511
-[2024-09-15 16:58:12]
-Finished trial 1bf274315257bdec09cf7bb602570960 after 214.5s
-[2024-09-15 16:58:12]
-2 configs remaining (~7m 8s, ETA: 17:05:21, based on a mean trial duration of 214.5s)
-[2024-09-15 16:58:12]
-========== CONFIG 2 ==========
-Kin                       200
-[2024-09-15 16:58:12]
-Starting trial cfe50d52504d01e516f96c421261388c.
+
+[2024-09-15 18:10:16]
+Starting trial 922e1970f27ab6c2281a71126a49e358.
+[2024-09-15 18:13:52]
+acc_max_epoch             39
+acc_max_mean              0.145
+acc_max_std               0.0122
+[2024-09-15 18:13:52]
+Finished trial 922e1970f27ab6c2281a71126a49e358 after 215.7s

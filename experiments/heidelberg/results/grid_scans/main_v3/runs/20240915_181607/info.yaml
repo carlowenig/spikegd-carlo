@@ -1,5 +1,5 @@
 scan_id: main_v3
-id: '20240915_165438'
+id: '20240915_181607'
 name: null
 description: null
 metadata:
@@ -10,8 +10,6 @@ constants:
   tau: 1.909859317102744
   I0: 1.25
   eps: 1.0e-06
-  Nhidden: 100
-  Nlayer: 2
   Nout: 20
   w_scale: 0.5
   T: 2.0
@@ -19,17 +17,19 @@ constants:
   dt: 0.001
   gamma: 0.01
   Nbatch: 1000
-  lr: 0.004
   tau_lr: 100.0
   beta1: 0.9
   beta2: 0.999
   p_flip: 0.0
-  Nepochs: 40
+  Nepochs: 100
   Ntrain: null
   Nin: 700
+  Kin: 80
   Nsamples: 3
 variables:
-- Kin
-started_at: 2024-09-15_16-54-38_003816
-finished_at: null
-duration: null
+- Nhidden
+- Nlayer
+- lr
+started_at: 2024-09-15_18-16-07_719188
+finished_at: 2024-09-15_20-28-57_242407
+duration: 7969.523235797882
