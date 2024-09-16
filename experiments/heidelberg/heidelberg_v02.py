@@ -234,11 +234,13 @@ def eventffwd(
 
     ### Input
     # Times computed as spike times of a LIF neuron with constant input Iconst
-    I_const = jnp.arange(Nin_virtual, 0, -1)
-    V_th = 0.01 * Nin_virtual
-    times_in = jnp.where(
-        I_const > V_th, T * jnp.log(I_const / (I_const - V_th)), jnp.inf
-    )
+    # I_const = jnp.arange(Nin_virtual, 0, -1)
+    # V_th = 0.001 * Nin_virtual
+    # times_in = jnp.where(
+    #     I_const > V_th, T * jnp.log(I_const / (I_const - V_th)), jnp.inf
+    # )
+    # TODO: Linear times (bins)
+    times_in = jnp.arange(Nin_virtual) * T / Nin_virtual
     neurons_in = jnp.arange(Nin_virtual)
     spikes_in = (times_in, neurons_in)
 
