@@ -1,0 +1,132 @@
+[2024-09-16 16:12:33]
+CONSTANTS:
+  device_count              1
+  seed                      0
+  tau                       1/6 pi^-1
+  I0                        1.25
+  eps                       1e-06
+  Nhidden                   100
+  Nlayer                    2
+  Nout                      20
+  w_scale                   0.5
+  T                         2
+  K                         300
+  dt                        0.001
+  gamma                     0.01
+  Nbatch                    1000
+  lr                        0.004
+  tau_lr                    100
+  beta1                     0.9
+  beta2                     0.999
+  p_flip                    0
+  Nepochs                   100
+  Ntrain                    None
+  Nin                       700
+  Nsamples                  3
+  normalize_times           1
+[2024-09-16 16:12:33]
+VARIABLES: Nin_virtual
+[2024-09-16 16:12:33]
+8 configs remaining (could not estimate remaining time)
+[2024-09-16 16:12:33]
+========== CONFIG 1 ==========
+Nin_virtual               1
+[2024-09-16 16:12:33]
+Starting trial e6e36b4e63278ad97058d3ef208ec74e.
+[2024-09-16 16:14:13]
+acc_max_epoch             87
+acc_max_mean              0.484
+acc_max_std               0.0094
+[2024-09-16 16:14:14]
+Finished trial e6e36b4e63278ad97058d3ef208ec74e after 99.6s
+[2024-09-16 16:14:14]
+7 configs remaining (~11m 37s, ETA: 16:25:51, based on a mean trial duration of 99.6s)
+[2024-09-16 16:14:14]
+========== CONFIG 2 ==========
+Nin_virtual               4
+[2024-09-16 16:14:14]
+Starting trial 3e05790258a45e594f654a24c203ce94.
+[2024-09-16 16:15:45]
+acc_max_epoch             96
+acc_max_mean              0.593
+acc_max_std               0.0186
+[2024-09-16 16:15:46]
+Finished trial 3e05790258a45e594f654a24c203ce94 after 91.8s
+[2024-09-16 16:15:46]
+6 configs remaining (~9m 34s, ETA: 16:25:20, based on a mean trial duration of 95.7s)
+[2024-09-16 16:15:46]
+========== CONFIG 3 ==========
+Nin_virtual               8
+[2024-09-16 16:15:46]
+Starting trial a634ef95f641f30124adfdee28067d21.
+[2024-09-16 16:17:28]
+acc_max_epoch             95
+acc_max_mean              0.598
+acc_max_std               0.0127
+[2024-09-16 16:17:29]
+Finished trial a634ef95f641f30124adfdee28067d21 after 102.7s
+[2024-09-16 16:17:30]
+5 configs remaining (~8m 10s, ETA: 16:25:40, based on a mean trial duration of 98.0s)
+[2024-09-16 16:17:30]
+========== CONFIG 4 ==========
+Nin_virtual               16
+[2024-09-16 16:17:30]
+Starting trial f89d95de399027040f48eaad6b3fb14a.
+[2024-09-16 16:19:36]
+acc_max_epoch             66
+acc_max_mean              0.598
+acc_max_std               0.0185
+[2024-09-16 16:19:36]
+Finished trial f89d95de399027040f48eaad6b3fb14a after 126.6s
+[2024-09-16 16:19:37]
+4 configs remaining (~7m 0s, ETA: 16:26:38, based on a mean trial duration of 105.2s)
+[2024-09-16 16:19:37]
+========== CONFIG 5 ==========
+Nin_virtual               32
+[2024-09-16 16:19:37]
+Starting trial 36ef8cb282eef0b2ddfb59768ed3f765.
+[2024-09-16 16:21:57]
+acc_max_epoch             97
+acc_max_mean              0.553
+acc_max_std               0.0376
+[2024-09-16 16:21:57]
+Finished trial 36ef8cb282eef0b2ddfb59768ed3f765 after 139.7s
+[2024-09-16 16:21:58]
+3 configs remaining (~5m 36s, ETA: 16:27:34, based on a mean trial duration of 112.1s)
+[2024-09-16 16:21:58]
+========== CONFIG 6 ==========
+Nin_virtual               48
+[2024-09-16 16:21:58]
+Starting trial 1314a542fe6ff7713c7d5aa809d7b66b.
+[2024-09-16 16:24:26]
+acc_max_epoch             61
+acc_max_mean              0.541
+acc_max_std               0.00953
+[2024-09-16 16:24:27]
+Finished trial 1314a542fe6ff7713c7d5aa809d7b66b after 147.9s
+[2024-09-16 16:24:27]
+2 configs remaining (~3m 56s, ETA: 16:28:24, based on a mean trial duration of 118.1s)
+[2024-09-16 16:24:27]
+========== CONFIG 7 ==========
+Nin_virtual               64
+[2024-09-16 16:24:27]
+Starting trial f5688e11bdc81dfde353cd94aea0b2bb.
+[2024-09-16 16:27:03]
+acc_max_epoch             98
+acc_max_mean              0.518
+acc_max_std               0.0347
+[2024-09-16 16:27:03]
+Finished trial f5688e11bdc81dfde353cd94aea0b2bb after 155.7s
+[2024-09-16 16:27:05]
+1 configs remaining (~2m 3s, ETA: 16:29:08, based on a mean trial duration of 123.4s)
+[2024-09-16 16:27:05]
+========== CONFIG 8 ==========
+Nin_virtual               100
+[2024-09-16 16:27:05]
+Starting trial 587a8e83829d98db0d352d0b72ed69b2.
+[2024-09-16 16:29:59]
+acc_max_epoch             77
+acc_max_mean              0.52
+acc_max_std               0.00571
+[2024-09-16 16:29:59]
+Finished trial 587a8e83829d98db0d352d0b72ed69b2 after 174.0s

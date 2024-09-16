@@ -7,7 +7,7 @@ import jax
 # jax.distributed.initialize()  # type: ignore
 import numpy as np
 
-from heidelberg_v03 import load_datasets, run_theta_ensemble
+from heidelberg_v02 import load_datasets, run_theta_ensemble
 from hyperparam_scan_util import GridScan, vary
 
 assert (
@@ -38,19 +38,21 @@ config_grid = {
     "I0": 5 / 4,
     "eps": 1e-6,
     # Network
-    # "Nin_virtual": vary(1, 4, 8, 16, 32),  # #Virtual input neurons = N_bin - 1
+    "Nin_virtual": vary(
+        1, 4, 8, 16, 32, 48, 64, 80, 100
+    ),  # #Virtual input neurons = N_bin - 1
     "Nhidden": vary(100, 200, 300),
     "Nlayer": vary(2, 3),  # Number of layers
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
     "T": 2.0,
-    "K": 300,  # Maximal number of simulated ordinary spikes
+    "K": 500,  # Maximal number of simulated ordinary spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
     "gamma": 1e-2,
     "Nbatch": 1000,
-    "lr": vary(1e-3, 4e-3, 1e-2),
+    "lr": 4e-3,
     "tau_lr": 1e2,
     "beta1": 0.9,
     "beta2": 0.999,
@@ -65,10 +67,10 @@ config_grid = {
     # Ensemble
     "Nsamples": 3,
     # Data transformation
-    "normalize_times": False,
+    "normalize_times": True,
 }
 
-scan = GridScan.load_or_create("main_v3.1", root="results")
+scan = GridScan.load_or_create("main_v2.1", root="results")
 
 
 scan.run(
