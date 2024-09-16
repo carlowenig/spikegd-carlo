@@ -143,7 +143,7 @@ class PlotType(ABC):
 
     def get_preferred_size(self, n_rows: int, n_cols: int) -> tuple[float, float]:
         width = 7 if n_cols == 1 else 3.5
-        height = 5 if n_rows == 1 else 2.5
+        height = 5 if n_rows == 1 else 2
         return width, height
 
 
