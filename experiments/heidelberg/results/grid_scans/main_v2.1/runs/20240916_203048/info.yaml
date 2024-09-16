@@ -1,5 +1,5 @@
 scan_id: main_v2.1
-id: '20240916_163932'
+id: '20240916_203048'
 name: null
 description: null
 metadata:
@@ -13,7 +13,7 @@ constants:
   Nout: 20
   w_scale: 0.5
   T: 2.0
-  K: 300
+  K: 1000
   dt: 0.001
   gamma: 0.01
   Nbatch: 1000
@@ -31,6 +31,6 @@ variables:
 - Nin_virtual
 - Nhidden
 - Nlayer
-started_at: 2024-09-16_16-39-32_247398
-finished_at: 2024-09-16_19-48-29_565843
-duration: 11337.318461418152
+started_at: 2024-09-16_20-30-48_270854
+finished_at: null
+duration: null

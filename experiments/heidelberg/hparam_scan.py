@@ -41,13 +41,13 @@ config_grid = {
     "Nin_virtual": vary(
         1, 4, 8, 16, 32, 48, 64, 80, 100
     ),  # #Virtual input neurons = N_bin - 1
-    "Nhidden": vary(100, 200, 300),
-    "Nlayer": vary(2, 3),  # Number of layers
+    "Nhidden": vary(300, 400),
+    "Nlayer": vary(3, 4),  # Number of layers
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
     "T": 2.0,
-    "K": 500,  # Maximal number of simulated ordinary spikes
+    "K": 1000,  # Maximal number of simulated ordinary spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
     "gamma": 1e-2,

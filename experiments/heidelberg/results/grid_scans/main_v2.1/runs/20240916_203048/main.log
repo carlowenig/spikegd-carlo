@@ -1,0 +1,35 @@
+[2024-09-16 20:30:48]
+CONSTANTS:
+  device_count              1
+  seed                      0
+  tau                       1/6 pi^-1
+  I0                        1.25
+  eps                       1e-06
+  Nout                      20
+  w_scale                   0.5
+  T                         2
+  K                         1000
+  dt                        0.001
+  gamma                     0.01
+  Nbatch                    1000
+  lr                        0.004
+  tau_lr                    100
+  beta1                     0.9
+  beta2                     0.999
+  p_flip                    0
+  Nepochs                   100
+  Ntrain                    None
+  Nin                       700
+  Nsamples                  3
+  normalize_times           1
+[2024-09-16 20:30:48]
+VARIABLES: Nin_virtual, Nhidden, Nlayer
+[2024-09-16 20:31:00]
+36 configs remaining (~2h 26m 11s, ETA: 22:57:11, based on a mean trial duration of 243.6s)
+[2024-09-16 20:31:00]
+========== CONFIG 1 ==========
+Nin_virtual               1
+Nhidden                   300
+Nlayer                    3
+[2024-09-16 20:31:00]
+Starting trial b4d7ac610823ae34658703fd330330e0.
