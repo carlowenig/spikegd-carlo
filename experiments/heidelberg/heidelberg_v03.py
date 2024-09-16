@@ -108,31 +108,60 @@ def homogenize_dataset(dataset: SHD, config: dict, normalize_trials=True):
 
     # Array containing the spike times or T if no spike
     # lost_spikes = {}
-    lost_spikes = {}
-    x_arr = np.full((N, Nin, Kin), T, dtype=float)
+    times_arr = np.full((N, Kin), T, dtype=float)
+    neurons_arr = np.full((N, Kin), -1, dtype=int)
+
+    Nlost_norm_vals = []
+    Nlost_cap_vals = []
+
+    print(
+        "Mean number of spikes per trial:",
+        np.mean([len(times) for times in dataset.times_arr]),
+    )
+    print(
+        "Max number of spikes per trial:",
+        max(len(times) for times in dataset.times_arr),
+    )
+    print("Kin:", Kin)
 
     for i in trange_script(N):
         times = dataset.times_arr[i]
         neurons = dataset.units_arr[i]
+        assert len(times) == len(neurons)
+
+        Nspike_total = len(times)
 
         if normalize_trials:
             times, neurons = normalize_times(times, neurons, 0)
 
-        for j in range(Nin):
-            spike_times = times[neurons == j]
-            Nspike = min(Kin, len(spike_times))
-            x_arr[i, j, :Nspike] = spike_times[:Nspike]
-            if (Nlost := len(spike_times) - Nspike) > 0:
-                lost_spikes[j] = lost_spikes.get(j, 0) + Nlost
+        Nlost_norm_vals.append(Nspike_total - len(times))
+        Nspike_total = len(times)
 
-    print("Lost spikes:", dict(enumerate(lost_spikes)))
-    print("Total:", sum(lost_spikes.values()))
+        # remove spikes over Kin
+        times = times[:Kin]
+        neurons = neurons[:Kin]
+
+        Nlost_cap_vals.append(Nspike_total - len(times))
+
+        times_arr[i, : len(times)] = times
+        neurons_arr[i, : len(neurons)] = neurons
+
+        # for j in range(Nin):
+        #     spike_times = times[neurons == j]
+        #     Nspike = min(Kin, len(spike_times))
+        #     x_arr[i, j, :Nspike] = spike_times[:Nspike]
+        #     if (Nlost := len(spike_times) - Nspike) > 0:
+        #         lost_spikes[j] = lost_spikes.get(j, 0) + Nlost
+
+    print("Mean lost spikes due to normalization:", np.mean(Nlost_norm_vals))
+    print("Mean lost spikes due to Kin-cap:", np.mean(Nlost_cap_vals))
 
     # Create tensor dataset
-    data = torch.as_tensor(x_arr)
+    times_tensor = torch.as_tensor(times_arr)
+    neurons_tensor = torch.as_tensor(neurons_arr)
     targets = torch.as_tensor(dataset.label_index_arr, dtype=torch.int8)
 
-    return TensorDataset(data, targets)
+    return TensorDataset(times_tensor, neurons_tensor, targets)
 
 
 def load_datasets(root: str, verbose: bool = False) -> tuple[SHD, SHD]:
@@ -254,7 +283,8 @@ def init_phi0(neuron: AbstractPhaseOscNeuron, config: dict) -> Array:
 def eventffwd(
     neuron: AbstractPhaseOscNeuron,
     p: list,
-    input: Float[Array, " Nin Kin"],
+    times_in: Float[Array, " Nspikes"],
+    neurons_in: Int[Array, " Nspikes"],
     config: dict,
 ) -> tuple:
     """
@@ -281,9 +311,15 @@ def eventffwd(
     # neurons_in = jnp.arange(Nin_virtual)
     # spikes_in = (times_in, neurons_in)
 
-    times_in = input.ravel()
-    neurons_in = jnp.tile(jnp.arange(Nin), Kin)
-    assert len(times_in) == len(neurons_in)
+    # input = [[t_00, t_01, t_03], [t_10, T, T], [t_20, t_21, T]]
+    # => times_in [t_00, t_01, t_03, t_10, T, T, t_20, t_21, T]
+    # (first index: neuron, second index: spike)
+    # times_in = input.ravel()
+
+    # neurons_in = jnp.tile(jnp.arange(Nin), Kin)
+    # assert len(times_in) == len(neurons_in)
+    # assert neurons_in[:Nin].all() == 0
+    # spikes_in = (times_in, neurons_in)
     spikes_in = (times_in, neurons_in)
 
     ### Input weights
@@ -379,14 +415,17 @@ def lossfn(
 def simulatefn(
     neuron: AbstractPseudoPhaseOscNeuron,
     p: list,
-    input: Int[Array, "Batch Nin"],
+    input: tuple[Float[Array, "Batch Nspikes"], Int[Array, "Batch Nspikes"]],
     labels: Int[Array, " Batch"],
     config: dict,
 ) -> tuple[Array, Array]:
     """
     Simulates the network and computes the loss and accuracy for batched input.
     """
-    outs = vmap(eventffwd, in_axes=(None, None, 0, None))(neuron, p, input, config)
+    times_in, neurons_in = input
+    outs = vmap(eventffwd, in_axes=(None, None, 0, 0, None))(
+        neuron, p, times_in, neurons_in, config
+    )
     t_outs = vmap(outfn, in_axes=(None, 0, None, None))(neuron, outs, p, config)
     loss, correct = vmap(lossfn, in_axes=(0, 0, None))(t_outs, labels, config)
     mean_loss = jnp.mean(loss)
@@ -397,7 +436,7 @@ def simulatefn(
 def probefn(
     neuron: AbstractPseudoPhaseOscNeuron,
     p: list,
-    input: Int[Array, "Batch Nin"],
+    input: tuple[Float[Array, "Batch Nspikes"], Int[Array, "Batch Nspikes"]],
     labels: Int[Array, " Batch"],
     config: dict,
 ) -> tuple:
@@ -415,8 +454,8 @@ def probefn(
 
     ### Batched functions
     @vmap
-    def batch_eventffwd(input):
-        return eventffwd(neuron, p, input, config)
+    def batch_eventffwd(times_in, neurons_in):
+        return eventffwd(neuron, p, times_in, neurons_in, config)
 
     @vmap
     def batch_outfn(outs):
@@ -427,7 +466,8 @@ def probefn(
         return lossfn(t_outs, labels, config)
 
     ### Run network
-    outs = batch_eventffwd(input)
+    times_in, neurons_in = input
+    outs = batch_eventffwd(times_in, neurons_in)
     times: Array = outs[0]
     spike_in: Array = outs[1]
     neurons: Array = outs[2]
@@ -562,7 +602,9 @@ def run(
     @jit
     @partial(value_and_grad, has_aux=True)
     def gradfn(
-        p: list, input: Int[Array, "Batch Nin"], labels: Int[Array, " Batch"]
+        p: list,
+        input: tuple[Float[Array, "Batch Nspikes"], Int[Array, "Batch Nspikes"]],
+        labels: Int[Array, " Batch"],
     ) -> tuple[Array, Array]:
         loss, acc = simulatefn(neuron, p, input, labels, config)
         return loss, acc
@@ -578,7 +620,7 @@ def run(
     @jit
     def trial(
         p: list,
-        input: Int[Array, "Batch Nin"],
+        input: tuple[Float[Array, "Batch Nspikes"], Int[Array, "Batch Nspikes"]],
         labels: Int[Array, " Batch"],
         opt_state: optax.OptState,
     ) -> tuple:
@@ -610,8 +652,12 @@ def run(
         }
         steps = len(test_loader)
         for data in test_loader:
-            input, labels = jnp.array(data[0]), jnp.array(data[1])
-            metric, silent = jprobefn(p, input, labels)
+            times_in, neurons_in, labels = (
+                jnp.array(data[0]),
+                jnp.array(data[1]),
+                jnp.array(data[2]),
+            )
+            metric, silent = jprobefn(p, (times_in, neurons_in), labels)
             metrics = {k: metrics[k] + metric[k] / steps for k in metrics}
             silents = {k: silents[k] & silent[k] for k in silents}
         for k, v in silents.items():
@@ -653,9 +699,15 @@ def run(
     # Training
     for epoch in trange(Nepochs):
         for data in train_loader:
-            input, labels = jnp.array(data[0]), jnp.array(data[1])
+            times_in, neurons_in, labels = (
+                jnp.array(data[0]),
+                jnp.array(data[1]),
+                jnp.array(data[2]),
+            )
             # key, input = flip(key, input)
-            loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+            loss, acc, p, opt_state = trial(
+                p, (times_in, neurons_in), labels, opt_state
+            )
         # Probe network
         metric = probe(p)
         metrics = {k: v + [metric[k]] for k, v in metrics.items()}
@@ -708,8 +760,8 @@ def run_example(
 
     ### Set up the simulation
     @jit
-    def jeventffwd(p, input):
-        return eventffwd(neuron, p, input, config)
+    def jeventffwd(p, times_in, neurons_in):
+        return eventffwd(neuron, p, times_in, neurons_in, config)
 
     @jit
     def joutfn(out, p):
@@ -720,8 +772,12 @@ def run_example(
     # Data
     _, test_loader = data_loaders
 
-    input, label = next(iter(test_loader))
-    input, label = jnp.array(input[2]), jnp.array(label[2])
+    times_in, neurons_in, label = next(iter(test_loader))
+    times_in, neurons_in, label = (
+        jnp.array(times_in[2]),
+        jnp.array(neurons_in[2]),
+        jnp.array(label[2]),
+    )
     out = jeventffwd(p, input)
     t_outs = joutfn(out, p)
 
