@@ -62,12 +62,13 @@ config_grid = {
     # "Nin_data": 700,
     # "Nin": computed(lambda Nin_data, Nt: Nin_data * Nt),
     "Nin": 700,
-    "Kin": 80,
     # Ensemble
     "Nsamples": 3,
+    # Data transformation
+    "normalize_times": True,
 }
 
-scan = GridScan.load_or_create("main_v3", root="results")
+scan = GridScan.load_or_create("main_v3.1", root="results")
 
 
 scan.run(
