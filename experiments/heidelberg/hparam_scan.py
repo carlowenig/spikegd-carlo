@@ -65,7 +65,7 @@ config_grid = {
     # Ensemble
     "Nsamples": 3,
     # Data transformation
-    "normalize_times": True,
+    "normalize_times": False,
 }
 
 scan = GridScan.load_or_create("main_v3.1", root="results")
