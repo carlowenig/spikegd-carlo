@@ -1,5 +1,6 @@
 # .vscode
 **/__pycache__
+**/*.backup
 experiments/*/data
 experiments/*/results
 .venv
