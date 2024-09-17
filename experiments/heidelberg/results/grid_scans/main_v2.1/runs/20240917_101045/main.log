@@ -1,0 +1,35 @@
+[2024-09-17 10:10:45]
+CONSTANTS:
+  device_count              1
+  seed                      0
+  I0                        1.25
+  eps                       1e-06
+  Nin_virtual               16
+  Nhidden                   100
+  Nlayer                    2
+  Nout                      20
+  K                         700
+  dt                        0.001
+  Nbatch                    2000
+  lr                        0.004
+  tau_lr                    100
+  beta1                     0.9
+  beta2                     0.999
+  p_flip                    0
+  Nepochs                   50
+  Ntrain                    None
+  Nin                       700
+  Nsamples                  3
+  normalize_times           1
+[2024-09-17 10:10:45]
+VARIABLES: tau, w_scale, T, gamma
+[2024-09-17 10:11:23]
+432 configs remaining (~1d 16h 47m 30s, ETA: 02:58:53, based on a mean trial duration of 339.9s)
+[2024-09-17 10:11:23]
+========== CONFIG 1 ==========
+tau                       0.1
+w_scale                   0.1
+T                         0.5
+gamma                     0.001
+[2024-09-17 10:11:23]
+Starting trial 93601d7e4b044a45913079c982c411ab.

@@ -1,0 +1,119 @@
+[2024-09-17 10:26:34]
+CONSTANTS:
+  device_count              1
+  seed                      0
+  I0                        1.25
+  eps                       1e-06
+  Nin_virtual               16
+  Nhidden                   100
+  Nlayer                    3
+  Nout                      20
+  K                         700
+  dt                        0.001
+  Nbatch                    2000
+  lr                        0.004
+  tau_lr                    100
+  beta1                     0.9
+  beta2                     0.999
+  p_flip                    0
+  Nepochs                   50
+  Ntrain                    None
+  Nin                       700
+  Nsamples                  3
+  normalize_times           0
+[2024-09-17 10:26:34]
+VARIABLES: tau, w_scale, T, gamma
+[2024-09-17 10:27:13]
+432 configs remaining (~1d 16h 39m 1s, ETA: 03:06:15, based on a mean trial duration of 338.8s)
+[2024-09-17 10:27:13]
+========== CONFIG 1 ==========
+tau                       0.1
+w_scale                   0.1
+T                         0.5
+gamma                     0.001
+[2024-09-17 10:27:13]
+Starting trial 7833082092b4f83c90cb8c78d26d6438.
+[2024-09-17 10:30:06]
+acc_max_epoch             10
+acc_max_mean              0.085
+acc_max_std               0.0275
+acc_ord_max_epoch         10
+acc_ord_max_mean          0.0929
+acc_ord_max_std           0.0332
+activity_final_mean       0
+loss_final_mean           3
+[2024-09-17 10:30:06]
+Finished trial 7833082092b4f83c90cb8c78d26d6438 after 172.6s
+[2024-09-17 10:30:45]
+431 configs remaining (~1d 16h 29m 29s, ETA: 03:00:15, based on a mean trial duration of 338.2s)
+[2024-09-17 10:30:45]
+========== CONFIG 2 ==========
+tau                       0.5
+w_scale                   0.1
+T                         0.5
+gamma                     0.001
+[2024-09-17 10:30:45]
+Starting trial d36845e8899aa1c172e33881e3986fdb.
+[2024-09-17 10:33:25]
+acc_max_epoch             49
+acc_max_mean              0.493
+acc_max_std               0.012
+acc_ord_max_epoch         49
+acc_ord_max_mean          0.473
+acc_ord_max_std           0.0251
+activity_final_mean       0.29
+loss_final_mean           2.16
+[2024-09-17 10:33:25]
+Finished trial d36845e8899aa1c172e33881e3986fdb after 159.7s
+[2024-09-17 10:34:05]
+430 configs remaining (~1d 16h 7m 37s, ETA: 02:41:43, based on a mean trial duration of 335.9s)
+[2024-09-17 10:34:05]
+========== CONFIG 3 ==========
+tau                       1
+w_scale                   0.1
+T                         0.5
+gamma                     0.001
+[2024-09-17 10:34:05]
+Starting trial 57fb36ddf24940e29d8ffbd0e1c51df6.
+[2024-09-17 10:36:45]
+acc_max_epoch             50
+acc_max_mean              0.623
+acc_max_std               0.00309
+acc_ord_max_epoch         46
+acc_ord_max_mean          0.071
+acc_ord_max_std           0.0151
+activity_final_mean       0.275
+loss_final_mean           1.6
+[2024-09-17 10:36:45]
+Finished trial 57fb36ddf24940e29d8ffbd0e1c51df6 after 159.5s
+[2024-09-17 10:37:25]
+429 configs remaining (~1d 15h 50m 28s, ETA: 02:27:54, based on a mean trial duration of 334.3s)
+[2024-09-17 10:37:25]
+========== CONFIG 4 ==========
+tau                       2
+w_scale                   0.1
+T                         0.5
+gamma                     0.001
+[2024-09-17 10:37:25]
+Starting trial 4bedcb31752d65a247e5e9cdba1439c8.
+[2024-09-17 10:40:06]
+acc_max_epoch             47
+acc_max_mean              0.089
+acc_max_std               0.0262
+acc_ord_max_epoch         5
+acc_ord_max_mean          0.0492
+acc_ord_max_std           0.00348
+activity_final_mean       0.336
+loss_final_mean           2.95
+[2024-09-17 10:40:06]
+Finished trial 4bedcb31752d65a247e5e9cdba1439c8 after 160.2s
+[2024-09-17 10:40:46]
+428 configs remaining (~1d 15h 42m 10s, ETA: 02:22:57, based on a mean trial duration of 333.9s)
+[2024-09-17 10:40:46]
+========== CONFIG 5 ==========
+tau                       0.1
+w_scale                   0.2
+T                         0.5
+gamma                     0.001
+[2024-09-17 10:40:46]
+Starting trial 30a0812ea5f147d6167253ae23cfacab.

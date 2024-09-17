@@ -5,8 +5,6 @@ from pathlib import Path
 import jax
 
 # jax.distributed.initialize()  # type: ignore
-import numpy as np
-
 from heidelberg_v02 import load_datasets, run_theta_ensemble
 from hyperparam_scan_util import GridScan, vary
 
@@ -34,23 +32,21 @@ config_grid = {
     "device_count": len(devices),
     "seed": 0,
     # Neuron
-    "tau": 6 / np.pi,
+    "tau": vary(0.1, 0.5, 1, 2),
     "I0": 5 / 4,
     "eps": 1e-6,
     # Network
-    "Nin_virtual": vary(
-        1, 4, 8, 16, 32, 48, 64, 80, 100, 120
-    ),  # #Virtual input neurons = N_bin - 1
-    "Nhidden": vary(100, 200, 300, 400),
-    "Nlayer": vary(2, 3, 4),  # Number of layers
+    "Nin_virtual": 16,  # #Virtual input neurons = N_bin - 1
+    "Nhidden": 100,
+    "Nlayer": 2,  # Number of layers (hidden layers + output layer)
     "Nout": 20,
-    "w_scale": 0.5,  # Scaling factor of initial weights
+    "w_scale": vary(0.1, 0.2, 0.5, 1, 2, 5),  # Scaling factor of initial weights
     # Trial
-    "T": 2.0,
+    "T": vary(0.5, 1, 2, 4, 8, 16),
     "K": 700,  # Maximal number of simulated ordinary spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
-    "gamma": 1e-2,
+    "gamma": vary(1e-3, 1e-2, 1e-1),
     "Nbatch": 2000,
     "lr": 4e-3,
     "tau_lr": 1e2,
@@ -67,7 +63,7 @@ config_grid = {
     # Ensemble
     "Nsamples": 3,
     # Data transformation
-    "normalize_times": True,
+    "normalize_times": False,
 }
 
 scan = GridScan.load_or_create("main_v2.1", root="results")
@@ -76,7 +72,16 @@ scan = GridScan.load_or_create("main_v2.1", root="results")
 scan.run(
     partial(run_theta_ensemble, datasets, progress_bar=None),
     config_grid,
-    show_metrics=("acc_max_epoch", "acc_max_mean", "acc_max_std"),
+    show_metrics=(
+        "loss_final_mean",
+        "activity_final_mean",
+        "acc_max_epoch",
+        "acc_max_mean",
+        "acc_max_std",
+        "acc_ord_max_epoch",
+        "acc_ord_max_mean",
+        "acc_ord_max_std",
+    ),
     if_trial_exists="recompute_if_error",
     n_processes=1,
 )

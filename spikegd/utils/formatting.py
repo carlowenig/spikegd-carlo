@@ -15,11 +15,11 @@ _DETECTABLE_CONSTANTS = {
 
 def _detect_constant(
     x: float, min_power=-1, max_power=1, max_int=100
-) -> tuple[str | None, int, Fraction]:
-    from fractions import Fraction
+) -> tuple[str, int, Fraction] | None:
+    if np.isnan(x) or x == 0:
+        return None
 
-    if x == 0:
-        return None, 0, Fraction(0)
+    from fractions import Fraction
 
     for name, value in _DETECTABLE_CONSTANTS.items():
         for power in range(min_power, max_power + 1):
@@ -30,13 +30,15 @@ def _detect_constant(
             if frac.numerator < max_int and frac.denominator < max_int:
                 return name, power, frac
 
-    return None, 0, Fraction(0)
-
 
 def fmt_number(num: float, value_format: Any = ".3g"):
-    constant, power, coeff = _detect_constant(num)
+    if np.isnan(num):
+        return "NaN"
 
-    if constant is not None:
+    constant_result = _detect_constant(num)
+
+    if constant_result is not None:
+        constant, power, coeff = constant_result
         return f"{coeff ** power} {constant}^{power}"
 
     # Prevent integer numbers from being formatted with e-notation
