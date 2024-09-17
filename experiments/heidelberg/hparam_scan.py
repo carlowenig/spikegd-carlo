@@ -47,7 +47,7 @@ config_grid = {
     "dt": 0.001,  # Step size used to compute state traces
     # Training
     "gamma": vary(1e-3, 1e-2, 1e-1),
-    "Nbatch": 2000,
+    "Nbatch": 1000,
     "lr": 4e-3,
     "tau_lr": 1e2,
     "beta1": 0.9,
