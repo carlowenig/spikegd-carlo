@@ -20,6 +20,8 @@ dependencies = [
     "h5py",
     "pandas",
     "pyarrow",
+    "paramiko",
+    "scp",
 ]
 
 [build-system]
