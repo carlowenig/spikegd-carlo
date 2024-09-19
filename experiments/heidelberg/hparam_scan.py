@@ -32,7 +32,7 @@ config_grid = {
     "device_count": len(devices),
     "seed": 0,
     # Neuron
-    "tau": vary(0.1, 0.5, 1, 2),
+    "tau": vary(0.1, 0.13, 0.2, 0.3, 0.5, 0.7, 1, 1.3, 2, 2.7, 4, 5.3, 8, 10.7, 16),
     "I0": 5 / 4,
     "eps": 1e-6,
     # Network
@@ -40,13 +40,13 @@ config_grid = {
     "Nhidden": 100,
     "Nlayer": 2,  # Number of layers (hidden layers + output layer)
     "Nout": 20,
-    "w_scale": vary(0.1, 0.2, 0.5, 1, 2, 5),  # Scaling factor of initial weights
+    "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
-    "T": vary(0.5, 1, 2, 4, 8, 16),
-    "K": 700,  # Maximal number of simulated ordinary spikes
+    "T": vary(0.1, 0.13, 0.2, 0.3, 0.5, 0.7, 1, 1.3, 2, 2.7, 4, 5.3, 8, 10.7, 16),
+    "K": 300,  # Maximal number of simulated ordinary spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
-    "gamma": vary(1e-3, 1e-2, 1e-1),
+    "gamma": 1e-2,
     "Nbatch": 1000,
     "lr": 4e-3,
     "tau_lr": 1e2,
