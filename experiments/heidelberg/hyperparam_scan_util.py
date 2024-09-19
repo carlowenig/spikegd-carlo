@@ -576,11 +576,16 @@ class GridScan(FolderWithInfoYamlResource[str]):
         if n_processes is None:
             n_processes = os.cpu_count()
 
+        cached_trials = self.load_trials().copy()
+
         def process_config(config: dict):
             config_index = config["_index"]
+            config_hash = hash_config(config)
 
             remaining_configs = len(configs) - config_index
-            mean_duration = self.get_mean_trial_duration()
+            mean_duration = np.mean(
+                [trial.duration for trial in cached_trials.values()]
+            )
 
             if not np.isnan(mean_duration):
                 remaining_time = remaining_configs * mean_duration
@@ -606,42 +611,49 @@ class GridScan(FolderWithInfoYamlResource[str]):
             )
 
             # Check if this config has already been run in this scan
-            existing_trial = self.find_trial_by_config(config)
+            existing_trial = cached_trials.get(config_hash)
 
             if existing_trial is not None:
+                if existing_trial.config != config:
+                    raise ValueError(
+                        f"Hash collision for config hash {config_hash}:\n"
+                        f"  Config 1: {config}\n"
+                        f"  Config 2: {existing_trial.config}"
+                    )
+
                 if if_trial_exists == "raise":
                     raise ValueError(
-                        f"This config has already been used in trial {existing_trial.config_hash}."
+                        f"This config has already been used in trial {config_hash}."
                     )
                 elif if_trial_exists == "warn":
                     warnings.warn(
-                        f"This config has already been used in trial {existing_trial.config_hash}."
+                        f"This config has already been used in trial {config_hash}."
                     )
                     return
                 elif if_trial_exists == "skip":
                     run.log(
-                        f"This config has already been used in trial {existing_trial.config_hash}. "
+                        f"This config has already been used in trial {config_hash}. "
                         "Skipping."
                     )
                     # print()
                     return
                 elif if_trial_exists == "recompute":
                     run.log(
-                        f"This config has already been used in trial {existing_trial.config_hash}. "
+                        f"This config has already been used in trial {config_hash}. "
                         "Recomputing."
                     )
                     existing_trial.delete()
                 elif if_trial_exists == "recompute_if_error":
                     if existing_trial.error is None:
                         run.log(
-                            f"This config has already been used in trial {existing_trial.config_hash} "
+                            f"This config has already been used in trial {config_hash} "
                             "and finished successfully. Skipping."
                         )
                         # print()
                         return
                     else:
                         run.log(
-                            f"This config has already been used in trial {existing_trial.config_hash} "
+                            f"This config has already been used in trial {config_hash} "
                             "but did not finish successfully. Recomputing."
                         )
                         existing_trial.delete()
@@ -650,7 +662,6 @@ class GridScan(FolderWithInfoYamlResource[str]):
                         f"Invalid value for if_trial_exists: {if_trial_exists}"
                     )
 
-            config_hash = hash_config(config)
             run.log(f"Starting trial {config_hash}.")
 
             started_time = time.time()
@@ -658,12 +669,10 @@ class GridScan(FolderWithInfoYamlResource[str]):
             try:
                 metrics = func(config)
             except Exception:
-                finished_time = time.time()
                 error = traceback.format_exc()
                 metrics = {}
                 run.log(fmt_dict_multiline({"error": error}))
             else:
-                finished_time = time.time()
                 error = None
                 run.log(
                     fmt_dict_multiline(
@@ -671,20 +680,26 @@ class GridScan(FolderWithInfoYamlResource[str]):
                     )
                 )
 
-            trial = GridTrial.create(
-                self.id,
-                config_hash,
-                run_id=run.id,
-                config=config,
-                root=self.root,
-                started_time=started_time,
-                finished_time=finished_time,
-                metrics=metrics,
-                error=error,
-            )
+            finished_time = time.time()
+
+            try:
+                trial = GridTrial.create(
+                    self.id,
+                    config_hash,
+                    run_id=run.id,
+                    config=config,
+                    root=self.root,
+                    started_time=started_time,
+                    finished_time=finished_time,
+                    metrics=metrics,
+                    error=error,
+                )
+            except Exception as e:
+                run.log(f"Error while saving trial {config_hash}: {e}")
+            else:
+                cached_trials[config_hash] = trial
 
             run.log(f"Finished trial {config_hash} after {trial.duration:.1f}s")
-            # print()
 
         configs = expand_config(config_grid)
 
@@ -848,6 +863,7 @@ class GridTrial(YamlResource[str, str]):
         root: PathLike,
         metrics: dict[str, Any] | None = None,
         error: str | None = None,
+        if_exists: Literal["compare", "raise", "skip", "override"] = "raise",
     ):
         assert started_time is not None
         assert finished_time is not None
@@ -864,7 +880,7 @@ class GridTrial(YamlResource[str, str]):
             metrics=metrics if metrics is not None else {},
             error=error,
         )
-        trial.save()
+        trial.save(if_exists=if_exists)
         return trial
 
     def _get_args(self):
