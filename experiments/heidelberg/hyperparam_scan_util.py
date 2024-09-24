@@ -650,35 +650,89 @@ class GridScan(FolderWithInfoYamlResource[str]):
         if_trial_exists: Literal[
             "skip", "recompute", "recompute_if_error", "raise", "warn"
         ] = "recompute_if_error",
+        base_id: str | None = None,
         name: str | None = None,
         description: str | None = None,
-        n_processes=None,
+        n_jobs: int | None = None,
+        job_index: int = 1,  # 1-based index
+        preview=False,
     ):
-        if n_processes is None:
-            n_processes = os.cpu_count()
+        if base_id is None:
+            base_id = GridRun.create_timestamp_id(name)
 
         configs = expand_config(config_grid)
+        n_configs_total = len(configs)
+
+        if n_jobs is not None:
+            if n_jobs > n_configs_total:
+                print(
+                    f"WARNING: Using more jobs {n_jobs} than there are configs to "
+                    f"process ({n_configs_total})!"
+                )
+
+            config_start = (job_index - 1) * n_jobs
+            config_end = min(len(configs), job_index * n_jobs)
+            configs = configs[config_start:config_end]
+
+            n_digit = len(str(n_jobs))
+            full_id = f"{base_id}_{job_index:0{n_digit}d}"
+        else:
+            config_start = 0
+            config_end = len(configs)
+            full_id = base_id
+
+        if len(configs) == 0:
+            print("No configs to process. Skipping run.")
+            return
 
         constants, variables = get_constants(configs)
 
+        if preview:
+            if n_jobs is not None:
+                print(f"JOB {job_index} / {n_jobs}")
+
+            print(
+                f"PROCESSING {len(configs)} of {n_configs_total} CONFIGS "
+                f"(index {config_start} - {config_end - 1})"
+            )
+            print(
+                f"CONSTANTS:\n  {fmt_dict_multiline(constants).replace("\n", "\n  ")}"
+            )
+            print(f"VARIABLES: {", ".join(variables)}")
+            return
+
         run = GridRun.create(
             self.id,
+            full_id,
             root=self.root,
             name=name,
             description=description,
-            metadata={"n_processes": n_processes},
             constants=constants,
             variables=variables,
+            metadata={
+                "base_id": base_id,
+                "split_size": n_jobs,
+                "split_index": job_index,
+            },
         )
         print(
             f"Started run {run.id}. Log can be found at grid_scans/runs/{run.id}/main.log"
         )
+
+        if n_jobs is not None:
+            run.log(f"JOB {job_index} / {n_jobs}")
+
+        run.log(
+            f"PROCESSING {len(configs)} of {n_configs_total} CONFIGS "
+            f"(index {config_start} - {config_end - 1})"
+        )
         run.log(f"CONSTANTS:\n  {fmt_dict_multiline(constants).replace("\n", "\n  ")}")
         run.log(f"VARIABLES: {", ".join(variables)}")
 
-        run.log("Loading trials for duration calculations...")
-        cached_trials = self.load_trials()
-        run.log(f"Loaded {len(cached_trials)} trials.")
+        # run.log("Loading trials for duration calculations...")
+        # cached_trials = self.load_trials()
+        # run.log(f"Loaded {len(cached_trials)} trials.")
+        cached_trials: dict[str, GridTrial] = {}
 
         def process_config(config_index: int, config: dict):
             config_hash = hash_config(config)
@@ -707,7 +761,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
             print()
 
             run.log(
-                f"========== CONFIG {config_index + 1} ==========\n"
+                f"========== CONFIG {config_index:03d} ==========\n"
                 + fmt_dict_multiline(filter_dict(config, variables))
             )
 
@@ -845,7 +899,7 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
         return GridScan.get_rel_path_of(scan_id) / "runs" / run_id
 
     @classmethod
-    def create_id(cls, name: str | None = None):
+    def create_timestamp_id(cls, name: str | None = None):
         id = datetime.now().strftime("%Y%m%d_%H%M%S")
         if name is not None:
             id += f"_{name}"
@@ -865,7 +919,7 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
         variables: list[str] | None = None,
     ):
         if id is None:
-            id = cls.create_id(name)
+            id = cls.create_timestamp_id(name)
 
         assert constants is not None
         assert variables is not None
