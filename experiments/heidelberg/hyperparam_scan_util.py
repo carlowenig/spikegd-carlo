@@ -854,8 +854,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 run.log(f"Error while saving trial {config_hash}: {e}")
             else:
                 cached_trials[config_hash] = trial
-
-            run.log(f"Finished trial {config_hash} after {trial.duration:.1f}s")
+                run.log(f"Finished trial {config_hash} after {trial.duration:.1f}s")
 
         try:
             # TODO: Is it possible to parallelize this?
