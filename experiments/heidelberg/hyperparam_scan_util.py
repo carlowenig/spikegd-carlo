@@ -565,7 +565,8 @@ class GridScan(FolderWithInfoYamlResource[str]):
 
     def update_trials(
         self,
-        func: Callable[["GridTrial"], "GridTrial | None"] | None = None,
+        func: Callable[["GridTrial"], "GridTrial | None | Literal[False]"]
+        | None = None,
         verbose=True,
     ):
         old_config_hashes = self.load_trial_config_hashes()
@@ -577,21 +578,26 @@ class GridScan(FolderWithInfoYamlResource[str]):
 
         for old_config_hash in pbar:
             old_trial = self.load_trial(old_config_hash)
-            mutable_trial = old_trial.copy()
+            new_trial = old_trial.copy()
+            skip = False
 
-            new_trial = func(mutable_trial) if func is not None else old_trial
-
-            if new_trial is None:
-                # mutated the trial inplace -> use mutated trial as new trial
-                new_trial = mutable_trial
-            elif not isinstance(new_trial, GridTrial):
-                raise ValueError(
-                    f"Invalid return value from trial update function: {new_trial}"
-                )
+            if func is not None:
+                result = func(new_trial)
+                if result is None:
+                    pass
+                elif result is False:
+                    # Skip this trial
+                    skip = True
+                elif isinstance(result, GridTrial):
+                    new_trial = result
+                else:
+                    raise ValueError(
+                        f"Invalid return value from trial update function: {result}"
+                    )
 
             new_trial.update_config_hash()
 
-            if new_trial == old_trial:
+            if skip or new_trial == old_trial:
                 unchanged_count += 1
             else:
                 try:
