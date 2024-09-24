@@ -476,9 +476,14 @@ class GridScan(FolderWithInfoYamlResource[str]):
             )
         }
 
-    def load_trials_df(self, *, progress=False):
+    def load_trials_df(self, *, progress=False, config_hashes: list[str] | None = None):
+        if config_hashes is None:
+            config_hashes = self.load_trial_config_hashes()
+
         trials = []
-        for trial in self.load_trials(progress=progress).values():
+        for config_hash in tqdm(config_hashes, disable=not progress):
+            trial = self.load_trial(config_hash)
+
             trial_dict = {
                 "run_id": trial.run_id,
                 "config_hash": trial.config_hash,
@@ -502,14 +507,46 @@ class GridScan(FolderWithInfoYamlResource[str]):
 
         return pd.DataFrame(trials)
 
-    def export_trials_df(self, path: PathLike = None, *, loading_progress=False):
-        if path is None:
-            path = f"trials_export_{time.strftime("%Y%m%d_%H%M%S")}.parquet"
+    def sync_trials_df(self, path: PathLike, *, verbose=False) -> pd.DataFrame:
+        path = self.get_abs_path() / as_path(path)
 
-        df = self.load_trials_df(progress=loading_progress)
-        df.to_parquet(self.get_abs_path() / path)
+        config_hashes = self.load_trial_config_hashes()
 
-        return df
+        existing_df = pd.read_parquet(path) if path.exists() else None
+
+        if existing_df is not None:
+            if verbose:
+                print(f"Found DataFrame with {len(existing_df)} trials.")
+
+            for existing_hash in list(existing_df["config_hash"]):
+                if existing_hash not in config_hashes:
+                    # Remove trials that are not in the scan anymore
+                    existing_df = existing_df[
+                        existing_df["config_hash"] != existing_hash
+                    ]
+                else:
+                    # Skip trials that are already in the dataframe
+                    config_hashes.remove(existing_hash)
+
+        if len(config_hashes) == 0:
+            if verbose:
+                print("Trials DataFrame is up-to-date.")
+            return existing_df if existing_df is not None else pd.DataFrame()
+
+        if verbose:
+            print(f"Loading {len(config_hashes)} new trials...")
+
+        new_df = self.load_trials_df(progress=verbose, config_hashes=config_hashes)
+
+        if existing_df is not None:
+            new_df = pd.concat([existing_df, new_df], ignore_index=True)
+
+        new_df.to_parquet(path)
+
+        if verbose:
+            print(f"Saved DataFrame with {len(new_df)} trials to {path}.")
+
+        return new_df
 
     def load_exported_trials_df(self, path: PathLike = None):
         if path is None:
