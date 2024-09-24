@@ -1,3 +1,4 @@
+import argparse
 import os
 from functools import partial
 from pathlib import Path
@@ -12,12 +13,9 @@ assert (
     Path.cwd().as_posix().endswith("experiments/heidelberg")
 ), f"Unexpected cwd: {os.getcwd()}"
 
-print(f"Total device count: {jax.device_count()}")
-print(f"Device count per task: {jax.local_device_count()}")
 devices = jax.local_devices()
 print(f"Local devices: {devices}")
 
-datasets = load_datasets("data", verbose=True)
 
 config_grid = {
     # "devices": [
@@ -32,18 +30,20 @@ config_grid = {
     "device_count": len(devices),
     "seed": 0,
     # Neuron
-    "tau": vary(0.1, 0.13, 0.2, 0.3, 0.5, 0.7, 1, 1.3, 2, 2.7, 4, 5.3, 8, 10.7, 16),
+    "tau": vary(0.1, 0.2, 0.5, 1, 2, 3, 4, 5),
     "I0": 5 / 4,
     "eps": 1e-6,
     # Network
-    "Nin_virtual": 16,  # #Virtual input neurons = N_bin - 1
+    "Nin_virtual": vary(
+        1, 4, 8, 16, 32, 48, 64, 80, 100, 120
+    ),  # #Virtual input neurons = N_bin - 1
     "Nhidden": 100,
-    "Nlayer": 2,  # Number of layers (hidden layers + output layer)
+    "Nlayer": vary(2, 3, 4),  # Number of layers (hidden layers + output layer)
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
-    "T": vary(0.1, 0.13, 0.2, 0.3, 0.5, 0.7, 1, 1.3, 2, 2.7, 4, 5.3, 8, 10.7, 16),
-    "K": 300,  # Maximal number of simulated ordinary spikes
+    "T": 2,
+    "K": 700,  # Maximal number of simulated ordinary spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
     "gamma": 1e-2,
@@ -63,11 +63,19 @@ config_grid = {
     # Ensemble
     "Nsamples": 3,
     # Data transformation
-    "normalize_times": False,
+    "normalize_times": vary(False, True),
 }
 
 scan = GridScan.load_or_create("main_v2.1", root="results")
 
+arg_parser = argparse.ArgumentParser()
+arg_parser.add_argument("--id", type=str)
+arg_parser.add_argument("--n-jobs", type=int)
+arg_parser.add_argument("--job-index", type=int)
+arg_parser.add_argument("--preview", action="store_true")
+args = arg_parser.parse_args()
+
+datasets = load_datasets("data", verbose=True) if not args.preview else None
 
 scan.run(
     partial(run_theta_ensemble, datasets, progress_bar=None),
@@ -82,7 +90,8 @@ scan.run(
         "acc_ord_max_mean",
         "acc_ord_max_std",
     ),
-    if_trial_exists="recompute_if_error",
-    n_processes=1,
+    base_id=args.id,
+    n_jobs=args.n_jobs,
+    job_index=args.job_index,
+    preview=args.preview,
 )
-# print(scan.load_trials())

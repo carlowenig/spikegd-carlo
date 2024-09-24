@@ -1,9 +1,10 @@
 #!/bin/bash
-#SBATCH --partition=mlgpu_medium
-#SBATCH --time=24:00:00
+#SBATCH --array=1-48
+#SBATCH --partition=mlgpu_short
+#SBATCH --time=1:00:00
 #SBATCH --gpus=1
 #SBATCH --account=ag_ifg_memmesheimer
-#SBATCH --output=slurm_output/%x_%j.out
+#SBATCH --output=slurm_output/%x_%A_%a.out
 
 source ~/.bashrc
 
@@ -13,10 +14,15 @@ if [[ "$PWD" != */experiments/heidelberg ]]; then
     exit 1
 fi 
 
+if [[ "$SLURM_ARRAY_TASK_MIN" != 1 ]]; then
+    echo "Error: The minimal array task id should be 1"
+    exit 1
+fi
+
 source ../../.venv/bin/activate
 echo "Using Python venv at: $(which python)"
 echo ""
 
 echo "--- SCRIPT START ---"
-python -u hparam_scan.py
+python -u hparam_scan.py --id $SLURM_ARRAY_JOB_ID --n-jobs $SLURM_ARRAY_TASK_COUNT --job-index $SLURM_ARRAY_TASK_ID
 echo "--- SCRIPT END ---"
