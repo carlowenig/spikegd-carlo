@@ -573,6 +573,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
         updated_count = 0
         failed_count = 0
         unchanged_count = 0
+        skipped_count = 0
 
         pbar = tqdm(old_config_hashes, disable=not verbose)
 
@@ -597,7 +598,9 @@ class GridScan(FolderWithInfoYamlResource[str]):
 
             new_trial.update_config_hash()
 
-            if skip or new_trial == old_trial:
+            if skip:
+                skipped_count += 1
+            elif new_trial == old_trial:
                 unchanged_count += 1
             else:
                 try:
@@ -624,13 +627,15 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 updated=updated_count,
                 failed=failed_count,
                 unchanged=unchanged_count,
+                skipped=skipped_count,
             )
 
         if verbose:
             print(
                 f"Updated: {updated_count}\n"
                 f"Failed: {failed_count}\n"
-                f"Unchanged: {unchanged_count}"
+                f"Unchanged: {unchanged_count}\n"
+                f"Skipped: {skipped_count}"
             )
 
     def run(
