@@ -616,7 +616,10 @@ class GridScan(FolderWithInfoYamlResource[str]):
                     failed_count += 1
                     if verbose:
                         print(
-                            f"Error while saving new trial {new_trial.config_hash}: {e}"
+                            f"Error while saving updated trial {old_config_hash} as "
+                            f"new trial {new_trial.config_hash}:\n"
+                            f"  {str(e).replace("\n", "\n  ")}\n"
+                            "Reverting to old trial..."
                         )
                     # Revert to old trial
                     old_trial.save(if_exists="raise")
