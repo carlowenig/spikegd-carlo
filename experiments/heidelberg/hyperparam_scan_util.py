@@ -670,8 +670,9 @@ class GridScan(FolderWithInfoYamlResource[str]):
                     f"process ({n_configs_total})!"
                 )
 
-            config_start = (job_index - 1) * n_jobs
-            config_end = min(len(configs), job_index * n_jobs)
+            n_configs_per_job = int(np.ceil(n_configs_total / n_jobs))
+            config_start = (job_index - 1) * n_configs_per_job
+            config_end = min(len(configs), job_index * n_configs_per_job)
             configs = configs[config_start:config_end]
 
             n_digit = len(str(n_jobs))
