@@ -5,14 +5,25 @@ import os
 import shutil
 import time
 import traceback
-import warnings
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 from types import EllipsisType
-from typing import Any, Callable, ClassVar, Iterable, Literal, Self, Unpack, final
+from typing import (
+    Any,
+    Callable,
+    ClassVar,
+    Iterable,
+    Literal,
+    Mapping,
+    Self,
+    Sequence,
+    Set,
+    Unpack,
+    final,
+)
 
 import numpy as np
 import pandas as pd
@@ -520,22 +531,6 @@ class GridScan(FolderWithInfoYamlResource[str]):
 
         return pd.read_parquet(path)
 
-    def find_trial_by_config(self, config: dict[str, Any]):
-        config_hash = hash_config(config)
-        try:
-            trial = self.load_trial(config_hash)
-        except FileNotFoundError:
-            return None
-        else:
-            if trial.config != config:
-                raise ValueError(
-                    f"Hash collision for config hash {config_hash}:\n"
-                    f"  Config 1: {config}\n"
-                    f"  Config 2: {trial.config}"
-                )
-
-            return trial
-
     def get_mean_trial_duration(self):
         return np.mean(
             [
@@ -648,7 +643,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
         *,
         show_metrics: Iterable[str] = (),
         if_trial_exists: Literal[
-            "skip", "recompute", "recompute_if_error", "raise", "warn"
+            "skip", "recompute", "recompute_if_error", "raise"
         ] = "recompute_if_error",
         base_id: str | None = None,
         name: str | None = None,
@@ -767,9 +762,14 @@ class GridScan(FolderWithInfoYamlResource[str]):
             )
 
             # Check if this config has already been run in this scan
-            existing_trial = cached_trials.get(config_hash)
-
-            if existing_trial is not None:
+            run.log("Checking for existing trial...")
+            try:
+                existing_trial = self.load_trial(config_hash)
+            except FileNotFoundError:
+                # config hash does not exist yet -> continue
+                pass
+            else:
+                # config hash already exists
                 if existing_trial.config != config:
                     raise ValueError(
                         f"Hash collision for config hash {config_hash}:\n"
@@ -781,17 +781,12 @@ class GridScan(FolderWithInfoYamlResource[str]):
                     raise ValueError(
                         f"This config has already been used in trial {config_hash}."
                     )
-                elif if_trial_exists == "warn":
-                    warnings.warn(
-                        f"This config has already been used in trial {config_hash}."
-                    )
-                    return
                 elif if_trial_exists == "skip":
                     run.log(
                         f"This config has already been used in trial {config_hash}. "
                         "Skipping."
                     )
-                    # print()
+                    cached_trials[config_hash] = existing_trial
                     return
                 elif if_trial_exists == "recompute":
                     run.log(
@@ -805,7 +800,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
                             f"This config has already been used in trial {config_hash} "
                             "and finished successfully. Skipping."
                         )
-                        # print()
+                        cached_trials[config_hash] = existing_trial
                         return
                     else:
                         run.log(
@@ -954,8 +949,25 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
             file.write(f"[{timestamp}]\n{message}\n")
 
 
+def _normalize_value(value: Any) -> Any:
+    if isinstance(value, str):
+        return value
+    elif isinstance(value, (bool, int, float, np.number)):
+        return float(value)
+    elif isinstance(value, Mapping):
+        return {
+            str(_normalize_value(k)): _normalize_value(value[k]) for k in sorted(value)
+        }
+    elif isinstance(value, Set):
+        return {_normalize_value(v) for v in value}
+    elif isinstance(value, Sequence):
+        return [_normalize_value(v) for v in value]
+    else:
+        return value
+
+
 def hash_config(config: dict[str, Any]):
-    config_str = json.dumps(config, sort_keys=True)
+    config_str = json.dumps(_normalize_value(config), sort_keys=True)
     hash_obj = hashlib.md5(config_str.encode())
     return hash_obj.hexdigest()
 
