@@ -762,7 +762,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
             print()
 
             run.log(
-                f"========== CONFIG {config_index:03d} ==========\n"
+                f"========== CONFIG {config_index + config_start:03d} ==========\n"
                 + fmt_dict_multiline(filter_dict(config, variables))
             )
 
