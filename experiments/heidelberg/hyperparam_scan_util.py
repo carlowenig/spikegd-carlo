@@ -576,7 +576,28 @@ class GridScan(FolderWithInfoYamlResource[str]):
         if n_processes is None:
             n_processes = os.cpu_count()
 
-        cached_trials = self.load_trials().copy()
+        configs = expand_config(config_grid)
+
+        constants, variables = get_constants(configs)
+
+        run = GridRun.create(
+            self.id,
+            root=self.root,
+            name=name,
+            description=description,
+            metadata={"n_processes": n_processes},
+            constants=constants,
+            variables=variables,
+        )
+        print(
+            f"Started run {run.id}. Log can be found at grid_scans/runs/{run.id}/main.log"
+        )
+        run.log(f"CONSTANTS:\n  {fmt_dict_multiline(constants).replace("\n", "\n  ")}")
+        run.log(f"VARIABLES: {", ".join(variables)}")
+
+        run.log("Loading trials for duration calculations...")
+        cached_trials = self.load_trials()
+        run.log(f"Loaded {len(cached_trials)} trials.")
 
         def process_config(config: dict):
             config_index = config["_index"]
@@ -700,25 +721,6 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 cached_trials[config_hash] = trial
 
             run.log(f"Finished trial {config_hash} after {trial.duration:.1f}s")
-
-        configs = expand_config(config_grid)
-
-        constants, variables = get_constants(configs)
-
-        run = GridRun.create(
-            self.id,
-            root=self.root,
-            name=name,
-            description=description,
-            metadata={"n_processes": n_processes},
-            constants=constants,
-            variables=variables,
-        )
-        run.log(f"CONSTANTS:\n  {fmt_dict_multiline(constants).replace("\n", "\n  ")}")
-        run.log(f"VARIABLES: {", ".join(variables)}")
-        print(
-            f"Started run {run.id}. Log can be found at grid_scans/runs/{run.id}/main.log"
-        )
 
         try:
             # TODO: Is it possible to parallelize this?
