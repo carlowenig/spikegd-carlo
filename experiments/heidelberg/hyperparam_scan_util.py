@@ -599,14 +599,13 @@ class GridScan(FolderWithInfoYamlResource[str]):
         cached_trials = self.load_trials()
         run.log(f"Loaded {len(cached_trials)} trials.")
 
-        def process_config(config: dict):
-            config_index = config["_index"]
+        def process_config(config_index: int, config: dict):
             config_hash = hash_config(config)
 
             remaining_configs = len(configs) - config_index
             mean_duration = np.mean(
                 [trial.duration for trial in cached_trials.values()]
-            )
+            ).item()
 
             if not np.isnan(mean_duration):
                 remaining_time = remaining_configs * mean_duration
@@ -736,7 +735,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
             #     pool.map(process_config, enumerate(configs))
 
             for config_index, config in enumerate(configs):
-                process_config(config | {"_index": config_index})
+                process_config(config_index, config)
 
         finally:
             run.finished_at = fmt_timestamp(time.time())
