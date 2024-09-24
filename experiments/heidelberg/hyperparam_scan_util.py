@@ -340,8 +340,9 @@ class Resource[*Args](ABC):
         self._save_to_unchecked(path)
         self._snapshot = self.copy()
 
-    def delete(self):
-        path = self.get_abs_path()
+    @classmethod
+    def delete_by_args(cls, *args: Unpack[Args], root: PathLike):
+        path = cls.get_abs_path_of(*args, root=root)
 
         if not path.exists():
             return
@@ -350,6 +351,8 @@ class Resource[*Args](ABC):
         else:
             shutil.rmtree(path)
 
+    def delete(self):
+        type(self).delete_by_args(*self._get_args(), root=self.root)
         self._snapshot = None
 
     def __str__(self):
@@ -382,7 +385,7 @@ class FolderWithInfoYamlResource[*Args](Resource[*Args]):
         path = self.get_abs_path()
         shutil.copytree(
             path,
-            path.with_name(f"{path.stem}_backup_{time.strftime("%Y%m%d_%H%M%S")}"),
+            path.with_name(f"{path.name}_backup_{time.strftime("%Y%m%d_%H%M%S")}"),
         )
 
 
@@ -559,6 +562,70 @@ class GridScan(FolderWithInfoYamlResource[str]):
             for run_id in empty_run_ids:
                 print(f"Deleting empty run {run_id}")
                 self.load_run(run_id).delete()
+
+    def update_trials(
+        self,
+        func: Callable[["GridTrial"], "GridTrial | None"] | None = None,
+        verbose=True,
+    ):
+        old_config_hashes = self.load_trial_config_hashes()
+        updated_count = 0
+        failed_count = 0
+        unchanged_count = 0
+
+        pbar = tqdm(old_config_hashes, disable=not verbose)
+
+        for old_config_hash in pbar:
+            old_trial = self.load_trial(old_config_hash)
+            mutable_trial = old_trial.copy()
+
+            new_trial = func(mutable_trial) if func is not None else old_trial
+
+            if new_trial is None:
+                # mutated the trial inplace -> use mutated trial as new trial
+                new_trial = mutable_trial
+            elif not isinstance(new_trial, GridTrial):
+                raise ValueError(
+                    f"Invalid return value from trial update function: {new_trial}"
+                )
+
+            new_trial.update_config_hash()
+
+            if new_trial == old_trial:
+                unchanged_count += 1
+            else:
+                try:
+                    old_trial.delete()
+                except Exception as e:
+                    raise ValueError(
+                        f"Could not delete old trial {old_trial.config_hash}"
+                    ) from e
+
+                try:
+                    new_trial.save(if_exists="raise")
+                except Exception as e:
+                    failed_count += 1
+                    if verbose:
+                        print(
+                            f"Error while saving new trial {new_trial.config_hash}: {e}"
+                        )
+                    # Revert to old trial
+                    old_trial.save(if_exists="raise")
+                else:
+                    updated_count += 1
+
+            pbar.set_postfix(
+                updated=updated_count,
+                failed=failed_count,
+                unchanged=unchanged_count,
+            )
+
+        if verbose:
+            print(
+                f"Updated: {updated_count}\n"
+                f"Failed: {failed_count}\n"
+                f"Unchanged: {unchanged_count}"
+            )
 
     def run(
         self,
@@ -839,13 +906,11 @@ class GridTrial(YamlResource[str, str]):
     config_hash: str = ""
 
     def __post_init__(self):
-        config_hash = hash_config(self.config)
         if not self.config_hash:
-            self.config_hash = config_hash
-        elif self.config_hash != config_hash:
-            raise ValueError(
-                f"The provided config hash {self.config_hash} is different from the actual config hash {config_hash}."
-            )
+            self.config_hash = hash_config(self.config)
+
+    def update_config_hash(self):
+        self.config_hash = hash_config(self.config)
 
     @classmethod
     def get_rel_path_of(cls, scan_id: str, config_hash: str):
