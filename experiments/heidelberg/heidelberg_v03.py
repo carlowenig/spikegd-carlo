@@ -10,11 +10,11 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
-from shd import SHD
 from torch.utils.data import DataLoader, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
+from shd import SHD
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
@@ -104,7 +104,7 @@ def homogenize_dataset(dataset: SHD, config: dict):
     N = dataset.Nsamples
     # Kin = config["Kin"]  # max number of input spikes per neuron
     Kin = max(len(times) for times in dataset.times_arr)
-    Nin = config["Nin"]
+    T = config["T"]
     # Tfallback = config["Tfallback"]
 
     # Array containing the spike times or T if no spike
@@ -129,9 +129,11 @@ def homogenize_dataset(dataset: SHD, config: dict):
             times, neurons = normalize_times(
                 times,
                 neurons,
+                t_max=T,
                 dt=normalize_times_dt,
                 signal_percentage=normalize_times_signal_percentage,
             )
+            assert (times < T).all()
 
         times_arr[i, : len(times)] = times
         neurons_arr[i, : len(neurons)] = neurons
