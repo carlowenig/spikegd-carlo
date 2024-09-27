@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
-from itertools import repeat
+from functools import partial
 from pathlib import Path
 from types import EllipsisType
 from typing import (
@@ -37,6 +37,7 @@ from spikegd.utils.formatting import (
     fmt_timestamp,
     parse_timestamp,
 )
+from spikegd.utils.misc import advanced_map, standardize_value
 
 
 class ConfigVariable(ABC):
@@ -308,7 +309,7 @@ class Resource[*Args](ABC):
     def to_dict(self) -> dict[str, Any]:
         dict_ = asdict(self)
         del dict_["root"]
-        return dict_
+        return standardize_value(dict_)
 
     def copy(self, *, remove_snapshot=True):
         copy = deepcopy(self)
@@ -410,6 +411,11 @@ class YamlResource[*Args](Resource[*Args]):
         with abs_path.open("r") as f:
             dict_ = yaml.load(f, yaml.Loader)
 
+        if not isinstance(dict_, dict):
+            raise ValueError(
+                f"YAML content of {abs_path} resulted in {type(dict_)}, expected dict."
+            )
+
         return cls.from_dict(dict_, root=root)
 
     def _save_to_unchecked(self, abs_path: Path):
@@ -417,9 +423,7 @@ class YamlResource[*Args](Resource[*Args]):
             yaml.dump(self.to_dict(), f, sort_keys=False)
 
 
-def _load_trial_dict(args: tuple[str, PathLike, str]) -> dict:
-    scan_id, scan_root, config_hash = args
-
+def _load_trial_dict(scan_id: str, scan_root: PathLike, config_hash: str) -> dict:
     with GridTrial.get_abs_path_of(scan_id, config_hash, root=scan_root).open("r") as f:
         trial_dict = yaml.load(f, yaml.Loader)
 
@@ -442,6 +446,78 @@ def _load_trial_dict(args: tuple[str, PathLike, str]) -> dict:
         trial_dict[f"metrics.{key}"] = value
 
     return trial_dict
+
+
+type TrialUpdateFunc = Callable[["GridTrial"], "GridTrial | None | Literal[False]"]
+type TrialUpdateResult = Literal["skipped", "unchanged", "failed", "updated"]
+
+
+def _update_trial(
+    scan_id: str,
+    scan_root: PathLike,
+    old_config_hash: str,
+    func: TrialUpdateFunc | None = None,
+    ignore_unchanged=True,
+    verbose=False,
+) -> TrialUpdateResult:
+    try:
+        old_trial = GridTrial.load(scan_id, old_config_hash, root=scan_root)
+    except Exception as e:
+        raise ValueError(f"Could not load old trial {old_config_hash}") from e
+
+    new_trial = old_trial.copy()
+
+    if func is not None:
+        try:
+            result = func(new_trial)
+        except Exception as e:
+            raise ValueError(
+                f"Encountered error in update function for trial {old_config_hash}"
+            ) from e
+
+        if result is None:
+            pass
+        elif result is False:
+            # Skip this trial
+            return "skipped"
+        elif isinstance(result, GridTrial):
+            new_trial = result
+        else:
+            raise ValueError(
+                f"Invalid return value from trial update function: {result}"
+            )
+
+    new_trial.update_config_hash()
+
+    if ignore_unchanged and new_trial == old_trial:
+        return "unchanged"
+
+    try:
+        old_trial.delete()
+    except Exception as e:
+        raise ValueError(f"Could not delete old trial {old_config_hash}") from e
+
+    try:
+        new_trial.save(if_exists="raise")
+        return "updated"
+    except Exception as e:
+        if verbose:
+            print(
+                f"Error while saving updated trial {old_config_hash} as "
+                f"new trial {new_trial.config_hash}:\n"
+                f"  {str(e).replace("\n", "\n  ")}\n"
+                "Reverting to old trial...",
+                flush=True,
+            )
+        # Revert to old trial
+        try:
+            old_trial.save(if_exists="raise")
+            return "failed"
+        except Exception as e:
+            raise ValueError(
+                f"Could not revert to old trial {old_config_hash}. "
+                "This trial is now lost."
+            ) from e
 
 
 @dataclass
@@ -521,39 +597,27 @@ class GridScan(FolderWithInfoYamlResource[str]):
         if config_hashes is None:
             config_hashes = self.load_trial_config_hashes()
 
-        if parallel:
-            import multiprocessing
-
-            args_iter = zip(repeat(self.id), repeat(self.root), config_hashes)
-
-            with multiprocessing.Pool() as pool:
-                if progress:
-                    trial_dicts = list(
-                        tqdm(
-                            pool.imap_unordered(_load_trial_dict, args_iter),
-                            total=len(config_hashes),
-                        )
-                    )
-                else:
-                    trial_dicts = pool.map(_load_trial_dict, args_iter)
-        else:
-            trial_dicts = [
-                _load_trial_dict((self.id, self.root, config_hash))
-                for config_hash in tqdm(config_hashes, disable=not progress)
-            ]
+        trial_dicts = advanced_map(
+            partial(_load_trial_dict, self.id, self.root),
+            config_hashes,
+            progress=progress,
+            parallel=parallel,
+        )
 
         return pd.DataFrame(trial_dicts).sort_values("started_at")
 
     def sync_trials_df(
-        self, path: PathLike, *, verbose=False, parallel=True
+        self, path: PathLike, *, verbose=False, parallel=True, fresh=False
     ) -> pd.DataFrame:
         path = self.get_abs_path() / as_path(path)
 
         config_hashes = self.load_trial_config_hashes()
 
-        df = pd.read_parquet(path) if path.exists() else None
+        if fresh or not path.exists():
+            df = None
+        else:
+            df = pd.read_parquet(path)
 
-        if df is not None:
             if verbose:
                 print(f"Found DataFrame with {len(df)} trials.")
 
@@ -567,7 +631,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
 
         if len(config_hashes) == 0:
             if verbose:
-                print("Trials DataFrame is up-to-date.")
+                print("No new trials to add.")
 
             if df is None:
                 df = pd.DataFrame()
@@ -633,73 +697,32 @@ class GridScan(FolderWithInfoYamlResource[str]):
         self,
         func: Callable[["GridTrial"], "GridTrial | None | Literal[False]"]
         | None = None,
+        ignore_unchanged=True,
         verbose=True,
+        parallel=True,
     ):
         old_config_hashes = self.load_trial_config_hashes()
-        updated_count = 0
-        failed_count = 0
-        unchanged_count = 0
-        skipped_count = 0
 
-        pbar = tqdm(old_config_hashes, disable=not verbose)
-
-        for old_config_hash in pbar:
-            old_trial = self.load_trial(old_config_hash)
-            new_trial = old_trial.copy()
-            skip = False
-
-            if func is not None:
-                result = func(new_trial)
-                if result is None:
-                    pass
-                elif result is False:
-                    # Skip this trial
-                    skip = True
-                elif isinstance(result, GridTrial):
-                    new_trial = result
-                else:
-                    raise ValueError(
-                        f"Invalid return value from trial update function: {result}"
-                    )
-
-            new_trial.update_config_hash()
-
-            if skip:
-                skipped_count += 1
-            elif new_trial == old_trial:
-                unchanged_count += 1
-            else:
-                try:
-                    old_trial.delete()
-                except Exception as e:
-                    raise ValueError(
-                        f"Could not delete old trial {old_trial.config_hash}"
-                    ) from e
-
-                try:
-                    new_trial.save(if_exists="raise")
-                except Exception as e:
-                    failed_count += 1
-                    if verbose:
-                        print(
-                            f"Error while saving updated trial {old_config_hash} as "
-                            f"new trial {new_trial.config_hash}:\n"
-                            f"  {str(e).replace("\n", "\n  ")}\n"
-                            "Reverting to old trial..."
-                        )
-                    # Revert to old trial
-                    old_trial.save(if_exists="raise")
-                else:
-                    updated_count += 1
-
-            pbar.set_postfix(
-                updated=updated_count,
-                failed=failed_count,
-                unchanged=unchanged_count,
-                skipped=skipped_count,
-            )
+        results = advanced_map(
+            partial(
+                _update_trial,
+                self.id,
+                self.root,
+                verbose=verbose,
+                ignore_unchanged=ignore_unchanged,
+                func=func,
+            ),
+            old_config_hashes,
+            progress=verbose,
+            parallel=parallel,
+        )
 
         if verbose:
+            updated_count = sum(result == "updated" for result in results)
+            failed_count = sum(result == "failed" for result in results)
+            unchanged_count = sum(result == "unchanged" for result in results)
+            skipped_count = sum(result == "skipped" for result in results)
+
             print(
                 f"Updated: {updated_count}\n"
                 f"Failed: {failed_count}\n"
@@ -1020,25 +1043,26 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
             file.write(f"[{timestamp}]\n{message}\n")
 
 
-def _normalize_value(value: Any) -> Any:
+def _standardize_value(value: Any) -> Any:
     if isinstance(value, str):
         return value
     elif isinstance(value, (bool, int, float, np.number)):
         return float(value)
     elif isinstance(value, Mapping):
         return {
-            str(_normalize_value(k)): _normalize_value(value[k]) for k in sorted(value)
+            str(_standardize_value(k)): _standardize_value(value[k])
+            for k in sorted(value)
         }
     elif isinstance(value, Set):
-        return {_normalize_value(v) for v in value}
+        return {_standardize_value(v) for v in value}
     elif isinstance(value, Sequence):
-        return [_normalize_value(v) for v in value]
+        return [_standardize_value(v) for v in value]
     else:
         return value
 
 
 def hash_config(config: dict[str, Any]):
-    config_str = json.dumps(_normalize_value(config), sort_keys=True)
+    config_str = json.dumps(_standardize_value(config), sort_keys=True)
     hash_obj = hashlib.md5(config_str.encode())
     return hash_obj.hexdigest()
 

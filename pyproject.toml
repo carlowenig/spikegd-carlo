@@ -22,6 +22,7 @@ dependencies = [
     "pyarrow",
     "paramiko",
     "attrs",
+    "multiprocess"
 ]
 
 [build-system]
