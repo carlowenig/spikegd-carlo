@@ -21,7 +21,7 @@ dependencies = [
     "pandas",
     "pyarrow",
     "paramiko",
-    "scp",
+    "attrs",
 ]
 
 [build-system]

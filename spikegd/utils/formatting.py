@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from fractions import Fraction
 from typing import Any, Callable, Iterable, Mapping
@@ -26,9 +27,30 @@ def _detect_constant(
             if power == 0:
                 continue
 
-            frac = Fraction(x / value**power)
-            if frac.numerator < max_int and frac.denominator < max_int:
-                return name, power, frac
+            coeff = Fraction(x / value**power)
+            if coeff.numerator < max_int and coeff.denominator < max_int:
+                return name, power, coeff
+
+
+def fmt_constant_with_coeff(name, power, coeff):
+    if coeff == 0:
+        return "0"
+
+    s = ""
+
+    if coeff != 1 or power < 0:
+        s += f"{coeff} "
+
+    if power == 1:
+        s += name
+    elif power == -1:
+        s += f"/ {name}"
+    elif power < 0:
+        s += f"/ {name}^{-power}"
+    else:
+        s += f"{name}^{power}"
+
+    return s
 
 
 def fmt_number(num: float, value_format: Any = ".3g"):
@@ -38,8 +60,7 @@ def fmt_number(num: float, value_format: Any = ".3g"):
     constant_result = _detect_constant(num)
 
     if constant_result is not None:
-        constant, power, coeff = constant_result
-        return f"{coeff ** power} {constant}^{power}"
+        return fmt_constant_with_coeff(*constant_result)
 
     # Prevent integer numbers from being formatted with e-notation
     if num.is_integer() and num < 1e6:
@@ -92,25 +113,44 @@ def fmt_duration(total_seconds: float):
 
 
 def fmt_list(
-    list_: Iterable,
+    items: Iterable,
     value_format=None,
     item_sep=", ",
-    last_item_sep=" and ",
+    last_item_sep=", ",
     empty="none",
 ):
-    list_ = list(list_)
+    items = list(items)
 
-    if not list_:
+    if not items:
         return empty
 
-    if len(list_) == 1:
-        return fmt(list_[0], value_format)
+    if len(items) == 1:
+        return fmt(items[0], value_format)
 
     return (
-        item_sep.join(fmt(x, value_format) for x in list_[:-1])
+        item_sep.join(fmt(x, value_format) for x in items[:-1])
         + last_item_sep
-        + fmt(list_[-1], value_format)
+        + fmt(items[-1], value_format)
     )
+
+
+def fmt_intersection(
+    items: Iterable,
+    value_format=None,
+):
+    return fmt_list(
+        items,
+        value_format,
+        last_item_sep=" and ",
+        empty="none",
+    )
+
+
+def fmt_union(
+    items: Iterable,
+    value_format=None,
+):
+    return fmt_list(items, value_format, last_item_sep=" or ", empty="any")
 
 
 # DICTS
@@ -179,6 +219,11 @@ def fmt_count(count: int, singular: str, plural: str = "{}s", zero: str = "{}s")
 
 # GENERAL
 
+
+def fmt_type(t: type):
+    return t.__name__
+
+
 Formatter = Callable[..., str]
 
 _formatters: dict[type, Formatter] = {
@@ -189,6 +234,7 @@ _formatters: dict[type, Formatter] = {
     list: fmt_list,
     tuple: fmt_list,
     set: fmt_list,
+    type: fmt_type,
 }
 
 
@@ -211,3 +257,44 @@ def fmt(
         return formatter(value, **options)
     else:
         raise ValueError(f"Invalid formatter {formatter}")
+
+
+def wrap_text(
+    s: str | Iterable[str],
+    width: int = 80,
+    allow_token_split=True,
+    trim_line_end=True,
+    token_pattern=r"(.+?(?:\s+|[,;\-]\s*|[.?!:]\s+))",
+) -> str:
+    if isinstance(s, str):
+        # split by whitespace, punctuation, etc.
+        tokens = re.split(token_pattern, s)
+    else:
+        tokens = list(s)
+
+    lines = [""]
+
+    for token in tokens:
+        if len(lines[-1]) + len(token) <= width:
+            # token fits on the current line
+            lines[-1] += token
+            continue
+
+        # token does not fit -> add new line
+
+        if allow_token_split:
+            # force wrapping -> split token if too long
+            while True:
+                lines.append(token[:width])
+                token = token[width:]
+
+                if not token:
+                    break
+        else:
+            # no force wrapping -> append token despite overflow
+            lines.append(token)
+
+    if trim_line_end:
+        lines = [line.rstrip() for line in lines]
+
+    return "\n".join(lines)
