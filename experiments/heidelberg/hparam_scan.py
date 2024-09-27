@@ -4,6 +4,7 @@ from functools import partial
 from pathlib import Path
 
 import jax
+import numpy as np
 
 # jax.distributed.initialize()  # type: ignore
 from heidelberg_v03 import load_datasets, run_theta_ensemble
@@ -30,12 +31,11 @@ config_grid = {
     "device_count": len(devices),
     "seed": 0,
     # Neuron
-    # "tau": vary(
-    #     # 25 points between 2^-4 = 0.0625 and 2^8 = 256
-    #     # (13 points at exact powers of 2, 12 points in between)
-    #     *np.logspace(-4, 8, num=25, base=2)
-    # ),
-    "tau": 1,
+    "tau": vary(
+        # 25 points between 2^-4 = 0.0625 and 2^8 = 256
+        # (13 points at exact powers of 2, 12 points in between)
+        *np.logspace(-4, 8, num=7, base=2)
+    ),
     "I0": 5 / 4,
     "eps": 1e-6,
     # Network
@@ -45,16 +45,15 @@ config_grid = {
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
-    # "T": vary(
-    #     # 25 points between 2^-4 = 0.0625 and 2^8 = 256
-    #     # (13 points at exact powers of 2, 12 points in between)
-    #     *np.logspace(-4, 8, num=25, base=2)
-    # ),
-    "T": 2,
-    "K": 700,  # Maximal number of simulated ordinary spikes
+    "T": vary(
+        # 25 points between 2^-4 = 0.0625 and 2^8 = 256
+        # (13 points at exact powers of 2, 12 points in between)
+        *np.logspace(-4, 8, num=7, base=2)
+    ),
+    "K": 2000,  # Maximal number of simulated ordinary spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
-    "gamma": vary(1e-3, 1e-2, 1e-1),
+    "gamma": 1e-2,
     "Nbatch": 1000,
     "lr": 4e-3,
     "tau_lr": 1e2,
