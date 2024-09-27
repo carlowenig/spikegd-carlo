@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
+from itertools import repeat
 from pathlib import Path
 from types import EllipsisType
 from typing import (
@@ -381,7 +382,7 @@ class FolderWithInfoYamlResource[*Args](Resource[*Args]):
         info_path = abs_path / cls._info_file_path
 
         with info_path.open("r") as f:
-            dict_ = yaml.safe_load(f)
+            dict_ = yaml.load(f, yaml.Loader)
 
         return cls.from_dict(dict_, root=root)
 
@@ -407,13 +408,40 @@ class YamlResource[*Args](Resource[*Args]):
             raise FileNotFoundError(f"{cls.__name__} at {abs_path} not found.")
 
         with abs_path.open("r") as f:
-            dict_ = yaml.safe_load(f)
+            dict_ = yaml.load(f, yaml.Loader)
 
         return cls.from_dict(dict_, root=root)
 
     def _save_to_unchecked(self, abs_path: Path):
         with abs_path.open("w") as f:
             yaml.dump(self.to_dict(), f, sort_keys=False)
+
+
+def _load_trial_dict(args: tuple[str, PathLike, str]) -> dict:
+    scan_id, scan_root, config_hash = args
+
+    with GridTrial.get_abs_path_of(scan_id, config_hash, root=scan_root).open("r") as f:
+        trial_dict = yaml.load(f, yaml.Loader)
+
+    assert isinstance(trial_dict, dict)
+
+    config = trial_dict.pop("config")
+    assert isinstance(config, dict)
+
+    for key, value in config.items():
+        if key == "_index":
+            continue
+        trial_dict[f"config.{key}"] = value
+
+    metrics = trial_dict.pop("metrics")
+    assert isinstance(metrics, dict)
+
+    for key, value in metrics.items():
+        if key == "epochs":
+            continue
+        trial_dict[f"metrics.{key}"] = value
+
+    return trial_dict
 
 
 @dataclass
@@ -487,54 +515,52 @@ class GridScan(FolderWithInfoYamlResource[str]):
             )
         }
 
-    def load_trials_df(self, *, progress=False, config_hashes: list[str] | None = None):
+    def load_trials_df(
+        self, *, progress=False, config_hashes: list[str] | None = None, parallel=True
+    ):
         if config_hashes is None:
             config_hashes = self.load_trial_config_hashes()
 
-        trials = []
-        for config_hash in tqdm(config_hashes, disable=not progress):
-            trial = self.load_trial(config_hash)
+        if parallel:
+            import multiprocessing
 
-            trial_dict = {
-                "run_id": trial.run_id,
-                "config_hash": trial.config_hash,
-                "started_at": trial.started_at,
-                "finished_at": trial.finished_at,
-                "duration": trial.duration,
-                "error": trial.error,
-            }
+            args_iter = zip(repeat(self.id), repeat(self.root), config_hashes)
 
-            for key, value in trial.config.items():
-                if key == "_index":
-                    continue
-                trial_dict[f"config.{key}"] = value
+            with multiprocessing.Pool() as pool:
+                if progress:
+                    trial_dicts = list(
+                        tqdm(
+                            pool.imap_unordered(_load_trial_dict, args_iter),
+                            total=len(config_hashes),
+                        )
+                    )
+                else:
+                    trial_dicts = pool.map(_load_trial_dict, args_iter)
+        else:
+            trial_dicts = [
+                _load_trial_dict((self.id, self.root, config_hash))
+                for config_hash in tqdm(config_hashes, disable=not progress)
+            ]
 
-            for key, value in trial.metrics.items():
-                if key == "epochs":
-                    continue
-                trial_dict[f"metrics.{key}"] = value
+        return pd.DataFrame(trial_dicts).sort_values("started_at")
 
-            trials.append(trial_dict)
-
-        return pd.DataFrame(trials)
-
-    def sync_trials_df(self, path: PathLike, *, verbose=False) -> pd.DataFrame:
+    def sync_trials_df(
+        self, path: PathLike, *, verbose=False, parallel=True
+    ) -> pd.DataFrame:
         path = self.get_abs_path() / as_path(path)
 
         config_hashes = self.load_trial_config_hashes()
 
-        existing_df = pd.read_parquet(path) if path.exists() else None
+        df = pd.read_parquet(path) if path.exists() else None
 
-        if existing_df is not None:
+        if df is not None:
             if verbose:
-                print(f"Found DataFrame with {len(existing_df)} trials.")
+                print(f"Found DataFrame with {len(df)} trials.")
 
-            for existing_hash in list(existing_df["config_hash"]):
+            for existing_hash in list(df["config_hash"]):
                 if existing_hash not in config_hashes:
                     # Remove trials that are not in the scan anymore
-                    existing_df = existing_df[
-                        existing_df["config_hash"] != existing_hash
-                    ]
+                    df = df[df["config_hash"] != existing_hash]
                 else:
                     # Skip trials that are already in the dataframe
                     config_hashes.remove(existing_hash)
@@ -542,22 +568,30 @@ class GridScan(FolderWithInfoYamlResource[str]):
         if len(config_hashes) == 0:
             if verbose:
                 print("Trials DataFrame is up-to-date.")
-            return existing_df if existing_df is not None else pd.DataFrame()
+
+            if df is None:
+                df = pd.DataFrame()
+        else:
+            if verbose:
+                print(f"Loading {len(config_hashes)} new trials...")
+
+            new_df = self.load_trials_df(
+                progress=verbose, config_hashes=config_hashes, parallel=parallel
+            )
+
+            if df is None:
+                df = new_df
+            else:
+                df = pd.concat([df, new_df], ignore_index=True)
+
+        df.sort_values("started_at", inplace=True, ignore_index=True)
+
+        df.to_parquet(path)
 
         if verbose:
-            print(f"Loading {len(config_hashes)} new trials...")
+            print(f"Saved DataFrame with {len(df)} trials to {path}.")
 
-        new_df = self.load_trials_df(progress=verbose, config_hashes=config_hashes)
-
-        if existing_df is not None:
-            new_df = pd.concat([existing_df, new_df], ignore_index=True)
-
-        new_df.to_parquet(path)
-
-        if verbose:
-            print(f"Saved DataFrame with {len(new_df)} trials to {path}.")
-
-        return new_df
+        return df
 
     def load_exported_trials_df(self, path: PathLike = None):
         if path is None:
