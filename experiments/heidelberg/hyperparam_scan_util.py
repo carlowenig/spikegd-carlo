@@ -423,8 +423,33 @@ class YamlResource[*Args](Resource[*Args]):
             yaml.dump(self.to_dict(), f, sort_keys=False)
 
 
-def _load_trial_dict(scan_id: str, scan_root: PathLike, config_hash: str) -> dict:
-    with GridTrial.get_abs_path_of(scan_id, config_hash, root=scan_root).open("r") as f:
+def _load_run_dict(scan_id: str, scan_root: PathLike, run_id: str) -> dict:
+    path = GridRun.get_abs_path_of(scan_id, run_id, root=scan_root)
+    info_path = path / "info.yaml"
+
+    with info_path.open("r") as f:
+        run_dict = yaml.load(f, yaml.Loader)
+
+    assert isinstance(run_dict, dict)
+
+    del run_dict["constants"]
+    del run_dict["variables"]
+
+    metadata = run_dict.pop("metadata")
+    assert isinstance(metadata, dict)
+
+    for key, value in metadata.items():
+        run_dict[f"metadata.{key}"] = value
+
+    return run_dict
+
+
+def _load_trial_dict_and_epoch_dicts(
+    scan_id: str, scan_root: PathLike, config_hash: str
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    path = GridTrial.get_abs_path_of(scan_id, config_hash, root=scan_root)
+
+    with path.open("r") as f:
         trial_dict = yaml.load(f, yaml.Loader)
 
     assert isinstance(trial_dict, dict)
@@ -445,7 +470,16 @@ def _load_trial_dict(scan_id: str, scan_root: PathLike, config_hash: str) -> dic
             continue
         trial_dict[f"metrics.{key}"] = value
 
-    return trial_dict
+    epoch_dicts = metrics["epochs"]
+    assert isinstance(epoch_dicts, list)
+
+    for epoch, epoch_dict in enumerate(epoch_dicts):
+        assert isinstance(epoch_dict, dict)
+        epoch_dict["scan_id"] = scan_id
+        epoch_dict["config_hash"] = config_hash
+        epoch_dict["epoch"] = epoch
+
+    return trial_dict, epoch_dicts
 
 
 type TrialUpdateFunc = Callable[["GridTrial"], "GridTrial | None | Literal[False]"]
@@ -521,6 +555,33 @@ def _update_trial(
 
 
 @dataclass
+class GridScanExports:
+    runs: pd.DataFrame
+    trials: pd.DataFrame
+    epochs: pd.DataFrame
+
+    @classmethod
+    def load(cls, path: str | Path):
+        path = Path(path)
+        return GridScanExports(
+            runs=pd.read_parquet(path / "runs.parquet"),
+            trials=pd.read_parquet(path / "trials.parquet"),
+            epochs=pd.read_parquet(path / "epochs.parquet"),
+        )
+
+    def save(self, path: str | Path):
+        path = Path(path)
+        path.mkdir(parents=True, exist_ok=True)
+
+        self.runs.to_parquet(path / "runs.parquet")
+        self.trials.to_parquet(path / "trials.parquet")
+        self.epochs.to_parquet(path / "epochs.parquet")
+
+    def __repr__(self):
+        return f"GridScanExports({len(self.runs)} runs, {len(self.trials)} trials, {len(self.epochs)} epochs)"
+
+
+@dataclass
 class GridScan(FolderWithInfoYamlResource[str]):
     id: str
     created_at: str
@@ -591,71 +652,124 @@ class GridScan(FolderWithInfoYamlResource[str]):
             )
         }
 
-    def load_trials_df(
+    def load_runs_df(self, *, progress=False, parallel=True):
+        run_ids = self.load_run_ids()
+
+        run_dicts = advanced_map(
+            partial(_load_run_dict, self.id, self.root),
+            run_ids,
+            progress=progress,
+            parallel=parallel,
+        )
+
+        return pd.DataFrame(run_dicts).sort_values("id")
+
+    def load_trials_and_epochs_dfs(
         self, *, progress=False, config_hashes: list[str] | None = None, parallel=True
     ):
         if config_hashes is None:
             config_hashes = self.load_trial_config_hashes()
 
-        trial_dicts = advanced_map(
-            partial(_load_trial_dict, self.id, self.root),
+        results = advanced_map(
+            partial(_load_trial_dict_and_epoch_dicts, self.id, self.root),
             config_hashes,
             progress=progress,
             parallel=parallel,
         )
 
-        return pd.DataFrame(trial_dicts).sort_values("started_at")
+        trial_dicts = []
+        epoch_dicts = []
 
-    def sync_trials_df(
-        self, path: PathLike, *, verbose=False, parallel=True, fresh=False
-    ) -> pd.DataFrame:
-        path = self.get_abs_path() / as_path(path)
+        for trial_dict, trial_epoch_dicts in results:
+            trial_dicts.append(trial_dict)
+            epoch_dicts.extend(trial_epoch_dicts)
 
-        config_hashes = self.load_trial_config_hashes()
+        trials_df = pd.DataFrame(trial_dicts).sort_values("started_at")
+        epochs_df = pd.DataFrame(epoch_dicts).sort_values(["config_hash", "epoch"])
 
-        if fresh or not path.exists():
-            df = None
-        else:
-            df = pd.read_parquet(path)
+        return trials_df, epochs_df
 
-            if verbose:
-                print(f"Found DataFrame with {len(df)} trials.")
-
-            for existing_hash in list(df["config_hash"]):
-                if existing_hash not in config_hashes:
-                    # Remove trials that are not in the scan anymore
-                    df = df[df["config_hash"] != existing_hash]
-                else:
-                    # Skip trials that are already in the dataframe
-                    config_hashes.remove(existing_hash)
-
-        if len(config_hashes) == 0:
-            if verbose:
-                print("No new trials to add.")
-
-            if df is None:
-                df = pd.DataFrame()
-        else:
-            if verbose:
-                print(f"Loading {len(config_hashes)} new trials...")
-
-            new_df = self.load_trials_df(
-                progress=verbose, config_hashes=config_hashes, parallel=parallel
-            )
-
-            if df is None:
-                df = new_df
-            else:
-                df = pd.concat([df, new_df], ignore_index=True)
-
-        df.sort_values("started_at", inplace=True, ignore_index=True)
-
-        df.to_parquet(path)
+    def create_exports(self, *, verbose=False, parallel=True):
+        if verbose:
+            print("Loading runs...")
+        runs_df = self.load_runs_df(progress=verbose, parallel=parallel)
 
         if verbose:
-            print(f"Saved DataFrame with {len(df)} trials to {path}.")
+            print("Loading trials and epochs...")
+        trials_df, epochs_df = self.load_trials_and_epochs_dfs(
+            progress=verbose, parallel=parallel
+        )
 
-        return df
+        return GridScanExports(runs=runs_df, trials=trials_df, epochs=epochs_df)
+
+    def export(
+        self,
+        root: str | Path = "exports/grid_scans",
+        *,
+        verbose=False,
+        parallel=True,
+    ):
+        path = Path(root) / self.id
+
+        exports = self.create_exports(verbose=verbose, parallel=parallel)
+        exports.save(path)
+
+        return exports
+
+    def load_exports(self, folder: str | Path = "grid_scan_exports"):
+        path = as_path(self.root) / folder / self.id
+        return GridScanExports.load(path)
+
+    # def sync_trials_df(
+    #     self, path: PathLike, *, verbose=False, parallel=True, fresh=False
+    # ) -> pd.DataFrame:
+    #     path = self.get_abs_path() / as_path(path)
+
+    #     config_hashes = self.load_trial_config_hashes()
+
+    #     if fresh or not path.exists():
+    #         df = None
+    #     else:
+    #         df = pd.read_parquet(path)
+
+    #         if verbose:
+    #             print(f"Found DataFrame with {len(df)} trials.")
+
+    #         for existing_hash in list(df["config_hash"]):
+    #             if existing_hash not in config_hashes:
+    #                 # Remove trials that are not in the scan anymore
+    #                 df = df[df["config_hash"] != existing_hash]
+    #             else:
+    #                 # Skip trials that are already in the dataframe
+    #                 config_hashes.remove(existing_hash)
+
+    #     if len(config_hashes) == 0:
+    #         if verbose:
+    #             print("No new trials to add.")
+
+    #         if df is None:
+    #             df = pd.DataFrame()
+    #     else:
+    #         if verbose:
+    #             print(f"Loading {len(config_hashes)} new trials...")
+
+    #         new_df = self.load_trials_df(
+    #             progress=verbose, config_hashes=config_hashes, parallel=parallel
+    #         )
+
+    #         if df is None:
+    #             df = new_df
+    #         else:
+    #             df = pd.concat([df, new_df], ignore_index=True)
+
+    #     df.sort_values("started_at", inplace=True, ignore_index=True)
+
+    #     df.to_parquet(path)
+
+    #     if verbose:
+    #         print(f"Saved DataFrame with {len(df)} trials to {path}.")
+
+    #     return df
 
     def load_exported_trials_df(self, path: PathLike = None):
         if path is None:
