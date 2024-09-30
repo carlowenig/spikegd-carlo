@@ -103,7 +103,7 @@ def normalize_times(times, neurons, dt=0, t_max=1, signal_percentage=0.05):
 def homogenize_dataset(dataset: SHD, config: dict):
     N = dataset.Nsamples
     # Kin = config["Kin"]  # max number of input spikes per neuron
-    Kin = max(len(times) for times in dataset.times_arr)
+    Kin = config.get("Kin") or max(len(times) for times in dataset.times_arr)
     T = config["T"]
     # Tfallback = config["Tfallback"]
 
@@ -120,10 +120,11 @@ def homogenize_dataset(dataset: SHD, config: dict):
     )
     normalize_times_dt = config.get("normalize_times_dt", 0)
 
-    for i in trange_script(N):
+    for i in range(N):
         times = dataset.times_arr[i]
         neurons = dataset.units_arr[i]
-        assert len(times) == len(neurons)
+        n_spike = len(times)
+        assert n_spike == len(neurons)
 
         if _normalize_times:
             times, neurons = normalize_times(
@@ -135,8 +136,27 @@ def homogenize_dataset(dataset: SHD, config: dict):
             )
             assert (times < T).all()
 
-        times_arr[i, : len(times)] = times
-        neurons_arr[i, : len(neurons)] = neurons
+            n_spike = len(times)
+
+        if n_spike > Kin:
+            n_drop = n_spike - Kin
+            # print(f"Dropping {n_drop} of {n_spike} spikes")
+
+            drop_indices = np.random.choice(
+                np.arange(n_spike), size=n_drop, replace=False
+            )
+            mask = np.ones(n_spike, dtype=bool)
+            mask[drop_indices] = False
+            times = times[mask]
+            neurons = neurons[mask]
+            n_spike = Kin
+            # print("Kin", Kin)
+            # print("len(times)", len(times))
+            # print("len(neurons)", len(neurons))
+            assert n_spike == len(times) == len(neurons)
+
+        times_arr[i, :n_spike] = times
+        neurons_arr[i, :n_spike] = neurons
 
     # Create tensor dataset
     times_tensor = torch.as_tensor(times_arr)
