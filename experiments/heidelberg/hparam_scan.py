@@ -36,13 +36,13 @@ config_grid = {
     #     # (13 points at exact powers of 2, 12 points in between)
     #     *np.logspace(-4, 8, num=7, base=2)
     # ),
-    "tau": 1,
+    "tau": 22.6,
     "I0": 5 / 4,
     "eps": 1e-6,
     # Network
     # "Nin_virtual": 16,  # #Virtual input neurons = N_bin - 1
     "Nhidden": 128,
-    "Nlayer": vary(2, 3),  # Number of layers (hidden layers + output layer)
+    "Nlayer": 3,  # Number of layers (hidden layers + output layer)
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
@@ -51,7 +51,7 @@ config_grid = {
     #     # (13 points at exact powers of 2, 12 points in between)
     #     *np.logspace(-4, 8, num=7, base=2)
     # ),
-    "T": 2,
+    "T": 64,
     "K": vary(
         1000, 1500, 2000, 1500, 3000, 4000, 5000
     ),  # Maximal number of simulated ordinary spikes
@@ -60,7 +60,7 @@ config_grid = {
     ),  # Maximal number of input spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
-    "gamma": 1e-2,
+    "gamma": vary(1e-3, 1e-2, 1e-1),
     "Nbatch": 1000,
     "lr": 4e-3,
     "tau_lr": 1e2,
