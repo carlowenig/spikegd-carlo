@@ -465,13 +465,11 @@ def _load_trial_dict_and_epoch_dicts(
     metrics = trial_dict.pop("metrics")
     assert isinstance(metrics, dict)
 
-    for key, value in metrics.items():
-        if key == "epochs":
-            continue
-        trial_dict[f"metrics.{key}"] = value
-
-    epoch_dicts = metrics["epochs"]
+    epoch_dicts = metrics.pop("epochs", [])
     assert isinstance(epoch_dicts, list)
+
+    for key, value in metrics.items():
+        trial_dict[f"metrics.{key}"] = value
 
     for epoch, epoch_dict in enumerate(epoch_dicts):
         assert isinstance(epoch_dict, dict)
