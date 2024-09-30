@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --array=1-14
+#SBATCH --array=1-10
 #SBATCH --partition=mlgpu_short
 #SBATCH --time=4:00:00
 #SBATCH --gpus=1

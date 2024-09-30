@@ -53,14 +53,20 @@ config_grid = {
     # ),
     "T": 64,
     "K": vary(
-        1000, 1500, 2000, 1500, 3000, 4000, 5000
+        1000, 3000, 5000, 7000, 10000
     ),  # Maximal number of simulated ordinary spikes
     "Kin": computed_vary(
-        lambda K: [int(rel_K_in * K) for rel_K_in in np.linspace(0.1, 1, 10)]
+        lambda K: [
+            int(rel_K_in * K)
+            for rel_K_in in (
+                list(np.linspace(0.1, 1, 10))  # 0.1, 0.2, ..., 0.9, 1.0
+                + [0.95, 0.98, 0.99, 0.995, 0.998, 0.999]
+            )
+        ]
     ),  # Maximal number of input spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
-    "gamma": vary(1e-3, 1e-2, 1e-1),
+    "gamma": 1e-2,
     "Nbatch": 1000,
     "lr": 4e-3,
     "tau_lr": 1e2,
