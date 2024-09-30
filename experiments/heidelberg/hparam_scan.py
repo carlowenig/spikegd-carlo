@@ -4,6 +4,7 @@ from functools import partial
 from pathlib import Path
 
 import jax
+import numpy as np
 
 # jax.distributed.initialize()  # type: ignore
 from heidelberg_v03 import load_datasets, run_theta_ensemble
@@ -41,7 +42,7 @@ config_grid = {
     # Network
     # "Nin_virtual": 16,  # #Virtual input neurons = N_bin - 1
     "Nhidden": 128,
-    "Nlayer": 2,  # Number of layers (hidden layers + output layer)
+    "Nlayer": vary(2, 3),  # Number of layers (hidden layers + output layer)
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
@@ -51,9 +52,11 @@ config_grid = {
     #     *np.logspace(-4, 8, num=7, base=2)
     # ),
     "T": 2,
-    "K": vary(1000, 2000, 3000),  # Maximal number of simulated ordinary spikes
+    "K": vary(
+        1000, 1500, 2000, 1500, 3000, 4000, 5000
+    ),  # Maximal number of simulated ordinary spikes
     "Kin": computed_vary(
-        lambda K: [K // 5, K // 2, K]
+        lambda K: [int(rel_K_in * K) for rel_K_in in np.linspace(0.1, 1, 10)]
     ),  # Maximal number of input spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training

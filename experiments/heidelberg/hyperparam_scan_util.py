@@ -901,6 +901,12 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 f"CONSTANTS:\n  {fmt_dict_multiline(constants).replace("\n", "\n  ")}"
             )
             print(f"VARIABLES: {", ".join(variables)}")
+            print()
+            print("CONFIG LIST:")
+            configs_df = pd.DataFrame(configs)
+            variables_df = configs_df[variables]
+            print(variables_df.to_string())
+
             return
 
         run = GridRun.create(
