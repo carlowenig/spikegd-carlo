@@ -1,3 +1,4 @@
+import argparse
 import shutil
 from pathlib import Path, PurePath
 from typing import Iterable
@@ -33,16 +34,17 @@ def create_tar_command(
     return tar_command
 
 
-def download_results(
-    archive_name="results.temp.tar.gz",
-    remote_root_path=PurePath(f"/home/{USERNAME}/spikegd-carlo/experiments/heidelberg"),
-    local_root_path=Path(__file__).parent,
+def download(
+    path: str | Path,
+    archive_name="download.temp.tar.gz",
+    remote_root_path=PurePath(f"/home/{USERNAME}/spikegd-carlo"),
+    local_root_path=Path.cwd(),
     exclude: Iterable[str] = ("*_backup_*",),
 ):
-    remote_results_path = remote_root_path / "results"
+    remote_results_path = remote_root_path / path
     remote_archive_path = remote_root_path / archive_name
 
-    local_results_path = local_root_path / "results"
+    local_results_path = local_root_path / path
     local_archive_path = local_root_path / archive_name
 
     print("Downloading results")
@@ -90,4 +92,11 @@ def download_results(
 
 
 if __name__ == "__main__":
-    download_results()
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument(
+        "path",
+        help="Path to the directory which should be downloaded",
+    )
+    args = argparser.parse_args()
+
+    download(args.path)
