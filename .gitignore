@@ -3,5 +3,6 @@
 **/*.backup
 experiments/*/data
 experiments/*/results
+experiments/*/exports
 .venv
 **/slurm_output
