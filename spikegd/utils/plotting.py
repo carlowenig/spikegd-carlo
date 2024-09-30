@@ -1,5 +1,6 @@
 """Figure options and helper functions for plotting."""
 
+import itertools
 from abc import ABC, abstractmethod
 from types import MappingProxyType
 from typing import Any, Iterable, Literal, Mapping
@@ -16,7 +17,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from .attrs_utils import UniqueCollector, as_converter
-from .formatting import fmt, fmt_dict, fmt_intersection, fmt_list, fmt_number, wrap_text
+from .formatting import fmt, fmt_dict, fmt_intersection, fmt_list, fmt_number
 
 
 def cm2inch(x: float, y: float) -> tuple[float, float]:
@@ -77,7 +78,7 @@ cmap_purples = plt.get_cmap("Purples")
 
 # Plot dataframe
 def _get_val_list(df, key, min_count=0, verbose=False) -> list:
-    if not key:
+    if not key or key not in df.columns:
         return []
 
     val_counts = df[key].value_counts()
@@ -484,7 +485,7 @@ class HeatmapPlot(Plot):
         x_vals = _get_val_list(full_df, x_key, grid.min_points_per_ax)
         y_vals = _get_val_list(full_df, y_key, grid.min_points_per_ax)
 
-        if not x_vals or not x_vals:
+        if not x_vals or not y_vals:
             return
 
         x_vals = np.sort(x_vals)
@@ -632,7 +633,9 @@ class PlotGrid:
     func_keys: tuple[str, ...] = attrs.field(converter=UniqueCollector(str))
     func_aggs: Mapping[str, str] = attrs.field(factory=dict, converter=MappingProxyType)
     plots: tuple[Plot, ...] = attrs.field(default=None, converter=plots_inferrer)
-    col_key: str | None = attrs.field(default=None)
+    col_keys: tuple[str, ...] = attrs.field(
+        default=None, converter=UniqueCollector(str)
+    )
     row_key: str | None = attrs.field(default=None)
     fig_key: str | None = attrs.field(default=None)
     fixed_values: Mapping[str, Any] = attrs.field(
@@ -658,15 +661,15 @@ class PlotGrid:
         self,
         df: pd.DataFrame,
         row_val: Any,
-        col_val: Any,
+        col_vals: tuple,
         func_key: str,
         ax: Axes,
     ):
         plot_vals = {}
         if self.row_key:
             plot_vals[self.row_key] = row_val
-        if self.col_key:
-            plot_vals[self.col_key] = col_val
+        for col_key, col_val in zip(self.col_keys, col_vals):
+            plot_vals[col_key] = col_val
 
         ax_df = df.copy()
         for key, value in plot_vals.items():
@@ -691,11 +694,11 @@ class PlotGrid:
     def _create_figure(
         self,
         df: pd.DataFrame,
-        col_vals,
+        col_val_tuples: list[tuple],
         row_vals,
         func_keys: tuple,
     ):
-        n_cols = len(col_vals)
+        n_cols = len(col_val_tuples)
         n_rows = len(row_vals)
         n_funcs = len(func_keys)
         n_rows_total = n_rows * n_funcs
@@ -720,18 +723,18 @@ class PlotGrid:
 
         for row_i, col_i, func_i in np.ndindex(n_rows, n_cols, n_funcs):
             row_val = row_vals[row_i]
-            col_val = col_vals[col_i]
+            col_vals = col_val_tuples[col_i]
             func_key = func_keys[func_i]
             ax = axs[row_i * n_funcs + func_i, col_i]
-            self._draw_func(df, row_val, col_val, func_key, ax)
+            self._draw_func(df, row_val, col_vals, func_key, ax)
 
         for plot in self.plots:
             plot.style_grid(self, fig, axs, df)
 
         return fig
 
-    def _preprocess_df(
-        self, df: pd.DataFrame
+    def _create_figure_df(
+        self, df: pd.DataFrame, fig_val
     ) -> tuple[pd.DataFrame, Mapping[str, Any]]:
         indep_constants = (
             {key for key in self.indep_keys if df[key].nunique() <= 1}
@@ -739,6 +742,10 @@ class PlotGrid:
             else set()
         )
         # print("INDEPENDENT CONSTANTS:", indep_constants)
+
+        # Filter fig value
+        if self.fig_key is not None:
+            df = df[df[self.fig_key] == fig_val]
 
         # Filter fixed values
         for fixed_key, fixed_value in self.fixed_values.items():
@@ -780,7 +787,7 @@ class PlotGrid:
         expected_variables = {
             *self.arg_keys,
             *self.func_keys,
-            self.col_key,
+            *self.col_keys,
             self.row_key,
             self.fig_key,
             *self.mean_keys,
@@ -816,30 +823,35 @@ class PlotGrid:
 
     def show(self, df):
         n_samples_total = len(df)
-
-        df, fixed_values = self._preprocess_df(df)
-
         fig_vals = _get_val_list(df, self.fig_key) or [None]
 
         for fig_val in fig_vals:
-            if self.fig_key is None:
-                fig_df = df
-            else:
-                fig_df = df[df[self.fig_key] == fig_val]
-                fixed_values = dict(fixed_values) | {self.fig_key: fig_val}
+            fig_df, fixed_values = self._create_figure_df(df, fig_val)
 
-            col_vals = _get_val_list(
-                fig_df, self.col_key, self.min_points_per_ax, verbose=True
-            ) or [None]
+            col_val_tuples = list(
+                itertools.product(
+                    *(
+                        _get_val_list(fig_df, col_key, self.min_points_per_ax) or [None]
+                        for col_key in self.col_keys
+                    )
+                )
+            )
 
             row_vals = _get_val_list(
                 fig_df, self.row_key, self.min_points_per_ax, verbose=True
             ) or [None]
 
-            fig = self._create_figure(fig_df, col_vals, row_vals, self.func_keys)
+            fig = self._create_figure(fig_df, col_val_tuples, row_vals, self.func_keys)
 
-            fig.suptitle(
-                wrap_text(
+            if self.fig_key is not None:
+                fig.suptitle(f"{fmt(self.fig_key, self.key_format)} = {fmt(fig_val)}")
+
+            fig.text(
+                # center horizontally (using 0.5 in figure coordinates)
+                0.5,
+                # offset by 0.1 inch (divide by figure height to get inches)
+                -0.1 / fig.get_figheight(),
+                (
                     (
                         f"Mean over {fmt_intersection(self.mean_keys, self.key_format)}\n"
                         if self.mean_keys
@@ -855,9 +867,14 @@ class PlotGrid:
                         if self.agg_keys
                         else ""
                     )
-                    + f"(contains {len(fig_df)} of {n_samples_total} samples)",
-                    token_pattern=r"(.+?\s*(?:,|and|\n)\s*)",
-                )
+                    + f"(contains {len(fig_df)} of {n_samples_total} samples)"
+                    # token_pattern=r"(.+?\s*(?:,|and|\n)\s*)",
+                ),
+                ha="center",
+                va="top",
+                fontsize=8,
+                style="italic",
+                wrap=True,
             )
 
             plt.show()

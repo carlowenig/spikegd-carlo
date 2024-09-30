@@ -162,7 +162,7 @@ def fmt_dict(
     key_format=None,
     item_sep=", ",
     value_sep=" = ",
-    last_item_sep=" and ",
+    last_item_sep=", ",
     empty="none",
 ):
     dict_ = dict(dict_)
