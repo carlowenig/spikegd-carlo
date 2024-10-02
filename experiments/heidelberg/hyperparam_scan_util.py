@@ -628,6 +628,22 @@ class GridScan(FolderWithInfoYamlResource[str]):
     def load_runs(self):
         return {run_id: self.load_run(run_id) for run_id in self.load_run_ids()}
 
+    def load_runs_df(self, *, progress=False, parallel=True):
+        run_ids = self.load_run_ids()
+
+        run_dicts = advanced_map(
+            partial(_load_run_dict, self.id, self.root),
+            run_ids,
+            progress=progress,
+            parallel=parallel,
+        )
+
+        return pd.DataFrame(run_dicts).sort_values("id")
+
+    def load_active_runs(self):
+        runs = self.load_runs()
+        return {run_id: run for run_id, run in runs.items() if run.finished_at is None}
+
     def load_trial_config_hashes(self) -> list[str]:
         trials_path = self.get_abs_path() / "trials"
 
@@ -649,18 +665,6 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 disable=not progress,
             )
         }
-
-    def load_runs_df(self, *, progress=False, parallel=True):
-        run_ids = self.load_run_ids()
-
-        run_dicts = advanced_map(
-            partial(_load_run_dict, self.id, self.root),
-            run_ids,
-            progress=progress,
-            parallel=parallel,
-        )
-
-        return pd.DataFrame(run_dicts).sort_values("id")
 
     def load_trials_and_epochs_dfs(
         self, *, progress=False, config_hashes: list[str] | None = None, parallel=True
@@ -1035,6 +1039,8 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 error = traceback.format_exc()
                 metrics = {}
                 run.log(fmt_dict_multiline({"error": error}))
+                run.n_failed += 1
+                run.save()
             else:
                 error = None
                 run.log(
@@ -1042,6 +1048,8 @@ class GridScan(FolderWithInfoYamlResource[str]):
                         filter_dict(metrics, show_metrics, require_all=True)
                     )
                 )
+                run.n_success += 1
+                run.save()
 
             finished_time = time.time()
 
@@ -1064,21 +1072,11 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 run.log(f"Finished trial {config_hash} after {trial.duration:.1f}s")
 
         try:
-            # TODO: Is it possible to parallelize this?
-            # import jax.numpy as jnp
-
-            # arr_configs = {
-            #     "_index": jnp.arange(len(configs)),
-            # } | {k: jnp.array([c[k] for c in configs]) for k in configs[0].keys()}
-
-            # jax.pmap(process_config)(arr_configs)
-
-            # with ThreadPool(n_processes) as pool:
-            #     pool.map(process_config, enumerate(configs))
-
             for config_index, config in enumerate(configs):
                 process_config(config_index, config)
-
+        except Exception:
+            run.error = traceback.format_exc()
+            run.log(f"Error during run: {run.error}")
         finally:
             run.finished_at = fmt_timestamp(time.time())
             run.duration = time.time() - parse_timestamp(run.started_at)
@@ -1086,6 +1084,24 @@ class GridScan(FolderWithInfoYamlResource[str]):
             print(f"Finished run {self.id}")
 
         return run
+
+    def load_progress_info(self):
+        active_runs = self.load_active_runs()
+        return "\n".join(
+            f"{id}: {run.get_progress_info()}" for id, run in active_runs.items()
+        )
+
+    def watch_progress(self, interval: float = 2.0):
+        while True:
+            try:
+                info = self.load_progress_info()
+            except Exception as e:
+                info = f"Error while loading progress info: {e}"
+
+            n_lines = info.count("\n") + 1
+
+            print(self.load_progress_info(), end="\r" * n_lines)
+            time.sleep(interval)
 
 
 @dataclass
@@ -1097,7 +1113,11 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
     metadata: dict
     constants: dict[str, Any]
     variables: list[str]
+    n_total: int
+    n_success: int
+    n_failed: int
     started_at: str
+    error: str | None = None
     finished_at: str | None = None
     duration: float | None = None
 
@@ -1124,12 +1144,14 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
         root: PathLike,
         constants: dict[str, Any] | None = None,
         variables: list[str] | None = None,
+        n_total: int | None = None,
     ):
         if id is None:
             id = cls.create_timestamp_id(name)
 
         assert constants is not None
         assert variables is not None
+        assert n_total is not None
 
         run = cls(
             root=root,
@@ -1140,6 +1162,9 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
             metadata=metadata or {},
             constants=constants,
             variables=variables,
+            n_total=n_total,
+            n_success=0,
+            n_failed=0,
             started_at=fmt_timestamp(time.time()),
         )
         run.save()
@@ -1159,6 +1184,21 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
 
         with log_path.open("a") as file:
             file.write(f"[{timestamp}]\n{message}\n")
+
+    def get_progress(self) -> float:
+        if self.n_total == 0:
+            return 1
+
+        n_finished = self.n_success + self.n_failed
+        return n_finished / self.n_total
+
+    def get_progress_info(self):
+        progress = self.get_progress()
+        n_remaining = self.n_total - self.n_success - self.n_failed
+        return (
+            f"{progress:.1%} ({self.n_success} successful, {self.n_failed} failed, "
+            f"{n_remaining} remaining of {self.n_total})"
+        )
 
 
 def _standardize_value(value: Any) -> Any:
