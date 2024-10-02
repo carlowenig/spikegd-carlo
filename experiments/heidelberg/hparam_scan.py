@@ -4,11 +4,10 @@ from functools import partial
 from pathlib import Path
 
 import jax
-import numpy as np
 
 # jax.distributed.initialize()  # type: ignore
-from heidelberg_v03 import load_datasets, run_theta_ensemble
-from hyperparam_scan_util import GridScan, computed_vary, vary
+from heidelberg_v02 import load_datasets, run_theta_ensemble
+from hyperparam_scan_util import GridScan
 
 assert (
     Path.cwd().as_posix().endswith("experiments/heidelberg")
@@ -36,11 +35,11 @@ config_grid = {
     #     # (13 points at exact powers of 2, 12 points in between)
     #     *np.logspace(-4, 8, num=7, base=2)
     # ),
-    "tau": 22.6,
+    "tau": 1,
     "I0": 5 / 4,
     "eps": 1e-6,
     # Network
-    # "Nin_virtual": 16,  # #Virtual input neurons = N_bin - 1
+    "Nin_virtual": 16,  # #Virtual input neurons = N_bin - 1
     "Nhidden": 128,
     "Nlayer": 3,  # Number of layers (hidden layers + output layer)
     "Nout": 20,
@@ -51,19 +50,9 @@ config_grid = {
     #     # (13 points at exact powers of 2, 12 points in between)
     #     *np.logspace(-4, 8, num=7, base=2)
     # ),
-    "T": 64,
-    "K": vary(
-        1000, 3000, 5000, 7000, 10000
-    ),  # Maximal number of simulated ordinary spikes
-    "Kin": computed_vary(
-        lambda K: [
-            int(rel_K_in * K)
-            for rel_K_in in (
-                list(np.linspace(0.1, 1, 10))  # 0.1, 0.2, ..., 0.9, 1.0
-                + [0.95, 0.98, 0.99, 0.995, 0.998, 0.999]
-            )
-        ]
-    ),  # Maximal number of input spikes
+    "T": 2,
+    "K": 700,  # Maximal number of simulated ordinary spikes
+    # "Kin":   # Maximal number of input spikes
     "dt": 0.001,  # Step size used to compute state traces
     # Training
     "gamma": 1e-2,
@@ -84,9 +73,11 @@ config_grid = {
     "Nsamples": 3,
     # Data transformation
     "normalize_times": True,
+    # Output function
+    "out_func": "max_over_time_potential",
 }
 
-scan = GridScan.load_or_create("main_v3.2_manual_Kin", root="results")
+scan = GridScan.load_or_create("main_v2_max_over_time", root="results")
 
 arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument("--id", type=str)

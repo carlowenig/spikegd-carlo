@@ -7,7 +7,7 @@ import numpy as np
 import optax
 import torch
 from jax import jit, random, value_and_grad, vmap
-from jaxtyping import Array, ArrayLike, Float, Int
+from jaxtyping import Array, ArrayLike, Bool, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
 from shd import SHD
@@ -266,6 +266,53 @@ def eventffwd(
     return out
 
 
+def leaky_evolve(
+    V: Float[Array, ""],
+    t: Float[Array, ""],
+    t_next: Float[Array, ""],
+    w: Float[Array, ""],
+    config: dict,
+) -> Float[Array, " N"]:
+    I0: float = config["I0"]
+    tau: float = config["tau"]
+
+    # evolve without spikes between t_0 and t_next and add weight w afterwards
+    return (V - I0) * jnp.exp(-(t_next - t) / tau) + I0 + w
+
+
+# @jax.jit
+def leaky_integrate(
+    times: Float[Array, " N"],
+    V_0: Float[Array, ""],
+    w: Float[Array, ""],
+    spike_mask: Bool[Array, " N"],
+    config: dict,
+) -> Float[Array, " N"]:
+    # compile evolve function with spike weight
+    # evolve_spike = jax.jit(partial(leaky_evolve, w=w, config=config))
+    # leak
+
+    N = len(times)  # number of time steps
+    assert len(spike_mask) == N
+
+    # weights for actual spikes or 0 otherwise
+    w_sp = jnp.where(spike_mask, w, 0)
+
+    def spike_scanner(
+        V: Float[Array, ""], i: Int[Array, ""]
+    ) -> tuple[Float[Array, ""], Float[Array, ""]]:
+        t_prev = jnp.where(i == 0, 0, times[i - 1])
+        t_next = times[i]
+
+        V_next = leaky_evolve(V, t_prev, t_next, w_sp[i], config=config)
+
+        return V_next, V_next
+
+    _, V_arr = jax.lax.scan(spike_scanner, V_0, jnp.arange(N))
+
+    return V_arr
+
+
 def outfn(
     neuron: AbstractPseudoPhaseOscNeuron, out: tuple, p: list, config: dict
 ) -> Array:
@@ -294,22 +341,47 @@ def outfn(
         pseudo_rates = neuron.construct_ratefn(x_end_i)(input)
     input = neuron.linear(pseudo_rates, weights[Nlayer - 1])
 
-    ### Spike times for each learned neuron
-    def compute_tout(i: ArrayLike) -> Array:
-        ### Potential ordinary output spike times
-        mask = (neurons == N - Nout + i) & (spike_in == False)  # noqa: E712
-        Kout = jnp.sum(mask)  # Number of ordinary output spikes
-        t_out_ord = times[jnp.argmax(mask)]
+    out_func = config["out_func"]
 
-        ### Pseudospike time
-        t_out_pseudo = neuron.t_pseudo(x_end[:, N - Nout + i], input[i], 1, config)
+    if out_func == "first_spike_time":
+        ### Spike times for each learned neuron
+        def compute_tout(i: ArrayLike) -> Array:
+            ### Potential ordinary output spike times
+            mask = (neurons == N - Nout + i) & (spike_in == False)  # noqa: E712
+            Kout = jnp.sum(mask)  # Number of ordinary output spikes
+            t_out_ord = times[jnp.argmax(mask)]
 
-        ### Output spike time
-        t_out = jnp.where(0 < Kout, t_out_ord, t_out_pseudo)
+            ### Pseudospike time
+            t_out_pseudo = neuron.t_pseudo(x_end[:, N - Nout + i], input[i], 1, config)
 
-        return t_out
+            ### Output spike time
+            t_out = jnp.where(0 < Kout, t_out_ord, t_out_pseudo)
 
-    t_outs = vmap(compute_tout)(jnp.arange(Nout))
+            return t_out
+
+        t_outs = vmap(compute_tout)(jnp.arange(Nout))
+
+    elif out_func == "max_over_time_potential":
+        T: float = config["T"]
+        integration_times = jnp.append(times, T)
+
+        def compute_tout(i: ArrayLike):
+            spike_mask = (neurons >= N - Nout + i) & (spike_in == False)  # noqa: E712
+            spike_mask = jnp.append(spike_mask, False)  # last time is T and no spike
+
+            V_arr = leaky_integrate(
+                times=integration_times,
+                V_0=0,  # type: ignore
+                w=1,  # type: ignore
+                spike_mask=spike_mask,
+                config=config,
+            )
+            return jnp.max(V_arr)
+
+        t_outs = vmap(compute_tout)(jnp.arange(Nout))
+
+    else:
+        raise ValueError(f"Unknown output function: {out_func}")
 
     return t_outs
 
