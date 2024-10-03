@@ -4,10 +4,11 @@ from functools import partial
 from pathlib import Path
 
 import jax
+import numpy as np
 
 # jax.distributed.initialize()  # type: ignore
 from heidelberg_v02 import load_datasets, run_theta_ensemble
-from hyperparam_scan_util import GridScan
+from hyperparam_scan_util import GridScan, vary
 
 assert (
     Path.cwd().as_posix().endswith("experiments/heidelberg")
@@ -41,7 +42,7 @@ config_grid = {
     # Network
     "Nin_virtual": 16,  # #Virtual input neurons = N_bin - 1
     "Nhidden": 128,
-    "Nlayer": 3,  # Number of layers (hidden layers + output layer)
+    "Nlayer": vary(2, 3),  # Number of layers (hidden layers + output layer)
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
@@ -50,7 +51,7 @@ config_grid = {
     #     # (13 points at exact powers of 2, 12 points in between)
     #     *np.logspace(-4, 8, num=7, base=2)
     # ),
-    "T": 2,
+    "T": vary(2, 4, 8),
     "K": 700,  # Maximal number of simulated ordinary spikes
     # "Kin":   # Maximal number of input spikes
     "dt": 0.001,  # Step size used to compute state traces
@@ -75,9 +76,12 @@ config_grid = {
     "normalize_times": True,
     # Output function
     "out_func": "max_over_time_potential",
+    # Readout layer params (e.g. used by max_over_time_potential)
+    "readout_V0": vary(*np.logspace(0, 12, num=13, base=2)),
+    "readout_w": vary(*np.logspace(0, 12, num=13, base=2)),
 }
 
-scan = GridScan.load_or_create("main_v2_max_over_time", root="results")
+scan = GridScan.load_or_create("main_v2.1_max_over_time", root="results")
 
 arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument("--id", type=str)

@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --array=1-10
+#SBATCH --array=1-13
 #SBATCH --partition=mlgpu_short
-#SBATCH --time=4:00:00
+#SBATCH --time=8:00:00
 #SBATCH --gpus=1
 #SBATCH --account=ag_ifg_memmesheimer
 #SBATCH --output=slurm_output/%x_%A_%a.out

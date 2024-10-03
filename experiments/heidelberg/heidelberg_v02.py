@@ -10,11 +10,11 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Bool, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
-from shd import SHD
 from torch.utils.data import DataLoader, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
+from shd import SHD
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
@@ -363,22 +363,27 @@ def outfn(
 
     elif out_func == "max_over_time_potential":
         T: float = config["T"]
+        readout_V0: float = config["readout_V0"]
+        readout_w: float = config["readout_w"]
         integration_times = jnp.append(times, T)
 
         def compute_tout(i: ArrayLike):
-            spike_mask = (neurons >= N - Nout + i) & (spike_in == False)  # noqa: E712
+            spike_mask = (neurons == N - Nout + i) & (spike_in == False)  # noqa: E712
             spike_mask = jnp.append(spike_mask, False)  # last time is T and no spike
 
             V_arr = leaky_integrate(
                 times=integration_times,
-                V_0=0,  # type: ignore
-                w=1,  # type: ignore
+                V_0=readout_V0,  # type: ignore
+                w=readout_w,  # type: ignore
                 spike_mask=spike_mask,
                 config=config,
             )
             return jnp.max(V_arr)
 
-        t_outs = vmap(compute_tout)(jnp.arange(Nout))
+        # use minus sign since -t_outs is used in log_softmax, but we want higher
+        # potentials to correspond to higher probabilities.
+        # TODO: use minus sign for first_spike_time instead to avoid double minus
+        t_outs = -vmap(compute_tout)(jnp.arange(Nout))
 
     else:
         raise ValueError(f"Unknown output function: {out_func}")
@@ -393,10 +398,14 @@ def lossfn(
     Compute cross entropy loss and if the network prediction was correct.
     """
     T: float = config["T"]
-    gamma: float = config["gamma"]
     log_softmax = jax.nn.log_softmax(-t_outs)
-    regu = jnp.exp(t_outs / T) - 1
-    loss = -log_softmax[label] + gamma * regu[label]
+    loss = -log_softmax[label]
+
+    if config["out_func"] == "first_spike_time":
+        regu = jnp.exp(t_outs / T) - 1
+        gamma: float = config["gamma"]
+        loss += gamma * regu[label]
+
     correct = jnp.argmin(t_outs) == label
     return loss, correct
 
@@ -463,8 +472,12 @@ def probefn(
     mean_loss = jnp.mean(loss)
     acc = jnp.mean(correct)
 
-    ### Loss and accuracy without pseudospikes
-    t_out_ord = jnp.where(t_outs < T, t_outs, T)
+    ### Loss and accuracy without pseudospikes (if using first_spike_time)
+    t_out_ord = (
+        jnp.where(t_outs < T, t_outs, T)
+        if config["out_func"] == "first_spike_time"
+        else t_outs
+    )
     loss_ord, correct_ord = batch_lossfn(t_out_ord, labels)
     mean_loss_ord = jnp.mean(loss_ord)
     acc_ord = jnp.mean(correct_ord)
