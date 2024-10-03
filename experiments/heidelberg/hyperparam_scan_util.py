@@ -579,6 +579,19 @@ class GridScanExports:
         return f"GridScanExports({len(self.runs)} runs, {len(self.trials)} trials, {len(self.epochs)} epochs)"
 
 
+def progress_info(n_success: int | None, n_failed: int | None, n_total: int | None):
+    if n_success is not None and n_failed is not None and n_total is not None:
+        n_finished = n_success + n_failed
+        n_remaining = n_total - n_finished
+        progress = 1 if n_total == 0 else n_finished / n_total
+        return (
+            f"{progress:.1%} ({n_success} successful, {n_failed} failed, "
+            f"{n_remaining} remaining of {n_total})"
+        )
+    else:
+        return "unknown"
+
+
 @dataclass
 class GridScan(FolderWithInfoYamlResource[str]):
     id: str
@@ -921,6 +934,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
             description=description,
             constants=constants,
             variables=variables,
+            n_total=len(configs),
             metadata={
                 "base_id": base_id,
                 "split_size": n_jobs,
@@ -1039,7 +1053,8 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 error = traceback.format_exc()
                 metrics = {}
                 run.log(fmt_dict_multiline({"error": error}))
-                run.n_failed += 1
+                if run.n_failed is not None:
+                    run.n_failed += 1
                 run.save()
             else:
                 error = None
@@ -1048,7 +1063,8 @@ class GridScan(FolderWithInfoYamlResource[str]):
                         filter_dict(metrics, show_metrics, require_all=True)
                     )
                 )
-                run.n_success += 1
+                if run.n_success is not None:
+                    run.n_success += 1
                 run.save()
 
             finished_time = time.time()
@@ -1086,22 +1102,110 @@ class GridScan(FolderWithInfoYamlResource[str]):
         return run
 
     def load_progress_info(self):
-        active_runs = self.load_active_runs()
-        return "\n".join(
-            f"{id}: {run.get_progress_info()}" for id, run in active_runs.items()
+        active_runs = sorted(self.load_active_runs().values(), key=lambda run: run.id)
+
+        n_total_total = sum(run.n_total or 0 for run in active_runs)
+        n_success_total = sum(run.n_success or 0 for run in active_runs)
+        n_failed_total = sum(run.n_failed or 0 for run in active_runs)
+
+        total_info = progress_info(n_success_total, n_failed_total, n_total_total)
+
+        info = f"{len(active_runs)} active runs:\n"
+        info += "\n".join(
+            f"- {run.id}: {run.get_progress_info()}" for run in active_runs
+        )
+        info += f"\nTOTAL: {total_info}"
+
+        return info
+
+    def create_progress_widget(self):
+        from ipywidgets import HTML, FloatProgress, HBox, Layout, VBox
+
+        active_runs = sorted(self.load_active_runs().values(), key=lambda run: run.id)
+
+        children: list = [HTML(f"<h3>{len(active_runs)} active runs</h3>")]
+
+        for run in active_runs:
+            progress = run.get_progress()
+
+            if progress is None:
+                children.append(HTML(f"{run.id}: Unknown progress"))
+            else:
+                pbar = FloatProgress(
+                    progress,
+                    min=0,
+                    max=1,
+                    layout=Layout(height="1.3em", margin="0 1em"),
+                )
+                children.append(
+                    HBox(
+                        [
+                            HTML(f"{run.id}: "),
+                            pbar,
+                            HTML(run.get_progress_info()),
+                        ],
+                        layout=Layout(align_items="baseline"),
+                    )
+                )
+
+        n_success_total = sum(run.n_success or 0 for run in active_runs)
+        n_failed_total = sum(run.n_failed or 0 for run in active_runs)
+        n_total_total = sum(run.n_total or 0 for run in active_runs)
+
+        total_progress = (
+            1
+            if n_total_total == 0
+            else (n_success_total + n_failed_total) / n_total_total
+        )
+        total_progress_info = progress_info(
+            n_success_total, n_failed_total, n_total_total
         )
 
-    def watch_progress(self, interval: float = 2.0):
-        while True:
-            try:
-                info = self.load_progress_info()
-            except Exception as e:
-                info = f"Error while loading progress info: {e}"
+        children.append(
+            HBox(
+                [
+                    HTML("<b>TOTAL: </b>"),
+                    FloatProgress(
+                        total_progress, min=0, max=1, layout=Layout(margin="0 1em")
+                    ),
+                    HTML(f"<b>{total_progress_info}</b>"),
+                ],
+                layout=Layout(margin="1em 0 0 0"),
+            )
+        )
 
-            n_lines = info.count("\n") + 1
+        return VBox(children)
 
-            print(self.load_progress_info(), end="\r" * n_lines)
-            time.sleep(interval)
+    def show_progress(self):
+        from IPython.display import display
+
+        display(self.create_progress_widget())
+
+    def watch_progress(self, interval: float = 5.0, max_updates=100):
+        from IPython.display import display
+        from ipywidgets import HTML, Output
+
+        seconds = int(interval) - 1
+        rest_time = interval - seconds
+
+        output = Output()
+        display(output)
+
+        update_info = HTML("(waiting)")
+
+        for _ in range(max_updates):
+            progress_widget = self.create_progress_widget()
+
+            with output:
+                output.clear_output(wait=True)
+                display(progress_widget)
+                display(update_info)
+
+            time.sleep(rest_time)
+
+            for second in range(seconds):
+                update_info.value = f"(updating in {seconds - second} seconds)"
+                time.sleep(1)
 
 
 @dataclass
@@ -1113,10 +1217,10 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
     metadata: dict
     constants: dict[str, Any]
     variables: list[str]
-    n_total: int
-    n_success: int
-    n_failed: int
     started_at: str
+    n_total: int | None = None
+    n_success: int | None = None
+    n_failed: int | None = None
     error: str | None = None
     finished_at: str | None = None
     duration: float | None = None
@@ -1162,10 +1266,10 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
             metadata=metadata or {},
             constants=constants,
             variables=variables,
+            started_at=fmt_timestamp(time.time()),
             n_total=n_total,
             n_success=0,
             n_failed=0,
-            started_at=fmt_timestamp(time.time()),
         )
         run.save()
         return run
@@ -1185,7 +1289,10 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
         with log_path.open("a") as file:
             file.write(f"[{timestamp}]\n{message}\n")
 
-    def get_progress(self) -> float:
+    def get_progress(self) -> float | None:
+        if self.n_success is None or self.n_failed is None or self.n_total is None:
+            return None
+
         if self.n_total == 0:
             return 1
 
@@ -1193,12 +1300,7 @@ class GridRun(FolderWithInfoYamlResource[str, str]):
         return n_finished / self.n_total
 
     def get_progress_info(self):
-        progress = self.get_progress()
-        n_remaining = self.n_total - self.n_success - self.n_failed
-        return (
-            f"{progress:.1%} ({self.n_success} successful, {self.n_failed} failed, "
-            f"{n_remaining} remaining of {self.n_total})"
-        )
+        return progress_info(self.n_success, self.n_failed, self.n_total)
 
 
 def _standardize_value(value: Any) -> Any:
