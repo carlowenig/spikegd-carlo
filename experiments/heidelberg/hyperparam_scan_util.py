@@ -1118,18 +1118,28 @@ class GridScan(FolderWithInfoYamlResource[str]):
 
         return info
 
-    def create_progress_widget(self):
-        from ipywidgets import HTML, FloatProgress, HBox, Layout, VBox
+    def create_progress_widget(self, score_key=None, score_fmt=".3f"):
+        from ipywidgets import HTML, Accordion, FloatProgress, HBox, Layout, VBox
 
         active_runs = sorted(self.load_active_runs().values(), key=lambda run: run.id)
 
-        children: list = [HTML(f"<h3>{len(active_runs)} active runs</h3>")]
+        children: list = [HTML(f"<h3>{len(active_runs)} active runs</h3><hr>")]
+
+        if score_key:
+            trials_df, _ = self.load_trials_and_epochs_dfs()
+
+            if score_key not in trials_df:
+                raise ValueError(
+                    f"Score key {score_key!r} not found in trials DataFrame"
+                )
+
+            trials_df.sort_values(score_key, inplace=True, ascending=False)
 
         for run in active_runs:
             progress = run.get_progress()
 
             if progress is None:
-                children.append(HTML(f"{run.id}: Unknown progress"))
+                children.append(HTML(f"<b>{run.id}:</b> Unknown progress"))
             else:
                 pbar = FloatProgress(
                     progress,
@@ -1140,13 +1150,29 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 children.append(
                     HBox(
                         [
-                            HTML(f"{run.id}: "),
+                            HTML(f"<b>{run.id}:</b> "),
                             pbar,
                             HTML(run.get_progress_info()),
                         ],
                         layout=Layout(align_items="baseline"),
                     )
                 )
+
+            if score_key:
+                best_trials = trials_df[trials_df["run_id"] == run.id]
+
+                if len(best_trials) > 0:
+                    best_trial = best_trials.iloc[0]
+                    children.append(
+                        Accordion(
+                            titles=[
+                                f"Best Trial:  {score_key} = {best_trial[score_key]:{score_fmt}}"
+                            ],
+                            children=[HTML(best_trial.to_frame("Values").to_html())],
+                        )
+                    )
+
+            children.append(HTML("<hr>"))
 
         n_success_total = sum(run.n_success or 0 for run in active_runs)
         n_failed_total = sum(run.n_failed or 0 for run in active_runs)
@@ -1164,7 +1190,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
         children.append(
             HBox(
                 [
-                    HTML("<b>TOTAL: </b>"),
+                    HTML("<b>TOTAL:</b> "),
                     FloatProgress(
                         total_progress, min=0, max=1, layout=Layout(margin="0 1em")
                     ),
@@ -1174,14 +1200,25 @@ class GridScan(FolderWithInfoYamlResource[str]):
             )
         )
 
+        if score_key and len(trials_df) > 0:
+            best_trial = trials_df.iloc[0]
+            children.append(
+                Accordion(
+                    titles=[
+                        f"Best Trial:  {score_key} =  {best_trial[score_key]:{score_fmt}}"
+                    ],
+                    children=[HTML(best_trial.to_frame("Values").to_html())],
+                )
+            )
+
         return VBox(children)
 
-    def show_progress(self):
+    def show_progress(self, **kwargs):
         from IPython.display import display
 
-        display(self.create_progress_widget())
+        display(self.create_progress_widget(**kwargs))
 
-    def watch_progress(self, interval: float = 5.0, max_updates=100):
+    def watch_progress(self, interval: float = 5.0, max_updates=100, **kwargs):
         from IPython.display import display
         from ipywidgets import HTML, Output
 
@@ -1194,7 +1231,7 @@ class GridScan(FolderWithInfoYamlResource[str]):
         update_info = HTML("(waiting)")
 
         for _ in range(max_updates):
-            progress_widget = self.create_progress_widget()
+            progress_widget = self.create_progress_widget(**kwargs)
 
             with output:
                 output.clear_output(wait=True)
