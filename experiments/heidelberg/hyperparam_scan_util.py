@@ -454,6 +454,7 @@ def _load_trial_dict_and_epoch_dicts(
 
     assert isinstance(trial_dict, dict)
 
+    # Process config
     config = trial_dict.pop("config")
     assert isinstance(config, dict)
 
@@ -462,17 +463,31 @@ def _load_trial_dict_and_epoch_dicts(
             continue
         trial_dict[f"config.{key}"] = value
 
+    # Process metrics
     metrics = trial_dict.pop("metrics")
-    assert isinstance(metrics, dict)
-
     epoch_dicts = metrics.pop("epochs", [])
-    assert isinstance(epoch_dicts, list)
+    train_epoch_dicts = metrics.pop("train_epochs", [])
+    assert isinstance(metrics, dict)
 
     for key, value in metrics.items():
         trial_dict[f"metrics.{key}"] = value
 
+    # Process epochs
+    assert isinstance(epoch_dicts, list)
+    assert isinstance(train_epoch_dicts, list)
+
+    if train_epoch_dicts:
+        assert len(epoch_dicts) == len(train_epoch_dicts)
+
     for epoch, epoch_dict in enumerate(epoch_dicts):
         assert isinstance(epoch_dict, dict)
+
+        if train_epoch_dicts:
+            assert isinstance(train_epoch_dicts[epoch], dict)
+            epoch_dict.update(
+                {f"train_{k}": v for k, v in train_epoch_dicts[epoch].items()}
+            )
+
         epoch_dict["scan_id"] = scan_id
         epoch_dict["config_hash"] = config_hash
         epoch_dict["epoch"] = epoch
@@ -550,6 +565,24 @@ def _update_trial(
                 f"Could not revert to old trial {old_config_hash}. "
                 "This trial is now lost."
             ) from e
+
+
+def _delete_trial(
+    scan_id: str,
+    scan_root: PathLike,
+    old_config_hash: str,
+    predicate: Callable[["GridTrial"], bool] | None = None,
+) -> bool:
+    try:
+        trial = GridTrial.load(scan_id, old_config_hash, root=scan_root)
+    except Exception as e:
+        raise ValueError(f"Could not load trial {old_config_hash}") from e
+
+    if predicate is None or predicate(trial):
+        trial.delete()
+        return True
+    else:
+        return False
 
 
 @dataclass
@@ -858,6 +891,30 @@ class GridScan(FolderWithInfoYamlResource[str]):
                 f"Unchanged: {unchanged_count}\n"
                 f"Skipped: {skipped_count}"
             )
+
+    def delete_trials(
+        self,
+        predicate: Callable[["GridTrial"], bool] | None = None,
+        verbose=True,
+        parallel=True,
+    ):
+        old_config_hashes = self.load_trial_config_hashes()
+
+        results = advanced_map(
+            partial(
+                _delete_trial,
+                self.id,
+                self.root,
+                predicate=predicate,
+            ),
+            old_config_hashes,
+            progress=verbose,
+            parallel=parallel,
+        )
+
+        if verbose:
+            deleted_count = sum(results)
+            print(f"Deleted {deleted_count} of {len(old_config_hashes)} trials")
 
     def run(
         self,

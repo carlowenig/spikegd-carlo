@@ -7,8 +7,8 @@ import jax
 import numpy as np
 
 # jax.distributed.initialize()  # type: ignore
-from heidelberg_v02 import load_datasets, run_theta_ensemble
-from hyperparam_scan_util import GridScan, vary
+from heidelberg_v02_more_metrics import load_datasets, run_theta_ensemble
+from hyperparam_scan_util import GridScan, computed, vary
 
 assert (
     Path.cwd().as_posix().endswith("experiments/heidelberg")
@@ -31,12 +31,12 @@ config_grid = {
     "device_count": len(devices),
     "seed": 0,
     # Neuron
-    # "tau": vary(
-    #     # 25 points between 2^-4 = 0.0625 and 2^8 = 256
-    #     # (13 points at exact powers of 2, 12 points in between)
-    #     *np.logspace(-4, 8, num=7, base=2)
-    # ),
-    "tau": 1,
+    "tau": vary(
+        # 25 points between 2^-4 = 0.0625 and 2^8 = 256
+        # (13 points at exact powers of 2, 12 points in between)
+        *np.logspace(-4, 8, num=13, base=2)
+    ),
+    # "tau": 1,
     "I0": 5 / 4,
     "eps": 1e-6,
     # Network
@@ -46,12 +46,12 @@ config_grid = {
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
-    # "T": vary(
-    #     # 25 points between 2^-4 = 0.0625 and 2^8 = 256
-    #     # (13 points at exact powers of 2, 12 points in between)
-    #     *np.logspace(-4, 8, num=7, base=2)
-    # ),
-    "T": vary(2, 4, 8),
+    "T": vary(
+        # 25 points between 2^-4 = 0.0625 and 2^8 = 256
+        # (13 points at exact powers of 2, 12 points in between)
+        *np.logspace(-4, 8, num=13, base=2)
+    ),
+    # "T": 4,
     "K": 700,  # Maximal number of simulated ordinary spikes
     # "Kin":   # Maximal number of input spikes
     "dt": 0.001,  # Step size used to compute state traces
@@ -77,8 +77,8 @@ config_grid = {
     # Output function
     "out_func": "max_over_time_potential",
     # Readout layer params (e.g. used by max_over_time_potential)
-    "readout_V0": vary(*np.logspace(0, 12, num=13, base=2)),
-    "readout_w": vary(*np.logspace(0, 12, num=13, base=2)),
+    "readout_V0": vary(64, 128, 256),
+    "readout_w": computed(lambda readout_V0: readout_V0),
 }
 
 scan = GridScan.load_or_create("main_v2.1_max_over_time", root="results")
