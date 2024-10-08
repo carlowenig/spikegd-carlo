@@ -3,7 +3,7 @@
 import itertools
 from abc import ABC, abstractmethod
 from types import MappingProxyType
-from typing import Any, Iterable, Literal, Mapping
+from typing import Any, Iterable, Literal, Mapping, Sequence
 
 import attrs
 import jax.numpy as jnp
@@ -369,21 +369,22 @@ class LinePlot(Plot):
             )
 
 
-def _set_value_ticks(ax, axis, vals, max_ticks=8):
+type Axis = Literal["x", "y"]
+
+
+def _set_value_ticks(ax: Axes, axis: Axis, vals, max_ticks: int | None = 8, **kwargs):
     step = 1
     indices = np.arange(0, len(vals))
-    while len(indices) > max_ticks:
+    while max_ticks is not None and len(indices) > max_ticks:
         indices = np.arange(0, len(vals), step)
         step += 1
 
     labels = [fmt_number(val) for val in np.asarray(vals)[indices]]
 
     if axis == "x":
-        ax.set_xticks(indices)
-        ax.set_xticklabels(labels)
+        ax.set_xticks(indices, labels, **kwargs)
     elif axis == "y":
-        ax.set_yticks(indices)
-        ax.set_yticklabels(labels)
+        ax.set_yticks(indices, labels, **kwargs)
     else:
         raise ValueError(f"Invalid axis {axis!r}")
 
@@ -445,6 +446,36 @@ def get_contrast_color(color: Color) -> Color:
 
 
 @attrs.define(frozen=True)
+class ValueTicks(Plot):
+    arg_axes: Mapping[str, Axis] | Sequence[Axis] = attrs.field(default=("x", "y"))
+    max_ticks: int | None = attrs.field(default=None)
+    text_kwargs: dict[str, Any] = attrs.field(factory=dict)
+
+    def draw_to_ax(
+        self,
+        grid: "PlotGrid",
+        full_df: pd.DataFrame,
+        ax: Axes,
+        ax_df: pd.DataFrame,
+        func_key: str,
+        func_agg: str | None,
+    ):
+        if isinstance(self.arg_axes, Mapping):
+            arg_axes: list[Axis | None] = [
+                self.arg_axes.get(arg_key, None) for arg_key in grid.arg_keys
+            ]
+        else:
+            arg_axes = list(self.arg_axes)
+
+        for arg_axis, arg_key in zip(arg_axes, grid.arg_keys):
+            if arg_axis is None:
+                continue
+
+            vals = _get_val_list(full_df, arg_key, grid.min_points_per_ax)
+            _set_value_ticks(ax, arg_axis, vals, self.max_ticks, **self.text_kwargs)
+
+
+@attrs.define(frozen=True)
 class HeatmapPlot(Plot):
     cmap: mcolors.Colormap = attrs.field(
         default=plt.get_cmap("viridis"), converter=plt.get_cmap
@@ -498,15 +529,21 @@ class HeatmapPlot(Plot):
         for x_i, y_i in np.ndindex(shape):
             mask = (ax_df[x_key] == x_vals[x_i]) & (ax_df[y_key] == y_vals[y_i])
             count = len(ax_df[mask])
+            func_vals = ax_df[mask][func_key]
 
             if func_agg is not None:
-                func_val = ax_df[mask][func_key].agg(func_agg)
+                func_val = func_vals.agg(func_agg)
             elif count == 1:
-                func_val = ax_df[mask][func_key].iloc[0]
+                func_val = func_vals.iloc[0]
+            elif count == 0:
+                func_val = np.nan
             else:
+                variables = [
+                    col for col in ax_df.columns if ax_df[mask][col].nunique() > 1
+                ]
                 raise ValueError(
                     f"func_agg for {func_key} must be specified since multiple values "
-                    f"per ({x_key}, {y_key})-pair are present"
+                    f"per ({x_key}, {y_key})-pair are present. They vary in {variables}."
                 )
 
             data[x_i, y_i] = func_val
@@ -557,9 +594,6 @@ class HeatmapPlot(Plot):
                     fontsize=8,
                     transform=ax.transData,
                 )
-
-        _set_value_ticks(ax, "x", x_vals)
-        _set_value_ticks(ax, "y", y_vals)
 
     def style_grid(
         self, grid: "PlotGrid", fig: Figure, axs: np.ndarray, full_df: pd.DataFrame
@@ -625,6 +659,10 @@ def plots_inferrer(plots: Iterable[Plot], owner: Any) -> tuple[Plot, ...]:
         raise ValueError(
             "Cannot infer plot_type from PlotGrid.arg_keys. Please specify it explicitly."
         )
+
+
+# class Layer:
+#     def draw()
 
 
 @attrs.define(frozen=True)

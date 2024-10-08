@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from fractions import Fraction
-from typing import Any, Callable, Iterable, Mapping
+from typing import Any, Callable, Iterable, Literal, Mapping
 
 import numpy as np
 
@@ -53,7 +53,18 @@ def fmt_constant_with_coeff(name, power, coeff):
     return s
 
 
-def fmt_number(num: float, value_format: Any = ".3g"):
+def _get_magnitude(num: float) -> int:
+    return int(np.floor(np.log10(abs(num)))) if num != 0 else 0
+
+
+assert _get_magnitude(0) == 0
+assert _get_magnitude(0.123) == -1
+assert _get_magnitude(1) == 0
+assert _get_magnitude(1.123) == 0
+assert _get_magnitude(1e6) == 6
+
+
+def fmt_number(num: float, value_format: Any = "{:.3g}") -> str:
     if np.isnan(num):
         return "NaN"
 
@@ -66,7 +77,92 @@ def fmt_number(num: float, value_format: Any = ".3g"):
     if num.is_integer() and num < 1e6:
         return str(int(num))
 
-    return f"{num:{value_format}}"
+    return fmt(num, value_format)
+
+
+def _scientific_power(num: float) -> int:
+    magnitude = _get_magnitude(num)
+
+    if magnitude > 6 or magnitude < -3:
+        return magnitude
+    else:
+        return 0
+
+
+def _scientific_coeff(
+    num: float,
+    pow: int | Literal["infer"] = "infer",
+):
+    if pow == "infer":
+        pow = _scientific_power(num)
+
+    coeff = num * 10 ** (-pow)
+
+    return coeff
+
+
+def _scientific_number(
+    num: float,
+    pow: int | Literal["infer"] = "infer",
+) -> tuple[float, int]:
+    if pow == "infer":
+        pow = _scientific_power(num)
+
+    coeff = _scientific_coeff(num, pow)
+
+    return coeff, pow
+
+
+def _get_number_format(
+    *nums: float,
+    precision: int = 3,
+    pow: int | Literal["infer"] = "infer",
+) -> "Formatter | str":
+    min_num = min(nums, key=abs)
+
+    if pow == "infer":
+        pow = _scientific_power(min_num)
+
+    if pow == 0:
+        min_mag = _get_magnitude(min_num)
+        decimals = max(0, -(min_mag + 1)) + precision
+
+        return f"{{:.{decimals}f}}"
+
+    else:
+
+        def formatter(num):
+            coeff = _scientific_coeff(num, pow)
+            return f"{coeff:.{precision - 1}f}E{pow}"
+
+        return formatter
+
+
+def fmt_numbers_equally(*nums: float, precision: int = 3) -> tuple[str, ...]:
+    value_format = _get_number_format(*nums, precision=precision)
+    return tuple(fmt(num, value_format) for num in nums)
+
+
+def fmt_number_with_error(
+    num: float,
+    err: float,
+    err_precision: int = 2,
+    pow: int | Literal["infer"] = "infer",
+):
+    if pow == "infer":
+        pow = _scientific_power(num)
+
+    num_coeff = _scientific_coeff(num, pow)
+    err_coeff = _scientific_coeff(err, pow)
+
+    value_format = _get_number_format(err_coeff, precision=err_precision, pow=0)
+
+    s = f"{fmt(num_coeff, value_format)} ± {fmt(err_coeff, value_format)}"
+
+    if pow != 0:
+        s = f"({s})E{pow}"
+
+    return s
 
 
 # TIME
