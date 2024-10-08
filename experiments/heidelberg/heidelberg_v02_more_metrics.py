@@ -10,11 +10,11 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Bool, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
-from shd import SHD
 from torch.utils.data import DataLoader, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
+from shd import SHD
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
@@ -756,11 +756,13 @@ def run(
     probe_time_total = 0.0
     N_probe_samples = len(train_loader.dataset) + len(test_loader.dataset)  # type: ignore
 
-    p_best_test_acc = p_init
-    best_test_acc = test_metrics["acc"][-1]
+    p_best_acc = p_init
+    epoch_best_acc = 0
+    best_acc = test_metrics["acc"][-1]
 
     # Training
-    for epoch in trange(Nepochs):
+    # (start from 1 since 0th epoch is used for initial state)
+    for epoch in trange(1, Nepochs + 1):
         opt_start = time.perf_counter()
 
         for data in train_loader:
@@ -784,9 +786,10 @@ def run(
         probe_time = time.perf_counter() - probe_start
         probe_time_total += probe_time
 
-        if test_metric["acc"] > best_test_acc:
-            best_test_acc = test_metric["acc"]
-            p_best_test_acc = p
+        if test_metric["acc"] > best_acc:
+            best_acc = test_metric["acc"]
+            p_best_acc = p
+            epoch_best_acc = epoch
 
     train_time = time.perf_counter() - train_start
 
@@ -803,7 +806,14 @@ def run(
     params = {
         "init": p_init,
         "final": p,
-        "best_test_acc": p_best_test_acc,
+        "best_acc": p_best_acc,
+        "_meta": {
+            "epochs": {
+                "init": 0,
+                "final": epoch,
+                "best_acc": epoch_best_acc,
+            }
+        },
     }
 
     perf_metrics = {
@@ -832,7 +842,11 @@ def run(
 
 
 def run_example(
-    p: list, neuron: AbstractPseudoPhaseOscNeuron, data_loaders, config: dict
+    p: list,
+    neuron: AbstractPseudoPhaseOscNeuron,
+    data_loaders,
+    config: dict,
+    sample_index=0,
 ) -> dict:
     """
     Simulates the network for a single example input given the parameters `p`.
@@ -859,7 +873,7 @@ def run_example(
     _, test_loader = data_loaders
 
     input, label = next(iter(test_loader))
-    input, label = jnp.array(input[2]), jnp.array(label[2])
+    input, label = jnp.array(input[sample_index]), jnp.array(label[sample_index])
     out = jeventffwd(p, input)
     t_outs = joutfn(out, p)
 
@@ -950,6 +964,28 @@ def plot_spikes(ax: Axes, example: dict, config: dict) -> None:
         [0, Nhidden - 1, 2 * Nhidden - 1, N - 1],
         [str(1), str(Nhidden), str(2 * Nhidden), str(N)],
     )
+    ax.set_ylim(-tick_len / 2, N - 1 + tick_len / 2)
+    ax.set_ylabel("Neuron", labelpad=-0.1)
+
+
+def plot_output_spikes(ax: Axes, example: dict, config: dict) -> None:
+    ### Unpack arguments
+    T: float = config["T"]
+    Nhidden: int = config["Nhidden"]
+    Nlayer: int = config["Nlayer"]
+    Nout: int = config["Nout"]
+    N = (Nlayer - 1) * Nhidden + Nout
+    spiketimes: Array = example["spiketimes"]
+
+    spiketimes = spiketimes[N - Nout :]
+    
+    ### Plot spikes
+    tick_len = 2
+    ax.eventplot(spiketimes, colors="k", linewidths=0.5, linelengths=tick_len)
+
+    ### Formatting
+    ax.set_xlim(0, T)
+    ax.set_xlabel("Time $t$", labelpad=-3)
     ax.set_ylim(-tick_len / 2, N - 1 + tick_len / 2)
     ax.set_ylabel("Neuron", labelpad=-0.1)
 
@@ -1048,13 +1084,13 @@ def run_theta(
 
 
 def run_theta_example(
-    data_loaders: tuple[DataLoader, DataLoader], p: list, config: dict
+    data_loaders: tuple[DataLoader, DataLoader], p: list, config: dict, **kwargs
 ) -> dict:
     from spikegd.theta import ThetaNeuron
 
     tau, I0, eps = config["tau"], config["I0"], config["eps"]
     neuron = ThetaNeuron(tau, I0, eps)
-    return run_example(p, neuron, data_loaders, config)
+    return run_example(p, neuron, data_loaders, config, **kwargs)
 
 
 def summarize_ensemble_metrics(ensemble_metrics: dict, Nepochs: int) -> dict:

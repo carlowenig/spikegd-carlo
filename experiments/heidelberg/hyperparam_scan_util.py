@@ -29,7 +29,6 @@ from typing import (
 import numpy as np
 import pandas as pd
 import yaml
-from tqdm import tqdm
 
 from spikegd.utils.formatting import (
     fmt_dict_multiline,
@@ -444,18 +443,18 @@ def _load_run_dict(scan_id: str, scan_root: PathLike, run_id: str) -> dict:
     return run_dict
 
 
-def _load_trial_dict_and_epoch_dicts(
-    scan_id: str, scan_root: PathLike, config_hash: str
-) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    path = GridTrial.get_abs_path_of(scan_id, config_hash, root=scan_root)
+def _load_trial(scan_id: str, scan_root: PathLike, config_hash: str):
+    return GridTrial.load(scan_id, config_hash, root=scan_root)
 
-    with path.open("r") as f:
+
+def _load_trial_dict_and_epoch_dicts_from_path(path: Path | str):
+    with open(path, "r") as f:
         trial_dict = yaml.load(f, yaml.Loader)
 
     assert isinstance(trial_dict, dict)
 
     # Process config
-    config = trial_dict.pop("config")
+    config = trial_dict.pop("config", {})
     assert isinstance(config, dict)
 
     for key, value in config.items():
@@ -464,7 +463,7 @@ def _load_trial_dict_and_epoch_dicts(
         trial_dict[f"config.{key}"] = value
 
     # Process metrics
-    metrics = trial_dict.pop("metrics")
+    metrics = trial_dict.pop("metrics", {})
     epoch_dicts = metrics.pop("epochs", [])
     train_epoch_dicts = metrics.pop("train_epochs", [])
     assert isinstance(metrics, dict)
@@ -488,9 +487,21 @@ def _load_trial_dict_and_epoch_dicts(
                 {f"train_{k}": v for k, v in train_epoch_dicts[epoch].items()}
             )
 
+        epoch_dict["epoch"] = epoch
+
+    return trial_dict, epoch_dicts
+
+
+def _load_trial_dict_and_epoch_dicts(
+    scan_id: str, scan_root: PathLike, config_hash: str
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    path = GridTrial.get_abs_path_of(scan_id, config_hash, root=scan_root)
+
+    trial_dict, epoch_dicts = _load_trial_dict_and_epoch_dicts_from_path(path)
+
+    for epoch_dict in epoch_dicts:
         epoch_dict["scan_id"] = scan_id
         epoch_dict["config_hash"] = config_hash
-        epoch_dict["epoch"] = epoch
 
     return trial_dict, epoch_dicts
 
@@ -701,16 +712,21 @@ class GridScan(FolderWithInfoYamlResource[str]):
     def load_trial(self, config_hash: str):
         return GridTrial.load(self.id, config_hash, root=self.root)
 
-    def load_trials(self, *, progress=False):
-        if progress:
-            print(f"Loading trials for scan {self.id}...")
-        return {
-            config_hash: self.load_trial(config_hash)
-            for config_hash in tqdm(
-                self.load_trial_config_hashes(),
-                disable=not progress,
-            )
-        }
+    def load_trials(
+        self, *, progress=False, config_hashes: list[str] | None = None, parallel=True
+    ):
+        # if progress:
+        #     print(f"Loading trials for scan {self.id}...")
+
+        if config_hashes is None:
+            config_hashes = self.load_trial_config_hashes()
+
+        return advanced_map(
+            partial(_load_trial, self.id, self.root),
+            config_hashes,
+            progress=progress,
+            parallel=parallel,
+        )
 
     def load_trials_and_epochs_dfs(
         self, *, progress=False, config_hashes: list[str] | None = None, parallel=True
@@ -832,23 +848,37 @@ class GridScan(FolderWithInfoYamlResource[str]):
         return np.mean(
             [
                 trial.duration
-                for trial in self.load_trials().values()
+                for trial in self.load_trials()
                 if trial.duration is not None
             ]
         ).item()
 
+    def load_best_trials(
+        self, metric: str, n: int | None = None, high_is_good=True, progress=False
+    ):
+        trials = self.load_trials(progress=progress)
+        trials.sort(key=lambda trial: trial.metrics[metric], reverse=high_is_good)
+        if n is not None:
+            trials = trials[:n]
+        return trials
+
+    def load_best_trial(self, metric: str, high_is_good=True, progress=False):
+        return self.load_best_trials(
+            metric, high_is_good=high_is_good, progress=progress
+        )[0]
+
     def clean(self, *, delete_unsuccessful_trials=True, delete_empty_runs=True):
-        trials = self.load_trials()
+        trials_dict = {trial.config_hash: trial for trial in self.load_trials()}
 
         if delete_unsuccessful_trials:
-            for trial_id, trial in trials.copy().items():
+            for config_hash, trial in trials_dict.copy().items():
                 if trial.error is not None:
-                    print(f"Deleting unsuccessful trial {trial_id}")
+                    print(f"Deleting unsuccessful trial {config_hash}")
                     trial.delete()
-                    del trials[trial_id]
+                    del trials_dict[config_hash]
 
         if delete_empty_runs:
-            non_empty_run_ids = {trial.run_id for trial in trials.values()}
+            non_empty_run_ids = {trial.run_id for trial in trials_dict.values()}
             empty_run_ids = set(self.load_run_ids()) - non_empty_run_ids
 
             for run_id in empty_run_ids:
