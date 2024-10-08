@@ -10,11 +10,11 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Bool, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
+from shd import SHD
 from torch.utils.data import DataLoader, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
-from shd import SHD
 from spikegd.models import AbstractPhaseOscNeuron, AbstractPseudoPhaseOscNeuron
 from spikegd.utils.plotting import formatter, petroff10
 
@@ -1031,9 +1031,8 @@ def plot_traces(ax: Axes, example: dict, config: dict) -> None:
 
 
 def run_theta(
-    datasets,
+    data_loaders: tuple[DataLoader, DataLoader],
     config: dict,
-    data_loaders: tuple[DataLoader, DataLoader] | None = None,
     **kwargs,
 ):
     """
@@ -1043,12 +1042,19 @@ def run_theta(
     """
     from spikegd.theta import ThetaNeuron
 
-    if data_loaders is None:
-        data_loaders = load_data(datasets, config)
-
     tau, I0, eps = config["tau"], config["I0"], config["eps"]
     neuron = ThetaNeuron(tau, I0, eps)
     return run(neuron, data_loaders, config, **kwargs)
+
+
+def run_theta_example(
+    data_loaders: tuple[DataLoader, DataLoader], p: list, config: dict
+) -> dict:
+    from spikegd.theta import ThetaNeuron
+
+    tau, I0, eps = config["tau"], config["I0"], config["eps"]
+    neuron = ThetaNeuron(tau, I0, eps)
+    return run_example(p, neuron, data_loaders, config)
 
 
 def summarize_ensemble_metrics(ensemble_metrics: dict, Nepochs: int) -> dict:
@@ -1145,7 +1151,7 @@ def run_theta_ensemble(
     for seed in seeds:
         config_theta = {**config, "seed": seed}
         params, test_metrics, train_metrics, perf_metrics = run_theta(
-            datasets, config_theta, data_loaders, **kwargs
+            data_loaders, config_theta, **kwargs
         )
         params_list.append(params)
         test_metrics_list.append(test_metrics)
