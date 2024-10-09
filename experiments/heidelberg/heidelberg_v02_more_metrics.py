@@ -10,7 +10,7 @@ from jax import jit, random, value_and_grad, vmap
 from jaxtyping import Array, ArrayLike, Bool, Float, Int
 from matplotlib.axes import Axes
 from matplotlib.patches import Rectangle
-from torch.utils.data import DataLoader, Subset, TensorDataset
+from torch.utils.data import DataLoader, Dataset, Subset, TensorDataset
 from tqdm import trange as trange_script
 from tqdm.notebook import trange as trange_notebook
 
@@ -844,7 +844,7 @@ def run(
 def run_example(
     p: list,
     neuron: AbstractPseudoPhaseOscNeuron,
-    data_loaders,
+    dataset: Dataset,
     config: dict,
     sample_index=0,
 ) -> dict:
@@ -870,10 +870,8 @@ def run_example(
     ### Run simulation
 
     # Data
-    _, test_loader = data_loaders
-
-    input, label = next(iter(test_loader))
-    input, label = jnp.array(input[sample_index]), jnp.array(label[sample_index])
+    input, label = map(jnp.array, dataset[sample_index])
+    # input, label = jnp.array(input[sample_index]), jnp.array(label[sample_index])
     out = jeventffwd(p, input)
     t_outs = joutfn(out, p)
 
@@ -978,7 +976,7 @@ def plot_output_spikes(ax: Axes, example: dict, config: dict) -> None:
     spiketimes: Array = example["spiketimes"]
 
     spiketimes = spiketimes[N - Nout :]
-    
+
     ### Plot spikes
     tick_len = 2
     ax.eventplot(spiketimes, colors="k", linewidths=0.5, linelengths=tick_len)
@@ -1083,14 +1081,12 @@ def run_theta(
     return run(neuron, data_loaders, config, **kwargs)
 
 
-def run_theta_example(
-    data_loaders: tuple[DataLoader, DataLoader], p: list, config: dict, **kwargs
-) -> dict:
+def run_theta_example(dataset: Dataset, p: list, config: dict, **kwargs) -> dict:
     from spikegd.theta import ThetaNeuron
 
     tau, I0, eps = config["tau"], config["I0"], config["eps"]
     neuron = ThetaNeuron(tau, I0, eps)
-    return run_example(p, neuron, data_loaders, config, **kwargs)
+    return run_example(p, neuron, dataset, config, **kwargs)
 
 
 def summarize_ensemble_metrics(ensemble_metrics: dict, Nepochs: int) -> dict:

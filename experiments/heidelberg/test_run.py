@@ -62,8 +62,13 @@ print(f"Local devices: {devices}")
 #     "readout_w": 64,
 # }
 
-scan = GridScan.load("main_v2.1_max_over_time", root="results")
-trial = scan.load_trial("b647c3b7fe874a3f60bf7b58cfea7c79")
+name = "v2.1_first_spike_time_best"
+
+# scan = GridScan.load("main_v2.1_max_over_time", root="results")
+# trial = scan.load_trial("b647c3b7fe874a3f60bf7b58cfea7c79")
+
+scan = GridScan.load("main_v2.1", root="results")
+trial = scan.load_trial("d843e4f7e1f26c0038cbb40204f8c6a7")
 print(trial)
 config = trial.config.copy()
 config["Nepochs"] = 100
@@ -78,8 +83,11 @@ params = metrics.pop("params")
 
 result_dict = {"config": config, "metrics": metrics}
 
-with open("test_result.yaml", "w") as f:
+path = Path("results/test_runs") / name
+path.mkdir(parents=True, exist_ok=True)
+
+with open(path / "results.yaml", "w") as f:
     yaml.dump(standardize_value(result_dict), f, sort_keys=False)
 
-with open("test_params.pickle", "wb") as f:
+with open(path / "params.pickle", "wb") as f:
     pickle.dump(params, f)
