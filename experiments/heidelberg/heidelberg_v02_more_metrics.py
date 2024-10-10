@@ -1,4 +1,5 @@
 import time
+import warnings
 from functools import partial
 
 import jax
@@ -266,50 +267,107 @@ def eventffwd(
     return out
 
 
-def leaky_evolve(
-    V: Float[Array, ""],
-    t: Float[Array, ""],
-    t_next: Float[Array, ""],
-    w: Float[Array, ""],
-    config: dict,
-) -> Float[Array, " N"]:
-    I0: float = config["I0"]
-    tau: float = config["tau"]
+# def leaky_integrate(
+#     times: Float[Array, " Nt"],
+#     V_0: Float[Array, ""],
+#     w: Float[Array, ""],
+#     spike_mask: Bool[Array, " Nt"],
+#     config: dict,
+# ) -> Float[Array, " Nt"]:
+#     Nt = len(times)  # number of time steps
+#     assert len(spike_mask) == Nt
 
-    # evolve without spikes between t_0 and t_next and add weight w afterwards
-    return (V - I0) * jnp.exp(-(t_next - t) / tau) + I0 + w
+#     # weights for actual spikes or 0 otherwise
+#     w_sp = jnp.where(spike_mask, w, 0)
+
+#     I0: float = config["I0"]
+#     tau: float = config["tau"]
+
+#     def spike_scanner(
+#         V: Float[Array, ""], i: Int[Array, ""]
+#     ) -> tuple[Float[Array, ""], Float[Array, ""]]:
+#         t_prev = jnp.where(i == 0, 0, times[i - 1])
+#         t_next = times[i]
+
+#         V_next = (V - I0) * jnp.exp(-(t_next - t_prev) / tau) + I0 + w_sp[i]
+
+#         return V_next, V_next
+
+#     _, V_arr = jax.lax.scan(spike_scanner, V_0, jnp.arange(Nt))
+
+#     return V_arr
 
 
+def assert_equal(*args, **kwargs):
+    arg_list = [(f"arg {i}", arg) for i, arg in enumerate(args)] + list(kwargs.items())
+    first_name, first_arg = arg_list.pop(0)
+
+    for name, arg in arg_list:
+        assert (
+            arg == first_arg
+        ), f"{name} does not equal {first_name}: {arg!r} != {first_arg!r}"
+
+
+def assert_shape(shape: tuple[int, ...], *args, **kwargs):
+    arg_list = [(f"array {i}", arg) for i, arg in enumerate(args)] + list(
+        kwargs.items()
+    )
+
+    for name, arg in arg_list:
+        assert (
+            arg_shape := jnp.shape(arg)
+        ) == shape, f"{name} has invalid shape. Expected {shape}, got {arg_shape}"
+
+
+def assert_same_shape(*args, **kwargs):
+    arg_list = [(f"array {i}", arg) for i, arg in enumerate(args)] + list(
+        kwargs.items()
+    )
+
+    first_name, first_arg = arg_list.pop(0)
+    first_shape = jnp.shape(first_arg)
+
+    for name, arg in arg_list:
+        assert (
+            (shape := jnp.shape(arg)) == first_shape
+        ), f"{name} has a different shape {shape} than {first_name} {first_shape}"
+
+
+@partial(
+    vmap, in_axes=(None, None, 0, 0, None, None)
+)  # vectorize along output neurons (weight vector (Nhidden,) -> weight matrix (Nout, Nhidden))
+@partial(vmap, in_axes=(0, None, None, None, None, None))  # vectorize along eval_times
 def leaky_integrate(
-    times: Float[Array, " N"],
+    eval_time: Float[Array, ""],
+    spikes: tuple[Float[Array, " K"], Int[Array, " K"]],
+    weights: Float[Array, " Nin"],
     V_0: Float[Array, ""],
-    w: Float[Array, ""],
-    spike_mask: Bool[Array, " N"],
+    input_spike_mask: Bool[Array, " K"],
     config: dict,
-) -> Float[Array, " N"]:
-    # compile evolve function with spike weight
-    # evolve_spike = jax.jit(partial(leaky_evolve, w=w, config=config))
-    # leak
+) -> Float[Array, ""]:
+    """"""
+    I_0 = config["I0"]
+    tau = config["tau"]
 
-    N = len(times)  # number of time steps
-    assert len(spike_mask) == N
+    spike_times, spike_neurons = spikes
+    assert_same_shape(
+        spike_times=spike_times,
+        spike_neurons=spike_neurons,
+        input_spike_mask=input_spike_mask,
+    )
+    # assert spike_times.shape == spike_neurons.shape
+    # assert input_spike_mask.shape == spike_times.shape
 
-    # weights for actual spikes or 0 otherwise
-    w_sp = jnp.where(spike_mask, w, 0)
+    spike_weights = weights[spike_neurons]
 
-    def spike_scanner(
-        V: Float[Array, ""], i: Int[Array, ""]
-    ) -> tuple[Float[Array, ""], Float[Array, ""]]:
-        t_prev = jnp.where(i == 0, 0, times[i - 1])
-        t_next = times[i]
-
-        V_next = leaky_evolve(V, t_prev, t_next, w_sp[i], config=config)
-
-        return V_next, V_next
-
-    _, V_arr = jax.lax.scan(spike_scanner, V_0, jnp.arange(N))
-
-    return V_arr
+    return (
+        (V_0 - I_0) * jnp.exp(-eval_time / tau)
+        + I_0
+        + jnp.sum(
+            spike_weights * jnp.exp(-(eval_time - spike_times) / tau),
+            where=(spike_times <= eval_time) & input_spike_mask,
+        )
+    )
 
 
 def outfn(
@@ -363,33 +421,49 @@ def outfn(
     elif out_func == "max_over_time_potential":
         T: float = config["T"]
         readout_V0: float = config["readout_V0"]
-        readout_w: float = config["readout_w"]
-        integration_times = jnp.append(times, T)
+        readout_w_factor: float = config["readout_w_factor"]
+        readout_tau_factor: float = config["readout_tau_factor"]
+        eval_times = jnp.append(times, T)
 
-        jleaky_integrate = jax.jit(
-            partial(
-                leaky_integrate,
-                times=integration_times,
-                V_0=readout_V0,  # type: ignore
-                w=readout_w,  # type: ignore
-                config=config,
-            )
+        output_weights = weights[Nlayer - 1]
+        assert_shape(
+            (Nout, Nhidden), output_weights=output_weights
+        )  # (see init_weights, output layer)
+
+        is_spike_in_last_hidden_layer = (neurons >= Nhidden * (Nlayer - 2)) & (
+            neurons < Nhidden * (Nlayer - 1)
         )
 
-        def compute_tout(i: ArrayLike):
-            spike_mask = (neurons == N - Nout + i) & (spike_in == False)  # noqa: E712
-            spike_mask = jnp.append(spike_mask, False)  # last time is T and no spike
+        V_0 = jnp.full(Nout, readout_V0)
 
-            V_arr = jleaky_integrate(spike_mask=spike_mask)
-            return jnp.max(V_arr)
+        V_arr = leaky_integrate(
+            eval_times,
+            (times, neurons),
+            output_weights * readout_w_factor,
+            V_0,
+            is_spike_in_last_hidden_layer,
+            config | {"tau": config["tau"] * readout_tau_factor},
+        )
+        assert_shape((Nout, len(eval_times)), V_arr=V_arr)
 
-        # use minus sign since -t_outs is used in log_softmax, but we want higher
-        # potentials to correspond to higher probabilities.
-        # TODO: use minus sign for first_spike_time instead to avoid double minus
-        t_outs = -vmap(compute_tout)(jnp.arange(Nout))
+        t_outs = -jnp.max(V_arr, axis=1)  # max over time
+
+        # def compute_tout(i: ArrayLike):
+        #     spike_mask = (neurons == N - Nout + i) & (spike_in == False)  # noqa: E712
+        #     spike_mask = jnp.append(spike_mask, False)  # last time is T and no spike
+
+        #     V_arr = jleaky_integrate(spike_mask=spike_mask)
+        #     return jnp.max(V_arr)
+
+        # # use minus sign since -t_outs is used in log_softmax, but we want higher
+        # # potentials to correspond to higher probabilities.
+        # # TODO: use minus sign for first_spike_time instead to avoid double minus
+        # t_outs = -vmap(compute_tout)(jnp.arange(Nout))
 
     else:
         raise ValueError(f"Unknown output function: {out_func}")
+
+    assert_shape((Nout,), t_outs=t_outs)
 
     return t_outs
 
@@ -419,7 +493,7 @@ def simulatefn(
     input: Int[Array, "Batch Nin"],
     labels: Int[Array, " Batch"],
     config: dict,
-) -> tuple[Array, Array]:
+) -> tuple[Array, Array, tuple]:
     """
     Simulates the network and computes the loss and accuracy for batched input.
     """
@@ -428,7 +502,7 @@ def simulatefn(
     loss, correct = vmap(lossfn, in_axes=(0, 0, None))(t_outs, labels, config)
     mean_loss = jnp.mean(loss)
     accuracy = jnp.mean(correct)
-    return mean_loss, accuracy
+    return mean_loss, accuracy, outs
 
 
 def probefn(
@@ -628,6 +702,8 @@ def run(
     tau_lr: float = config["tau_lr"]
     beta1: float = config["beta1"]
     beta2: float = config["beta2"]
+    T: float = config["T"]
+
     theta = neuron.Theta()
     if progress_bar == "notebook":
         trange = trange_notebook
@@ -644,9 +720,9 @@ def run(
     @partial(value_and_grad, has_aux=True)
     def gradfn(
         p: list, input: Int[Array, "Batch Nin"], labels: Int[Array, " Batch"]
-    ) -> tuple[Array, Array]:
-        loss, acc = simulatefn(neuron, p, input, labels, config)
-        return loss, acc
+    ) -> tuple[Array, tuple]:
+        loss, acc, outs = simulatefn(neuron, p, input, labels, config)
+        return loss, (acc, outs)
 
     # Regularization
     @jit
@@ -663,11 +739,11 @@ def run(
         labels: Int[Array, " Batch"],
         opt_state: optax.OptState,
     ) -> tuple:
-        (loss, acc), grad = gradfn(p, input, labels)
+        (loss, (acc, outs)), grad = gradfn(p, input, labels)
         updates, opt_state = optim.update(grad, opt_state)
         p = optax.apply_updates(p, updates)  # type: ignore
         p[1] = jnp.clip(p[1], 0, theta)
-        return loss, acc, p, opt_state
+        return loss, acc, p, opt_state, outs
 
     # Probe network
     @jit
@@ -769,7 +845,19 @@ def run(
             input, labels = jnp.array(data[0]), jnp.array(data[1])
             key, input = flip(key, input)
 
-            loss, acc, p, opt_state = trial(p, input, labels, opt_state)
+            loss, acc, p, opt_state, outs = trial(p, input, labels, opt_state)
+
+            out_ts = outs[0]
+            assert_equal(out_ts_last_dim_size=out_ts.shape[-1], K=config["K"])
+
+            out_final_ts = out_ts[:, -1]
+
+            if jnp.any(out_final_ts < T):
+                warnings.warn(
+                    f"Last simulated spike appeared before trial end, at "
+                    f"{out_final_ts[out_final_ts < T]}. "
+                    f"Try increasing K to simulate enough spikes."
+                )
 
         opt_time = time.perf_counter() - opt_start
         opt_time_total += opt_time
