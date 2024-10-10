@@ -88,12 +88,18 @@ arg_parser.add_argument("--id", type=str)
 arg_parser.add_argument("--n-jobs", type=int)
 arg_parser.add_argument("--job-index", type=int)
 arg_parser.add_argument("--preview", action="store_true")
+arg_parser.add_argument("--with-params", action="store_true")
 args = arg_parser.parse_args()
 
 datasets = load_datasets("data", verbose=True) if not args.preview else None
 
 scan.run(
-    partial(run_theta_ensemble, datasets, progress_bar="script"),
+    partial(
+        run_theta_ensemble,
+        datasets,
+        progress_bar="script",
+        return_params=args.with_params,
+    ),
     config_grid,
     show_metrics=(
         "loss_final_mean",
