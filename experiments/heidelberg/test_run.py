@@ -30,11 +30,11 @@ config = {
     # Network
     "Nin_virtual": 16,  # #Virtual input neurons = N_bin - 1
     "Nhidden": 128,
-    "Nlayer": 2,  # Number of layers (hidden layers + output layer)
+    "Nlayer": 3,  # Number of layers (hidden layers + output layer)
     "Nout": 20,
     "w_scale": 0.5,  # Scaling factor of initial weights
     # Trial
-    "T": 4,
+    "T": 2,
     "K": 700,  # Maximal number of simulated ordinary spikes
     # "Kin":   # Maximal number of input spikes
     "dt": 0.001,  # Step size used to compute state traces
@@ -46,7 +46,7 @@ config = {
     "beta1": 0.9,
     "beta2": 0.999,
     "p_flip": 0.0,
-    "Nepochs": 50,
+    "Nepochs": 10,
     "Ntrain": None,  # Number of training samples
     # SHD Quantization
     # "Nt": 10,
@@ -63,6 +63,7 @@ config = {
     "readout_V0": 0,
     "readout_w_factor": 1,
     "readout_tau_factor": 1,
+    "readout_I0": 0,
 }
 
 # ...OR LOAD A CONFIG

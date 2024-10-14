@@ -340,7 +340,7 @@ def assert_same_shape(*args, **kwargs):
 def leaky_integrate(
     eval_time: Float[Array, ""],
     spikes: tuple[Float[Array, " K"], Int[Array, " K"]],
-    weights: Float[Array, " Nin"],
+    weights: Float[Array, " N"],
     V_0: Float[Array, ""],
     input_spike_mask: Bool[Array, " K"],
     config: dict,
@@ -355,8 +355,11 @@ def leaky_integrate(
         spike_neurons=spike_neurons,
         input_spike_mask=input_spike_mask,
     )
-    # assert spike_times.shape == spike_neurons.shape
-    # assert input_spike_mask.shape == spike_times.shape
+
+    N = config["N"]
+    assert_shape((N,), weights=weights)
+    # assert jnp.any(spike_neurons >= N), "spike neuron index above N"
+    # assert jnp.any(spike_neurons < 0), "negative spike neuron index"
 
     spike_weights = weights[spike_neurons]
 
@@ -423,15 +426,32 @@ def outfn(
         readout_V0: float = config["readout_V0"]
         readout_w_factor: float = config["readout_w_factor"]
         readout_tau_factor: float = config["readout_tau_factor"]
-        eval_times = jnp.append(times, T)
+        readout_I0: float = config["readout_I0"]
+        eval_times = jnp.append(times, T)  # evaluate at every spike time
+        # TODO: only use spike times in last hidden layer?
 
         output_weights = weights[Nlayer - 1]
         assert_shape(
             (Nout, Nhidden), output_weights=output_weights
         )  # (see init_weights, output layer)
 
-        is_spike_in_last_hidden_layer = (neurons >= Nhidden * (Nlayer - 2)) & (
-            neurons < Nhidden * (Nlayer - 1)
+        # is_spike_in_last_hidden_layer = (
+        #     (neurons >= Nhidden * (Nlayer - 2))
+        #     & (neurons < Nhidden * (Nlayer - 1))
+        #     & (spike_in == False)
+        # )
+
+        weight_matrix = jnp.zeros((Nout, N))
+
+        last_hidden_start = N - Nout - Nhidden
+        last_hidden_end = N - Nout
+
+        weight_matrix.at[:, last_hidden_start:last_hidden_end].set(output_weights)
+
+        is_spike_in_last_hidden_layer = (
+            (neurons >= last_hidden_start)
+            & (neurons < last_hidden_end)
+            & (spike_in == False)
         )
 
         V_0 = jnp.full(Nout, readout_V0)
@@ -439,26 +459,14 @@ def outfn(
         V_arr = leaky_integrate(
             eval_times,
             (times, neurons),
-            output_weights * readout_w_factor,
+            weight_matrix * readout_w_factor,
             V_0,
             is_spike_in_last_hidden_layer,
-            config | {"tau": config["tau"] * readout_tau_factor},
+            {"tau": config["tau"] * readout_tau_factor, "I0": readout_I0, "N": N},
         )
         assert_shape((Nout, len(eval_times)), V_arr=V_arr)
 
         t_outs = -jnp.max(V_arr, axis=1)  # max over time
-
-        # def compute_tout(i: ArrayLike):
-        #     spike_mask = (neurons == N - Nout + i) & (spike_in == False)  # noqa: E712
-        #     spike_mask = jnp.append(spike_mask, False)  # last time is T and no spike
-
-        #     V_arr = jleaky_integrate(spike_mask=spike_mask)
-        #     return jnp.max(V_arr)
-
-        # # use minus sign since -t_outs is used in log_softmax, but we want higher
-        # # potentials to correspond to higher probabilities.
-        # # TODO: use minus sign for first_spike_time instead to avoid double minus
-        # t_outs = -vmap(compute_tout)(jnp.arange(Nout))
 
     else:
         raise ValueError(f"Unknown output function: {out_func}")
@@ -647,7 +655,7 @@ def run(
     data_loaders: tuple[DataLoader, DataLoader],
     config: dict,
     progress_bar: str | None = None,
-) -> tuple[dict, dict, dict, dict]:
+) -> tuple[dict, dict, dict, dict, dict]:
     """
     Trains a feedforward network with time-to-first-spike encoding on MNIST.
 
@@ -743,7 +751,7 @@ def run(
         updates, opt_state = optim.update(grad, opt_state)
         p = optax.apply_updates(p, updates)  # type: ignore
         p[1] = jnp.clip(p[1], 0, theta)
-        return loss, acc, p, opt_state, outs
+        return loss, acc, p, opt_state, outs, grad
 
     # Probe network
     @jit
@@ -820,8 +828,14 @@ def run(
     train_input = jnp.array(train_loader.dataset.tensors[0])  # type: ignore
     train_labels = jnp.array(train_loader.dataset.tensors[1])  # type: ignore
 
-    train_metrics: dict[str, Array | list] = {
+    train_metrics: dict = {
         k: [v] for k, v in probe(p, train_input, train_labels).items()
+    }
+
+    opt_metrics: dict = {
+        "weight_grad": [0.0],
+        "weight_in_grad": [0.0],
+        "weight_out_grad": [0.0],
     }
 
     init_time = time.perf_counter() - init_start
@@ -845,7 +859,7 @@ def run(
             input, labels = jnp.array(data[0]), jnp.array(data[1])
             key, input = flip(key, input)
 
-            loss, acc, p, opt_state, outs = trial(p, input, labels, opt_state)
+            loss, acc, p, opt_state, outs, grad = trial(p, input, labels, opt_state)
 
             out_ts = outs[0]
             assert_equal(out_ts_last_dim_size=out_ts.shape[-1], K=config["K"])
@@ -854,10 +868,24 @@ def run(
 
             if jnp.any(out_final_ts < T):
                 warnings.warn(
-                    f"Last simulated spike appeared before trial end, at "
-                    f"{out_final_ts[out_final_ts < T]}. "
+                    f"{jnp.sum(out_final_ts < T)} of {len(out_final_ts)} simulated "
+                    f"spikes appeared before trial end, starting at "
+                    f"{out_final_ts[out_final_ts < T].min()}."
                     f"Try increasing K to simulate enough spikes."
                 )
+
+            # for layer in range(Nlayer):
+            #     print(f"LAYER {layer}")
+
+            #     weights_grad = grad[0][layer]
+            #     if jnp.any(jnp.isnan(weights_grad)):
+            #         warnings.warn(
+            #             f"Found {jnp.sum(jnp.isnan(weights_grad))} nan weight gradients (of {jnp.size(weights_grad)} weights)."
+            #         )
+
+            #     print(f"Mean weight grad: {jnp.mean(weights_grad)}")
+            #     print(f"Min weight grad: {jnp.min(weights_grad)}")
+            #     print(f"Max weight grad: {jnp.max(weights_grad)}")
 
         opt_time = time.perf_counter() - opt_start
         opt_time_total += opt_time
@@ -870,6 +898,14 @@ def run(
 
         train_metric = probe(p, train_input, train_labels)
         train_metrics = {k: v + [train_metric[k]] for k, v in train_metrics.items()}
+
+        weight_grad = grad[0]
+        weight_mean_grads = jnp.array(
+            [jnp.mean(layer_grad) for layer_grad in weight_grad]
+        )
+        opt_metrics["weight_grad"].append(jnp.mean(weight_mean_grads))
+        opt_metrics["weight_in_grad"].append(weight_mean_grads[0])
+        opt_metrics["weight_out_grad"].append(weight_mean_grads[-1])
 
         probe_time = time.perf_counter() - probe_start
         probe_time_total += probe_time
@@ -890,6 +926,7 @@ def run(
 
     test_metrics = {k: jnp.array(v) for k, v in test_metrics.items()}
     train_metrics = {k: jnp.array(v) for k, v in train_metrics.items()}
+    opt_metrics = {k: jnp.array(v) for k, v in opt_metrics.items()}
 
     params = {
         "init": p_init,
@@ -920,7 +957,7 @@ def run(
         "probe_time_per_sample": probe_time_total / (Nepochs * N_probe_samples),
     }
 
-    return params, test_metrics, train_metrics, perf_metrics
+    return params, test_metrics, train_metrics, opt_metrics, perf_metrics
 
 
 # %%
@@ -1262,6 +1299,7 @@ def run_theta_ensemble(
     params_list = []
     test_metrics_list = []
     train_metrics_list = []
+    opt_metrics_list = []
     perf_metrics_list = []
 
     # load data once if not provided
@@ -1270,27 +1308,42 @@ def run_theta_ensemble(
 
     for seed in seeds:
         config_theta = {**config, "seed": seed}
-        params, test_metrics, train_metrics, perf_metrics = run_theta(
+        params, test_metrics, train_metrics, opt_metrics, perf_metrics = run_theta(
             data_loaders, config_theta, **kwargs
         )
         params_list.append(params)
         test_metrics_list.append(test_metrics)
         train_metrics_list.append(train_metrics)
+        opt_metrics_list.append(opt_metrics)
         perf_metrics_list.append(perf_metrics)
 
     test_metrics = jax.tree.map(lambda *args: jnp.stack(args), *test_metrics_list)
     train_metrics = jax.tree.map(lambda *args: jnp.stack(args), *train_metrics_list)
+    opt_metrics = jax.tree.map(lambda *args: jnp.stack(args), *opt_metrics_list)
     perf_metrics = jax.tree.map(lambda *args: jnp.stack(args), *perf_metrics_list)
 
-    summarized_test_metrics = summarize_ensemble_metrics(test_metrics, Nepochs)
-    summarized_train_metrics = summarize_ensemble_metrics(train_metrics, Nepochs)
-    summarized_perf_metrics = summarize_ensemble_metrics(perf_metrics, Nepochs)
+    # summarized_test_metrics = summarize_ensemble_metrics(test_metrics, Nepochs)
+    # summarized_train_metrics = summarize_ensemble_metrics(train_metrics, Nepochs)
+    # summarized_opt_metrics = summarize_ensemble_metrics(opt_metrics, Nepochs)
+    # summarized_perf_metrics = summarize_ensemble_metrics(perf_metrics, Nepochs)
 
-    metrics: dict = {
-        **summarized_test_metrics,
-        **{f"train_{key}": value for key, value in summarized_train_metrics.items()},
-        **summarized_perf_metrics,
-    }
+    # metrics: dict = {
+    #     **summarized_test_metrics,
+    #     **{f"train_{key}": value for key, value in summarized_train_metrics.items()},
+    #     **summarized_opt_metrics,
+    #     **summarized_perf_metrics,
+    # }
+
+    metrics = summarize_ensemble_metrics(
+        {
+            **test_metrics,
+            **{f"train_{key}": value for key, value in train_metrics.items()},
+            **opt_metrics,
+            **perf_metrics,
+        },
+        Nepochs,
+    )
+
     if return_params:
         metrics["params"] = params_list
 
